@@ -1,34 +1,93 @@
-version: "3.1"
-
+version: '3.1'
 intents:
-  - greet
-  - goodbye
-  - affirm
-  - deny
-  - mood_great
-  - mood_unhappy
-  - bot_challenge
-
+- affirm
+- ask_Humidity
+- ask_temprature
+- bot_challenge
+- deny
+- goodbye
+- greet
+- inform
+- mood_great
+- mood_unhappy
+- out_of_scope
+- query
+slots:
+  metric:
+    type: categorical
+    values:
+    - Temprature
+    - Humidity
+    - Temp
+    - RH
+    mappings:
+    - type: from_entity
+      entity: metric
+  aggregation:
+    type: categorical
+    values:
+    - MIN
+    - MAX
+    - AVG
+    - HIGH
+    - LOW
+    - average
+    mappings:
+    - type: from_entity
+      entity: aggregation
+  room:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: room
+entities:
+- metric
+- room
+- aggregation
+actions:
+- action_reply_query
+- utter_did_that_help
+- utter_temprature
+- utter_humidity
+- utter_greet
+- utter_cheer_up
+- utter_happy
+- utter_goodbye
+- utter_iamabot
+- utter_room
+- utter_slots_values
 responses:
   utter_greet:
-  - text: "Hey! How are you?"
-
+  - text: Hey! How are you?
   utter_cheer_up:
-  - text: "Here is something to cheer you up:"
-    image: "https://i.imgur.com/nGF1K8f.jpg"
-
+  - text: 'Here is something to cheer you up:'
+    image: https://i.imgur.com/nGF1K8f.jpg
   utter_did_that_help:
-  - text: "Did that help you?"
-
+  - text: Did that help you?
   utter_happy:
-  - text: "Great, carry on!"
-
+  - text: Great, carry on!
   utter_goodbye:
-  - text: "Bye"
-
+  - text: Bye
   utter_iamabot:
-  - text: "I am a bot, powered by Rasa."
-
+  - text: I am a bot, powered by Rasa.
+  utter_temprature:
+  - text: temprature is 24'C
+  utter_humidity:
+  - text: humidity is 60%
+  utter_room:
+  - text: which room data would u like to have?
+  utter_slots_values:
+  - text: |-
+      Here's your area parameters for room {confirm_room}:
+       - Temprature: {confirm_temprature} 
+       - Humidity: {confirm_room}  
+forms:
+  metric_form:
+    required_slots:
+    - metric
+    - aggregation
+    - room
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

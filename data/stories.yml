@@ -28,3 +28,58 @@ stories:
   - action: utter_did_that_help
   - intent: deny
   - action: utter_goodbye
+
+- story: temprature path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_temprature
+  - action: utter_temprature
+
+- story: humidity path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_Humidity
+  - action: utter_humidity
+
+
+- story: interactive_story
+  steps:
+  - intent: ask_temprature
+  - action: utter_temprature
+  - intent: ask_Humidity
+  - action: utter_humidity
+
+- story: fill_the_form
+  steps:  
+  - intent: inform
+  - action: action_extract_slots
+  - intent: inform
+
+
+- story: interactive_story_1
+  steps:
+  - intent: query
+    entities:
+    - metric: temprature
+    - room: unit 4
+  - slot_was_set:
+    - metric: temprature
+  - slot_was_set:
+    - room: unit 4
+  - action: action_reply_query
+  - action: utter_did_that_help
+
+- story: interactive_story_1
+  steps:
+  - intent: query
+    entities:
+    - metric: temprature
+    - room: unit 3
+  - slot_was_set:
+    - metric: temprature
+  - slot_was_set:
+    - room: unit 3
+  - action: action_reply_query
+  - action: utter_did_that_help

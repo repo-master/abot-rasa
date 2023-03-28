@@ -1,5 +1,4 @@
 version: "3.1"
-
 nlu:
 - intent: greet
   examples: |
@@ -16,7 +15,6 @@ nlu:
     - goodmorning
     - goodevening
     - good afternoon
-
 - intent: goodbye
   examples: |
     - cu
@@ -29,7 +27,6 @@ nlu:
     - see you around
     - bye bye
     - see you later
-
 - intent: affirm
   examples: |
     - yes
@@ -38,7 +35,6 @@ nlu:
     - of course
     - that sounds good
     - correct
-
 - intent: deny
   examples: |
     - no
@@ -48,7 +44,6 @@ nlu:
     - don't like that
     - no way
     - not really
-
 - intent: mood_great
   examples: |
     - perfect
@@ -65,7 +60,6 @@ nlu:
     - so so perfect
     - so good
     - so perfect
-
 - intent: mood_unhappy
   examples: |
     - my day was horrible
@@ -82,10 +76,41 @@ nlu:
     - extremly sad
     - so saad
     - so sad
-
 - intent: bot_challenge
   examples: |
     - are you a bot?
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
+- intent: ask_temprature
+  examples: |
+    - What is the temprature?
+    - How hot is it today?
+    - give me the temprature now.
+    - what's temprature today?
+- intent: ask_Humidity
+  examples: |
+    - What is the Humidity?
+    - What is the level of Humidity?
+    - what is humidity today?
+- intent: query
+  examples: |
+    - What is the [Humidity](metric) in [room 5](room)?
+    - What is the level of [Humidity](metric)?
+    - what is [temprature](metric) in [unit 2](room)?
+    - get [average](aggregation) of [temprature](metric)
+    - get [max](aggregation) [humidity](metric)
+    - [temprature](metric) is [high](aggregation)
+    - get [min](aggregation) [humidity](metric)
+    - can i get [temprature](metric) in [unit3](room)
+    - what is the [temprature](metric) of [unit 3](room)
+- intent: out_of_scope
+  examples: |
+    - That is not what i want to do
+    - wait stop
+    - stop
+    - this is not helpful
+    - tell me the weather
+    - I dont want to share u that
+    - none of your business
+    - changed my mind
