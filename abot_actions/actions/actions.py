@@ -4,25 +4,26 @@
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
 
-from typing import Any, Text, Dict, List, Union
-
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 
 from random import randint
 
+from rasa_sdk.types import DomainDict
+from typing import Any, Text, Dict, List, Union
+
 class ActionCheckTemprature(Action):
     def name(self):
         return "action_check_temprature"
-    
-    def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain) :
-        return "this is action reply"
 
-class Action_Test(Action):
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain : DomainDict) -> List[Dict[Text, Any]]:
+        return []
+
+class ActionTest(Action):
     def name(self):
         return "action_reply_query"
-    
-    def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain) :
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain : DomainDict) -> List[Dict[Text, Any]]:
         metric = tracker.get_slot("metric")
         room = tracker.get_slot("room")
         aggri = tracker.get_slot("aggregation")
@@ -35,6 +36,6 @@ class Action_Test(Action):
         else:
             dispatcher.utter_message(f"{aggri} {metric} for {room} is {hard_value}")
         return []
-    
+
     # "this is action reply"
     # {metric} for {room} is {hard_value}
