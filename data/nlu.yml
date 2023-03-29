@@ -82,17 +82,17 @@ nlu:
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
-- intent: ask_temprature
-  examples: |
-    - What is the temprature?
-    - How hot is it today?
-    - give me the temprature now.
-    - what's temprature today?
-- intent: ask_Humidity
-  examples: |
-    - What is the Humidity?
-    - What is the level of Humidity?
-    - what is humidity today?
+# - intent: ask_temprature
+#   examples: |
+#     - What is the temprature?
+#     - How hot is it today?
+#     - give me the temprature now.
+#     - what's temprature today?
+# - intent: ask_Humidity
+#   examples: |
+#     - What is the Humidity?
+#     - What is the level of Humidity?
+#     - what is humidity today?
 - intent: query
   examples: |
     - What is the [Humidity](metric) in [room 5](room)?
