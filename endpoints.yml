@@ -1,3 +1,8 @@
+###### FOR DEVELOPMENT USE ONLY ######
+# Use a different endpoints.yml file when running the model in the backend. Do NOT copy
+# this file to the backend!
+
+
 # This file contains the different endpoints your bot can use.
 
 # Server where the models are pulled from.
