@@ -11,25 +11,39 @@ from random import randint
 import pandas as pd
 
 from rasa_sdk.types import DomainDict
+from enum import Enum, auto
 from typing import Any, Text, Dict, List, Union
 
 
-class ActionCheckTemprature(Action):
+class AggregationMethod(Enum):
+  CURRENT = auto()
+  AVERAGE = auto()
+  MINIMUM = auto()
+  MAXIMUM = auto()
+
+class ActionMetricAggregate(Action):
   def name(self):
-    return "action_check_temprature"
+    return "action_metric_aggregate"
 
-  def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
-    return []
+  def run_aggregation_on_data(self, data : pd.DataFrame, agg_method : AggregationMethod, unit : str = '') -> str:
+    result : float
 
-
-class ActionTest(Action):
-  def name(self):
-    return "action_reply_query"
+    if agg_method == AggregationMethod.CURRENT:
+      result = data['VALUE'].iloc[-1]
+    if agg_method == AggregationMethod.AVERAGE:
+      result = data['VALUE'].mean()
+    if agg_method == AggregationMethod.MAXIMUM:
+      result = data['VALUE'].max()
+    if agg_method == AggregationMethod.MINIMUM:
+      result = data['VALUE'].min()
+    return "%.2f%s" % (result, unit)
 
   def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
     metric = tracker.get_slot("metric")
-    room = tracker.get_slot("room")
-    agg_method = tracker.get_slot("aggregation")
+    location = tracker.get_slot("location")
+    agg_method : str = tracker.get_slot("aggregation")
+
+    print("Got slots:", metric, location, agg_method, flush=True)
 
     metric_unit = ''
     if 'temp' in metric:
@@ -38,21 +52,38 @@ class ActionTest(Action):
       metric_unit = '%'
 
     data = pd.read_csv("temperature_data_dummy_modified.csv")
+    aggregation = AggregationMethod.CURRENT
 
-    if agg_method is None:
-      latest_value = "%.2f%s" % (data["VALUE"].iloc[-1], metric_unit)
-      dispatcher.utter_message("Current value of the sensor {sensor_name} is {sensor_value}".format(
-        sensor_name="/TWC/VER_W1_B1_GF_B_1_temp",
-        sensor_value=latest_value
-      ))
-    else:
-      calculated_value = "%.2f%s" % (data["VALUE"].mean(), metric_unit)
-      dispatcher.utter_message("Average value of the sensor {sensor_name} is {sensor_value}".format(
-        sensor_name="/TWC/VER_W1_B1_GF_B_1_temp",
-        sensor_value=calculated_value
-      ))
+    if agg_method is not None:
+      m = agg_method.lower()
+      if m == "min":
+        aggregation = AggregationMethod.MINIMUM
+      elif m == "max":
+        aggregation = AggregationMethod.MAXIMUM
+      elif m == "average":
+        aggregation = AggregationMethod.AVERAGE
+
+    aggregated_result = self.run_aggregation_on_data(data, aggregation, metric_unit)
+
+    fmt_options = {}
+
+    if aggregation == AggregationMethod.CURRENT:
+      fmt_options['agg'] = "current"
+    if aggregation == AggregationMethod.AVERAGE:
+      fmt_options['agg'] = "average"
+    if aggregation == AggregationMethod.MINIMUM:
+      fmt_options['agg'] = "minimum"
+    if aggregation == AggregationMethod.MAXIMUM:
+      fmt_options['agg'] = "maximum"
+
+    fmt_options['sensor_name'] = "VER_W1_B1_GF_B_1_temp"
+    fmt_options['sensor_value'] = aggregated_result
+
+    response_text = "The {agg} value of {sensor_name} is {sensor_value}".format(**fmt_options)
+
+    dispatcher.utter_message(response_text)
 
     return []
 
   # "this is action reply"
-  # {metric} for {room} is {hard_value}
+  # {metric} for {location} is {hard_value}

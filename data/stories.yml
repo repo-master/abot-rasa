@@ -1,85 +1,103 @@
 version: "3.1"
 
 stories:
+  - story: User asks or queries sensor data with optional aggregate and location
+    steps:
+    - intent: query_metric_aggregate
+    - action: action_metric_aggregate
+    # - slot_was_set:
+    #   - previous_action: "action_metric_aggregate"
+  - story: user wants to change a parameter
+    steps:
+    - or:
+      - intent: change_sensor
+      - intent: change_aggregation
+      - intent: change_location
+    - action: action_metric_aggregate
+    # - slot_was_set:
+    #     - previous_action
+    #   - action: "{previous_action}"
 
-- story: happy path
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_great
-  - action: utter_happy
-
-- story: sad path 1
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: affirm
-  - action: utter_happy
-
-- story: sad path 2
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: deny
-  - action: utter_goodbye
-
-- story: temprature path
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: ask_temprature
-  - action: utter_temprature
-
-- story: humidity path
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: ask_Humidity
-  - action: utter_humidity
+  - story: User did not want the response that they received
+    steps:
+    #TODO: Use action_two_stage_fallback and action_default_ask_rephrase default actions
+    - intent: out_of_scope
+    - action: utter_mistake
+    - or:
+      - intent: change_sensor
+      - intent: change_aggregation
+      - intent: change_location
+    - action: action_metric_aggregate
+    - action: utter_corrected
 
 
-- story: interactive_story
-  steps:
-  - intent: ask_temprature
-  - action: utter_temprature
-  - intent: ask_Humidity
-  - action: utter_humidity
+#   - intent: query_metric_aggregate
+#     entities:
+#     - sensor: temperature
+#   - slot_was_set:
+#     - metric: temperature
+#   - intent: query_metric_aggregate
+#     entities:
+#     - sensor: temperature
+#   - slot_was_set:
+#     - metric: temperature
+#   - action: action_metric_aggregate
+#   - action: utter_did_that_help
+#   - intent: query_metric_aggregate
+#     entities:
+#     - aggregation: maximum
+#     - sensor: energy reading
+#   - slot_was_set:
+#     - metric: energy reading
+#   - slot_was_set:
+#     - aggregation: maximum
+#   - action: action_metric_aggregate
+#   - action: utter_did_that_help
+#   - intent: query_metric_aggregate
+#     entities:
+#     - aggregation: average
+#     - sensor: humidity reading
+#   - slot_was_set:
+#     - metric: humidity reading
+#   - slot_was_set:
+#     - aggregation: average
+#   - action: action_metric_aggregate
+#   - action: utter_did_that_help
+#   - intent: query_metric_aggregate
+#     entities:
+#     - sensor: temperature
+#   - slot_was_set:
+#     - metric: temperature
+#   - action: action_metric_aggregate
+#   - action: utter_did_that_help
+#   - intent: query_metric_aggregate
+#     entities:
+#     - aggregation: maximum
+#   - slot_was_set:
+#     - aggregation: maximum
+#   - action: action_metric_aggregate
+#   - action: utter_did_that_help
 
-- story: fill_the_form
-  steps:  
-  - intent: inform
-  - action: action_extract_slots
-  - intent: inform
-
-
-- story: interactive_story_1
-  steps:
-  - intent: query
-    entities:
-    - metric: temprature
-    - room: unit 4
-  - slot_was_set:
-    - metric: temprature
-  - slot_was_set:
-    - room: unit 4
-  - action: action_reply_query
-  - action: utter_did_that_help
-
-- story: interactive_story_1
-  steps:
-  - intent: query
-    entities:
-    - metric: temprature
-    - room: unit 3
-  - slot_was_set:
-    - metric: temprature
-  - slot_was_set:
-    - room: unit 3
-  - action: action_reply_query
-  - action: utter_did_that_help
+# - story: interactive_story_1
+#   steps:
+#   - intent: query_metric_aggregate
+#     entities:
+#     - sensor: temperature
+#     - latest_period: currently
+#   - slot_was_set:
+#     - metric: temperature
+#   - action: action_metric_aggregate
+#   - action: utter_did_that_help
+#   - intent: query_metric_aggregate
+#     entities:
+#     - aggregation: average
+#   - slot_was_set:
+#     - aggregation: average
+#   - action: action_metric_aggregate
+#   - action: utter_did_that_help
+#   - intent: query_metric_aggregate
+#     entities:
+#     - location: Outdoor
+#     - sensor: reading
+#   - action: action_metric_aggregate
+#   - action: utter_did_that_help
