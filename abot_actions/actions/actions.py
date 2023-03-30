@@ -35,6 +35,8 @@ class ActionTest(Action):
             dispatcher.utter_message(f"{metric} for {room} is {hard_value}")
         else:
             dispatcher.utter_message(f"{aggri} {metric} for {room} is {hard_value}")
+            from rasa_sdk.events import SlotSet
+            return [SlotSet("aggregation" , None)]
         return []
 
     # "this is action reply"
