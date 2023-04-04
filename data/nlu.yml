@@ -1,5 +1,6 @@
 version: "3.1"
 nlu:
+
 - intent: greet
   examples: |
     - hey
@@ -176,40 +177,3 @@ nlu:
     - I dont want to share u that
     - none of your business
     - changed my mind
-- synonym: latest_period
-  examples: |
-    - Current
-    - Latest
-    - Last
-    - Up to date
-    - Most recent
-    - Right now
-- lookup: sensor
-  examples: |
-    - Sensor
-    - Sensor measurement
-    - Measurement
-    - Temperature
-    - Temperature sensor
-    - Temperature measurement
-    - Temperature status
-    - Humidity
-    - Humidity sensor
-    - Humidity measurement
-    - Humidity status
-    - Relative humidity
-    - RH sensor
-    - Energy meter
-    - Energy reading
-    - Power reading
-    - Power
-    - Energy
-    - Energy sensor
-    - Power sensor
-    - Energy status
-    - Power status
-    - Power usage
-    - Energy usage
-    - Energy measurement
-    - Power measurement
-    - Door status

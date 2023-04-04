@@ -46,8 +46,6 @@ slots:
     values:
     - Temprature
     - Humidity
-    - Temp
-    - RH
     mappings:
     - type: from_entity
       entity: sensor
@@ -66,6 +64,7 @@ slots:
     - type: from_entity
       entity: aggregation
   location:
+  location:
     type: text
     influence_conversation: true
     mappings:
@@ -74,6 +73,7 @@ slots:
 
 
 actions:
+- action_metric_aggregate
 - action_metric_aggregate
 - utter_did_that_help
 - utter_greet
