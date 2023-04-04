@@ -18,3 +18,15 @@ stories:
     # - slot_was_set:
     #     - previous_action
     #   - action: "{previous_action}"
+
+  # - story: User did not want the response that they received
+  #   steps:
+  #   #TODO: Use action_two_stage_fallback and action_default_ask_rephrase default actions
+  #   - intent: out_of_scope
+  #   - action: utter_mistake
+  #   - or:
+  #     - intent: change_sensor
+  #     - intent: change_aggregation
+  #     - intent: change_location
+  #   - action: action_metric_aggregate
+  #   - action: utter_corrected
