@@ -1,9 +1,24 @@
 version: '3.1'
+
+
 intents:
 - affirm
-- ask_Humidity
-- ask_temprature
 - bot_challenge
+- change_aggregation:
+    use_entities:
+    - sensor
+    - location
+    - aggregation
+- change_location:
+    use_entities:
+    - sensor
+    - location
+    - aggregation
+- change_sensor:
+    use_entities:
+    - sensor
+    - location
+    - aggregation
 - deny
 - goodbye
 - greet
@@ -11,7 +26,20 @@ intents:
 - mood_great
 - mood_unhappy
 - out_of_scope
-- query
+- query_metric_aggregate:
+    use_entities:
+    - sensor
+    - location
+    - aggregation
+
+
+entities:
+- sensor
+- aggregation
+- latest_period
+- location
+
+
 slots:
   metric:
     type: categorical
@@ -22,7 +50,7 @@ slots:
     - RH
     mappings:
     - type: from_entity
-      entity: metric
+      entity: sensor
   aggregation:
     type: categorical
     values:
@@ -32,62 +60,47 @@ slots:
     - HIGH
     - LOW
     - average
+    - current
+    - latest
     mappings:
     - type: from_entity
       entity: aggregation
-  room:
+  location:
     type: text
     influence_conversation: true
     mappings:
     - type: from_entity
-      entity: room
-entities:
-- metric
-- room
-- aggregation
+      entity: location
+
+
 actions:
-- action_reply_query
+- action_metric_aggregate
 - utter_did_that_help
-- utter_temprature
-- utter_humidity
 - utter_greet
 - utter_cheer_up
 - utter_happy
 - utter_goodbye
 - utter_iamabot
-- utter_room
-- utter_slots_values
+
+
 responses:
   utter_greet:
-  - text: Hey! How are you?
-  utter_cheer_up:
-  - text: 'Here is something to cheer you up:'
-    image: https://i.imgur.com/nGF1K8f.jpg
+  - text: Hey! What would you like to know?
   utter_did_that_help:
   - text: Did that help you?
   utter_happy:
   - text: Great, carry on!
   utter_goodbye:
-  - text: Bye
+  - text: Thank you for using me!
   utter_iamabot:
-  - text: I am a bot, powered by Rasa.
-  utter_temprature:
-  - text: temprature is 24'C
-  utter_humidity:
-  - text: humidity is 60%
-  utter_room:
-  - text: which room data would u like to have?
-  utter_slots_values:
-  - text: |-
-      Here's your area parameters for room {confirm_room}:
-       - Temprature: {confirm_temprature} 
-       - Humidity: {confirm_room}  
-forms:
-  metric_form:
-    required_slots:
-    - metric
-    - aggregation
-    - room
+  - text: I am Abot, a chat bot powered by Rasa.
+  utter_mistake:
+  - text: I am sorry for that. Can you tell me what you wanted?
+  utter_corrected:
+  - text: Okay, let me try again...
+  utter_default:
+  - text: Sorry I didn't get that. Can you rephrase?
+
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

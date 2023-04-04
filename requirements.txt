@@ -1,0 +1,5 @@
+rasa_sdk
+uvicorn
+sqlalchemy~=1.4.47
+aiosqlite
+pandas

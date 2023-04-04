@@ -15,6 +15,7 @@ nlu:
     - goodmorning
     - goodevening
     - good afternoon
+    - Hello!
 - intent: goodbye
   examples: |
     - cu
@@ -82,28 +83,89 @@ nlu:
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
-- intent: ask_temprature
+- intent: query_metric_aggregate
   examples: |
-    - What is the temprature?
-    - How hot is it today?
-    - give me the temprature now.
-    - what's temprature today?
-- intent: ask_Humidity
+    - What is the [temperature](sensor)?
+    - What is the [humidity](sensor)?
+    - What is the [current](latest_period) [energy reading](sensor)?
+    - What is the [latest](latest_period) [energy reading](sensor)?
+    - What is the [latest](latest_period) [power reading](sensor)?
+    - What is the [temperature](sensor) [currently](latest_period)?
+    - What is the [humidity](sensor) [currently](latest_period)?
+    - What is the [average](aggregation) [temperature](sensor)?
+    - What is the [average](aggregation) [humidity](sensor)?
+    - What is the [temperature](sensor) [outside](location)?
+    - What is the [humidity](sensor) [outside](location)?
+    - What is the [temperature](sensor) [currently](latest_period) [outside](location)?
+    - What is the [humidity](sensor) [currently](latest_period) [outside](location)?
+    - What is the [average](aggregation) [temperature](sensor) [outside](location)?
+    - What is the [average](aggregation) [humidity](sensor) [outside](location)?
+    - Give me the [temperature](sensor)
+    - Give me the [humidity](sensor)
+    - Give me the current [energy reading](sensor)
+    - Give me the latest [energy reading](sensor)
+    - Give me the latest [power reading](sensor)
+    - Give me the current [temperature](sensor)
+    - Give me the current [humidity](sensor)
+    - Give me the [average](aggregation) [temperature](sensor)
+    - Give me the [average](aggregation) [humidity](sensor)
+    - What is the [Humidity](sensor) in [room 5](location)?
+    - What is the level of [Humidity](sensor)?
+    - what is [temprature](sensor) in [unit 2](location)?
+    - get [average](aggregation) of [temprature](sensor)
+    - get [max](aggregation) [humidity](sensor)
+    - [temprature](sensor) is [high](aggregation)
+    - get [min](aggregation) [humidity](sensor)
+    - can i get [temprature](sensor) in [unit3](location)
+    - what is the [temprature](sensor) of [unit 3](location)
+    - What is the current [temperature](sensor)?
+    - What is the [maximum](aggregation) [energy reading](sensor)?
+    - Give me the [average](aggregation) [humidity reading](sensor)
+    - What is the [temperature](sensor)?
+    - What about [humidity](sensor)?
+    - please give me the [average](aggregation)
+- intent: change_sensor
   examples: |
-    - What is the Humidity?
-    - What is the level of Humidity?
-    - what is humidity today?
-- intent: query
+    - The [temperature](sensor) sensor.
+    - The [energy meter](sensor).
+    - I wanted to know about the [power](sensor) meter
+    - Actually I asked for [door](sensor) status.
+    - And what about [temperature](sensor)?
+    - Do the same for [humidity](sensor)
+    - Same calculation but for [energy](sensor)
+    - Can you tell me for [power meter](sensor)?
+    - now the [minimum](aggregation) for [temperature](sensor)
+- intent: change_aggregation
   examples: |
-    - What is the [Humidity](metric) in [room 5](room)?
-    - What is the level of [Humidity](metric)?
-    - what is [temprature](metric) in [unit 2](room)?
-    - get [average](aggregation) of [temprature](metric)
-    - get [max](aggregation) [humidity](metric)
-    - [temprature](metric) is [high](aggregation)
-    - get [min](aggregation) [humidity](metric)
-    - can i get [temprature](metric) in [unit3](room)
-    - what is the [temprature](metric) of [unit 3](room)
+    - The [average](aggregation).
+    - The [mean](aggregation).
+    - Not that, I asked for the [max value](aggregation).
+    - The [the latest value](aggregation).
+    - I wanted to know about the [mean](aggregation)
+    - Actually I asked for [current value](aggregation).
+    - Okay and what is the [maximum](aggregation)?
+    - Okay and what about the [average](aggregation)?
+    - Thanks. What is the [current](aggregation) then?
+    - What is the [temperature](sensor) [currently](latest_period)?
+    - What is the [average](aggregation)?
+    - what is the [maximum](aggregation) value?
+    - What is the [max](aggregation)?
+    - and [min](aggregation)?
+    - give me the [min](aggregation)
+- intent: change_location
+  examples: |
+    - The [outside](location) value.
+    - The [unit 1](location).
+    - [my](location) location.
+    - [my](location) present location.
+    - The [indoor](location).
+    - I wanted to know about the [unit 9](location)
+    - Actually I asked for [basement](location).
+    - [Outdoor](location) reading?
+    - How about in the [basement](location)?
+    - What about [outside](location)?
+    - And the [unit 1](location)?
+    - also at [unit 2](location)?
 - intent: out_of_scope
   examples: |
     - That is not what i want to do
@@ -114,3 +176,40 @@ nlu:
     - I dont want to share u that
     - none of your business
     - changed my mind
+- synonym: latest_period
+  examples: |
+    - Current
+    - Latest
+    - Last
+    - Up to date
+    - Most recent
+    - Right now
+- lookup: sensor
+  examples: |
+    - Sensor
+    - Sensor measurement
+    - Measurement
+    - Temperature
+    - Temperature sensor
+    - Temperature measurement
+    - Temperature status
+    - Humidity
+    - Humidity sensor
+    - Humidity measurement
+    - Humidity status
+    - Relative humidity
+    - RH sensor
+    - Energy meter
+    - Energy reading
+    - Power reading
+    - Power
+    - Energy
+    - Energy sensor
+    - Power sensor
+    - Energy status
+    - Power status
+    - Power usage
+    - Energy usage
+    - Energy measurement
+    - Power measurement
+    - Door status

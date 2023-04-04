@@ -2,6 +2,11 @@ version: "3.1"
 
 rules:
 
+- rule: Greet the user when the user greets
+  steps:
+  - intent: greet
+  - action: utter_greet
+
 - rule: Say goodbye anytime the user says goodbye
   steps:
   - intent: goodbye
@@ -11,21 +16,8 @@ rules:
   steps:
   - intent: bot_challenge
   - action: utter_iamabot
-- rule : solve user query when intent is for getting temprature
-  condition: 
-  - slot_was_set:
-    - metric: true
-    - room : true
-  steps:
-  - intent: inform
-  - action: utter_temprature
 
-# - rule : solve user query 
-#   condition: 
-#   - slot_was_set:
-#     - metric: true
-#     - room : true
-#   steps:
-#   - intent: query
-#   - action: action_reply_query
-#   - action: utter_did_that_help
+- rule: Ask the user to rephrase whenever they send a message with low NLU confidence
+  steps:
+  - intent: nlu_fallback
+  - action: utter_default
