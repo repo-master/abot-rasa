@@ -16,6 +16,7 @@ nlu:
     - goodevening
     - good afternoon
     - Hello!
+
 - intent: goodbye
   examples: |
     - cu
@@ -28,6 +29,7 @@ nlu:
     - see you around
     - bye bye
     - see you later
+
 - intent: affirm
   examples: |
     - yes
@@ -36,6 +38,7 @@ nlu:
     - of course
     - that sounds good
     - correct
+
 - intent: deny
   examples: |
     - no
@@ -45,6 +48,7 @@ nlu:
     - don't like that
     - no way
     - not really
+
 - intent: mood_great
   examples: |
     - perfect
@@ -61,6 +65,7 @@ nlu:
     - so so perfect
     - so good
     - so perfect
+
 - intent: mood_unhappy
   examples: |
     - my day was horrible
@@ -77,16 +82,22 @@ nlu:
     - extremly sad
     - so saad
     - so sad
+
 - intent: bot_challenge
   examples: |
     - are you a bot?
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
+
 - intent: query_metric_aggregate
   examples: |
     - What is the [temperature](sensor)?
     - What is the [humidity](sensor)?
+    - How [hot](sensor) is it?
+    - How [cold](sensor) is it?
+    - How is the [temp](sensor) sensor faring?
+    - How is the [climate](sensor) is it?
     - What is the [current](latest_period) [energy reading](sensor)?
     - What is the [latest](latest_period) [energy reading](sensor)?
     - What is the [latest](latest_period) [power reading](sensor)?
@@ -124,6 +135,7 @@ nlu:
     - What is the [temperature](sensor)?
     - What about [humidity](sensor)?
     - please give me the [average](aggregation)
+
 - intent: change_sensor
   examples: |
     - The [temperature](sensor) sensor.
@@ -135,6 +147,7 @@ nlu:
     - Same calculation but for [energy](sensor)
     - Can you tell me for [power meter](sensor)?
     - now the [minimum](aggregation) for [temperature](sensor)
+
 - intent: change_aggregation
   examples: |
     - The [average](aggregation).
@@ -152,6 +165,7 @@ nlu:
     - What is the [max](aggregation)?
     - and [min](aggregation)?
     - give me the [min](aggregation)
+
 - intent: change_location
   examples: |
     - The [outside](location) value.
@@ -166,16 +180,17 @@ nlu:
     - What about [outside](location)?
     - And the [unit 1](location)?
     - also at [unit 2](location)?
+
 - intent: out_of_scope
   examples: |
-    - That is not what i want to do
-    - wait stop
-    - stop
-    - this is not helpful
-    - tell me the weather
-    - I dont want to share u that
-    - none of your business
-    - changed my mind
+    - I want to order food
+    - What is 2 + 2?
+    - Who's the US President?
+    - What is the time?
+    - Tell me a joke
+    - I am bored
+    - Let's play a game
+
 - synonym: latest_period
   examples: |
     - Current
@@ -184,7 +199,8 @@ nlu:
     - Up to date
     - Most recent
     - Right now
-- lookup: sensor
+
+- synonym: sensor
   examples: |
     - Sensor
     - Sensor measurement
@@ -193,7 +209,10 @@ nlu:
     - Temperature sensor
     - Temperature measurement
     - Temperature status
+    - Heat
+    - Hot
     - Humidity
+    - Humid
     - Humidity sensor
     - Humidity measurement
     - Humidity status
@@ -213,3 +232,18 @@ nlu:
     - Energy measurement
     - Power measurement
     - Door status
+
+# - synonym: temprature
+#   examples: |
+#     - temprature
+#     - temp
+#     - hot
+#     - cold
+#     - climate
+
+# - synonym: humidity
+#   examples: |
+#     - humid
+#     - Humidity
+#     - rh
+#     - relative humidity

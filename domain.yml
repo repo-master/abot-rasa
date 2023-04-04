@@ -42,32 +42,17 @@ entities:
 
 slots:
   metric:
-    type: categorical
-    values:
-    - Temprature
-    - Humidity
-    - Temp
-    - RH
+    type: text
     mappings:
     - type: from_entity
       entity: sensor
   aggregation:
-    type: categorical
-    values:
-    - MIN
-    - MAX
-    - AVG
-    - HIGH
-    - LOW
-    - average
-    - current
-    - latest
+    type: text
     mappings:
     - type: from_entity
       entity: aggregation
   location:
     type: text
-    influence_conversation: true
     mappings:
     - type: from_entity
       entity: location
@@ -77,10 +62,11 @@ actions:
 - action_metric_aggregate
 - utter_did_that_help
 - utter_greet
-- utter_cheer_up
 - utter_happy
 - utter_goodbye
 - utter_iamabot
+- utter_mistake
+- utter_corrected
 
 
 responses:
