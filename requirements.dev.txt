@@ -1,4 +1,4 @@
-rasa-sdk~=3.4.1
+rasa~=3.4.5
 uvicorn
 sqlalchemy~=1.4.47
 aiosqlite
