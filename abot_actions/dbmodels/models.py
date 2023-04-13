@@ -7,10 +7,10 @@ from .basemodel import BaseModel
 
 
 class Sensor(BaseModel):
-  __tablename__ = "sensor"
-  sensor_id = Column(INTEGER())
-  value_ = Column("value", String())
+    __tablename__ = "sensor"
+    sensor_id = Column(INTEGER())
+    value_ = Column("value", String())
 
-  @hybrid_property
-  def value(self):
-    return self.value_.cast(float)
+    @hybrid_property
+    def value(self):
+        return self.value_.cast(float)
