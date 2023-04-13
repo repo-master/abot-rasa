@@ -6,17 +6,17 @@ intents:
 - bot_challenge
 - change_aggregation:
     use_entities:
-    - sensor
+    - metric
     - location
     - aggregation
 - change_location:
     use_entities:
-    - sensor
+    - metric
     - location
     - aggregation
 - change_sensor:
     use_entities:
-    - sensor
+    - metric
     - location
     - aggregation
 - deny
@@ -28,13 +28,13 @@ intents:
 - out_of_scope
 - query_metric_aggregate:
     use_entities:
-    - sensor
+    - metric
     - location
     - aggregation
 
 
 entities:
-- sensor
+- metric
 - aggregation
 - latest_period
 - location
@@ -45,7 +45,7 @@ slots:
     type: text
     mappings:
     - type: from_entity
-      entity: sensor
+      entity: metric
   aggregation:
     type: text
     mappings:

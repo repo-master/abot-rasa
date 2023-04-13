@@ -1,6 +1,17 @@
 version: "3.1"
 nlu:
-
+- synonym: temperature
+  examples: |
+    - temp
+    - temps
+    - cold
+    - hot
+- synonym: humidity
+  examples: |
+    - humid
+    - rh
+    - RH    
+    - relative humidity
 - intent: greet
   examples: |
     - hey
@@ -93,61 +104,61 @@ nlu:
 
 - intent: query_metric_aggregate
   examples: |
-    - What is the [temperature](sensor)?
-    - What is the [humidity](sensor)?
-    - How [hot](sensor) is it?
-    - How [cold](sensor) is it?
-    - How is the [temp](sensor) sensor faring?
-    - How is the [climate](sensor) is it?
-    - What is the [current](latest_period) [energy reading](sensor)?
-    - What is the [latest](latest_period) [energy reading](sensor)?
-    - What is the [latest](latest_period) [power reading](sensor)?
-    - What is the [temperature](sensor) [currently](latest_period)?
-    - What is the [humidity](sensor) [currently](latest_period)?
-    - What is the [average](aggregation) [temperature](sensor)?
-    - What is the [average](aggregation) [humidity](sensor)?
-    - What is the [temperature](sensor) [outside](location)?
-    - What is the [humidity](sensor) [outside](location)?
-    - What is the [temperature](sensor) [currently](latest_period) [outside](location)?
-    - What is the [humidity](sensor) [currently](latest_period) [outside](location)?
-    - What is the [average](aggregation) [temperature](sensor) [outside](location)?
-    - What is the [average](aggregation) [humidity](sensor) [outside](location)?
-    - Give me the [temperature](sensor)
-    - Give me the [humidity](sensor)
-    - Give me the current [energy reading](sensor)
-    - Give me the latest [energy reading](sensor)
-    - Give me the latest [power reading](sensor)
-    - Give me the current [temperature](sensor)
-    - Give me the current [humidity](sensor)
-    - Give me the [average](aggregation) [temperature](sensor)
-    - Give me the [average](aggregation) [humidity](sensor)
-    - What is the [Humidity](sensor) in [room 5](location)?
-    - What is the level of [Humidity](sensor)?
-    - what is [temprature](sensor) in [unit 2](location)?
-    - get [average](aggregation) of [temprature](sensor)
-    - get [max](aggregation) [humidity](sensor)
-    - [temprature](sensor) is [high](aggregation)
-    - get [min](aggregation) [humidity](sensor)
-    - can i get [temprature](sensor) in [unit3](location)
-    - what is the [temprature](sensor) of [unit 3](location)
-    - What is the current [temperature](sensor)?
-    - What is the [maximum](aggregation) [energy reading](sensor)?
-    - Give me the [average](aggregation) [humidity reading](sensor)
-    - What is the [temperature](sensor)?
-    - What about [humidity](sensor)?
+    - What is the [temperature](metric)?
+    - What is the [humidity](metric)?
+    - How [hot](metric) is it?
+    - How [cold](metric) is it?
+    - How is the [temp](metric) sensor faring?
+    - How is the [climate](metric) is it?
+    - What is the [current](latest_period) [energy reading](metric)?
+    - What is the [latest](latest_period) [energy reading](metric)?
+    - What is the [latest](latest_period) [power reading](metric)?
+    - What is the [temperature](metric) [currently](latest_period)?
+    - What is the [humidity](metric) [currently](latest_period)?
+    - What is the [average](aggregation) [temperature](metric)?
+    - What is the [average](aggregation) [humidity](metric)?
+    - What is the [temperature](metric) [outside](location)?
+    - What is the [humidity](metric) [outside](location)?
+    - What is the [temperature](metric) [currently](latest_period) [outside](location)?
+    - What is the [rh](metric) [currently](latest_period) [outside](location)?
+    - What is the [average](aggregation) [temperature](metric) [outside](location)?
+    - What is the [average](aggregation) [humidity](metric) [outside](location)?
+    - Give me the [temperature](metric)
+    - Give me the [humidity](metric)
+    - Give me the current [energy reading](metric)
+    - Give me the latest [energy reading](metric)
+    - Give me the latest [power reading](metric)
+    - Give me the current [temperature](metric)
+    - Give me the current [humidity](metric)
+    - Give me the [average](aggregation) [temperature](metric)
+    - Give me the [average](aggregation) [humidity](metric)
+    - What is the [rh](metric) in [room 5](location)?
+    - What is the level of [Humidity](metric)?
+    - what is [temprature](metric) in [unit 2](location)?
+    - get [average](aggregation) of [temprature](metric)
+    - get [max](aggregation) [humidity](metric)
+    - [temprature](metric) is [high](aggregation)
+    - get [min](aggregation) [humidity](metric)
+    - can i get [temprature](metric) in [unit3](location)
+    - what is the [temprature](metric) of [unit 3](location)
+    - What is the current [temperature](metric)?
+    - What is the [maximum](aggregation) [energy reading](metric)?
+    - Give me the [average](aggregation) [humidity reading](metric)
+    - What is the [temperature](metric)?
+    - What about [rh](metric)?
     - please give me the [average](aggregation)
 
 - intent: change_sensor
   examples: |
-    - The [temperature](sensor) sensor.
-    - The [energy meter](sensor).
-    - I wanted to know about the [power](sensor) meter
-    - Actually I asked for [door](sensor) status.
-    - And what about [temperature](sensor)?
-    - Do the same for [humidity](sensor)
-    - Same calculation but for [energy](sensor)
-    - Can you tell me for [power meter](sensor)?
-    - now the [minimum](aggregation) for [temperature](sensor)
+    - The [temperature](metric) metric.
+    - The [energy meter](metric).
+    - I wanted to know about the [power](metric) meter
+    - Actually I asked for [door](metric) status.
+    - And what about [temperature](metric)?
+    - Do the same for [humidity](metric)
+    - Same calculation but for [energy](metric)
+    - Can you tell me for [power meter](metric)?
+    - now the [minimum](aggregation) for [temperature](metric)
 
 - intent: change_aggregation
   examples: |
@@ -160,7 +171,7 @@ nlu:
     - Okay and what is the [maximum](aggregation)?
     - Okay and what about the [average](aggregation)?
     - Thanks. What is the [current](aggregation) then?
-    - What is the [temperature](sensor) [currently](latest_period)?
+    - What is the [temperature](metric) [currently](latest_period)?
     - What is the [average](aggregation)?
     - what is the [maximum](aggregation) value?
     - What is the [max](aggregation)?
@@ -201,38 +212,38 @@ nlu:
     - Most recent
     - Right now
 
-- synonym: sensor
-  examples: |
-    - Sensor
-    - Sensor measurement
-    - Measurement
-    - Temperature
-    - Temperature sensor
-    - Temperature measurement
-    - Temperature status
-    - Heat
-    - Hot
-    - Humidity
-    - Humid
-    - Humidity sensor
-    - Humidity measurement
-    - Humidity status
-    - Relative humidity
-    - RH sensor
-    - Energy meter
-    - Energy reading
-    - Power reading
-    - Power
-    - Energy
-    - Energy sensor
-    - Power sensor
-    - Energy status
-    - Power status
-    - Power usage
-    - Energy usage
-    - Energy measurement
-    - Power measurement
-    - Door status
+# - synonym: metric
+#   examples: |
+#     - metric
+#     - metric measurement
+#     - Measurement
+#     - Temperature
+#     - Temperature metric
+#     - Temperature measurement
+#     - Temperature status
+#     - Heat
+#     - Hot
+#     - Humidity
+#     - Humid
+#     - Humidity metric
+#     - Humidity measurement
+#     - Humidity status
+#     - Relative humidity
+#     - RH metric
+#     - Energy meter
+#     - Energy reading
+#     - Power reading
+#     - Power
+#     - Energy
+#     - Energy metric
+#     - Power metric
+#     - Energy status
+#     - Power status
+#     - Power usage
+#     - Energy usage
+#     - Energy measurement
+#     - Power measurement
+#     - Door status
 
 # - synonym: temprature
 #   examples: |
