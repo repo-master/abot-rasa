@@ -7,12 +7,13 @@ import pandas as pd
 from typing import Optional, Tuple
 
 
-
 async def get_sensor_data(requested_sensor_id: Optional[str] = None,
-                            requested_sensor_type: Optional[str] = None) -> Tuple[pd.DataFrame, SensorMetadata]:
+                          requested_sensor_type: Optional[str] = None) -> Tuple[pd.DataFrame, SensorMetadata]:
 
     sensor_data = await fetch_sensor_data(requested_sensor_id, requested_sensor_type)
     print(sensor_data)
+
+    # TODO: Remove read_csv, use above data
 
     data = pd.read_csv("sensor_data_dummy.csv")
     data['TIMESTAMP'] = pd.to_datetime(data['TIMESTAMP'])

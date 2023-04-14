@@ -131,6 +131,5 @@ dmypy.json
 .vscode/
 
 models/
-abot_actions/actions/sensor_data_dummy.csv
 .rasa/
 *.dot
