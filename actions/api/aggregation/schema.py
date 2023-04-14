@@ -1,6 +1,7 @@
 
 from enum import Enum
-from typing import TypedDict, Optional
+from typing import Optional
+from typing_extensions import TypedDict, NotRequired
 
 
 class AggregationMethod(Enum):
@@ -17,6 +18,9 @@ class AggregationResult(TypedDict):
 
 
 class SensorMetadata(TypedDict):
-    sensor_id: Optional[str]
+    sensor_urn: str
+    sensor_id: NotRequired[int]
+    sensor_name: NotRequired[str]
+    sensor_alias: NotRequired[str]
     sensor_type: str
     sensor_unit: str

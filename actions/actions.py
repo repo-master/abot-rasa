@@ -6,10 +6,15 @@
 
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.events import ActionExecutionRejected
 
 from .api.aggregation import (
-    get_sensor_data, user_to_sensor_type, user_to_aggregation_type, get_sensor_id,
-    perform_aggregation_on_data
+    get_sensor_data,
+    determine_user_request_sensor_id,
+    perform_aggregation_on_data,
+
+    user_to_sensor_type,
+    user_to_aggregation_type
 )
 
 from rasa_sdk.types import DomainDict
@@ -31,14 +36,22 @@ class ActionMetricAggregate(Action):
         # TODO: More assumption magic needed
 
         # Either one can be set
-        requested_sensor_id = get_sensor_id(user_req_metric,user_req_location)
-        requested_sensor_type = user_to_sensor_type(user_req_metric)
+        requested_sensor_id = await determine_user_request_sensor_id(
+            sensor_type=user_req_metric,
+            sensor_name=None, # TODO: Get from slot
+            location=user_req_location
+        )
+
+        # Could not determine the sensor to get info on (or no info provided at all)
+        if requested_sensor_id is None:
+            dispatcher.utter_message("Which sensor do you want to get information on?")
+            return [ActionExecutionRejected(self.name())]
 
         # Check aggregation method provided by the user
         aggregation = user_to_aggregation_type(user_req_agg_method)
 
         # Load data
-        data, metadata = await get_sensor_data(requested_sensor_id, requested_sensor_type)
+        data, metadata = await get_sensor_data(requested_sensor_id)
 
         # Run aggregation
         aggregated_result = perform_aggregation_on_data(data, aggregation, metadata)

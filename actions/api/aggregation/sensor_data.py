@@ -4,21 +4,27 @@ from .loader import fetch_sensor_data
 
 import pandas as pd
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Dict
 
 
-async def get_sensor_data(requested_sensor_id: Optional[str] = None,
-                          requested_sensor_type: Optional[str] = None) -> Tuple[pd.DataFrame, SensorMetadata]:
+async def get_sensor_data(requested_sensor_id: str) -> Tuple[pd.DataFrame, SensorMetadata]:
+    sensor_data = await fetch_sensor_data(requested_sensor_id)
 
-    sensor_data = await fetch_sensor_data(requested_sensor_id, requested_sensor_type)
-    print(sensor_data)
+    metadata: Dict = sensor_data.get('metadata', {})
+    values: List[Dict] = sensor_data.get('data', [])
 
-    # TODO: Remove read_csv, use above data
+    metadata: SensorMetadata = {
+        'sensor_urn': metadata.get('sensor_urn'),
+        'sensor_type': metadata.get('sensor_type'),
+        'sensor_id': metadata.get('sensor_id'),
+        'sensor_unit': metadata.get('display_unit', ''),
+        'sensor_name': metadata.get('sensor_name'),
+        'sensor_alias': metadata.get('sensor_alias')
+    }
 
-    data = pd.read_csv("sensor_data_dummy.csv")
-    data['TIMESTAMP'] = pd.to_datetime(data['TIMESTAMP'])
-    data.sort_values('TIMESTAMP', ascending=False, inplace=True)
+    data = pd.DataFrame(values, index=None)
 
+    '''
     # Filter the sensor required (only one for now)
     if requested_sensor_id is not None:
         data = data.where(data['HISTORY_ID'].str.split('/')[-1] == requested_sensor_id)
@@ -27,39 +33,19 @@ async def get_sensor_data(requested_sensor_id: Optional[str] = None,
     else:
         # Nothing is known, raise error
         pass
+    '''
 
-    data.dropna(inplace=True)
+    data.dropna(inplace=True, axis=1)
 
     if len(data) > 0:
-        first_row = data.iloc[0]
-
-        # TODO: This will also be gathered from a query
-        metadata: SensorMetadata = {
-            'sensor_id': first_row['HISTORY_ID'],
-            'sensor_type': first_row['sensor_type'],
-            'sensor_unit': ''
-        }
-        set_sensor_units_from_type(metadata)
-    else:
-        metadata: SensorMetadata = {
-            'sensor_id': None,
-            'sensor_type': requested_sensor_type,
-            'sensor_unit': ''
-        }
+        data['timestamp'] = pd.to_datetime(data['timestamp'])
+        data.sort_values('timestamp', ascending=False, inplace=True)
+        # We get a dictionary result in the 'value' column. We need to 'explode' it to separate columns.
+        data_value_series = data['value'].apply(pd.Series)
+        # Concatenate the data value columns to original df, remove the 'value' column from original
+        data = pd.concat([data.drop(['value'], axis=1), data_value_series], axis=1)
 
     return data, metadata
-
-
-def set_sensor_units_from_type(metadata: SensorMetadata):
-    if metadata.get('sensor_type') is None:
-        # TODO: Warning of some sorts
-        pass
-    SENSORTYPE_UNIT_MAP = {
-        'temp': '\u2103',  # degree C symbol
-        'rh': '%'
-    }
-    # Assign the unit if possible, else it is set to ''
-    metadata['sensor_unit'] = SENSORTYPE_UNIT_MAP.get(metadata['sensor_type'], '')
 
 
 def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
@@ -70,17 +56,6 @@ def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
         return 'rh'
     elif name == 'em' or name == 'energy' or name == 'power':
         return 'em'
-
-def get_sensor_id(sensor_type = None, location = None):
-  print(f"looking into sensor master to find {sensor_type} sensor in {location}")
-  if sensor_type == 'temprature':
-    sensor_id = '/TWC/VER_W1_B1_GF_B_1_temp'
-  elif sensor_type == 'humidity':
-    sensor_id ='/TWC/VER_W1_B1_GF_B_1_rh'
-  else:
-    sensor_id = None
-  print("sensor_id is : ", sensor_id )
-  return sensor_id
 
 def user_to_aggregation_type(name: Optional[str]) -> AggregationMethod:
     aggregation = AggregationMethod.CURRENT
