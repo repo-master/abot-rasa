@@ -71,6 +71,16 @@ def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
     elif name == 'em' or name == 'energy' or name == 'power':
         return 'em'
 
+def get_sensor_id(sensor_type = None, location = None):
+  print(f"looking into sensor master to find {sensor_type} sensor in {location}")
+  if sensor_type == 'temprature':
+    sensor_id = '/TWC/VER_W1_B1_GF_B_1_temp'
+  elif sensor_type == 'humidity':
+    sensor_id ='/TWC/VER_W1_B1_GF_B_1_rh'
+  else:
+    sensor_id = None
+  print("sensor_id is : ", sensor_id )
+  return sensor_id
 
 def user_to_aggregation_type(name: Optional[str]) -> AggregationMethod:
     aggregation = AggregationMethod.CURRENT

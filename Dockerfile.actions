@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY . /app
 
-CMD ["uvicorn", "abot_actions:create_app", "--host", "0.0.0.0", "--port", "5055", "--factory"]
+CMD ["rasa", "run", "actions"]

@@ -1,7 +1,5 @@
 rasa-sdk~=3.4.1
 uvicorn
-sqlalchemy~=1.4.47
-aiosqlite
 pandas
 websockets~=10.4
 httpx~=0.24.0

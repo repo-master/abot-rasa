@@ -8,7 +8,7 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 
 from .api.aggregation import (
-    get_sensor_data, user_to_sensor_type, user_to_aggregation_type,
+    get_sensor_data, user_to_sensor_type, user_to_aggregation_type, get_sensor_id,
     perform_aggregation_on_data
 )
 
@@ -31,7 +31,7 @@ class ActionMetricAggregate(Action):
         # TODO: More assumption magic needed
 
         # Either one can be set
-        requested_sensor_id = None
+        requested_sensor_id = get_sensor_id(user_req_metric,user_req_location)
         requested_sensor_type = user_to_sensor_type(user_req_metric)
 
         # Check aggregation method provided by the user
