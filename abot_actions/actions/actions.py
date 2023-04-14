@@ -43,6 +43,16 @@ def set_sensor_units_from_type(metadata : SensorMetadata):
   # Assign the unit if possible, else it is set to ''
   metadata['sensor_unit'] = SENSORTYPE_UNIT_MAP.get(metadata['sensor_type'], '')
 
+def get_sensor_id(sensor_type = None, location = None):
+  print(f"looking into sensor master to find {sensor_type} sensor in {location}")
+  if sensor_type == 'temprature':
+    sensor_id = '/TWC/VER_W1_B1_GF_B_1_temp'
+  elif sensor_type == 'humidity':
+    sensor_id ='/TWC/VER_W1_B1_GF_B_1_rh'
+  else:
+    sensor_id = None
+  print("sensor_id is : ", sensor_id )
+  return sensor_id
 
 def user_to_sensor_type(name):
   name = name.lower() if name else ''
@@ -67,13 +77,12 @@ class ActionMetricAggregate(Action):
 
     # Filter the sensor required (only one for now)
     if requested_sensor_id is not None:
-      data = data.where(data['HISTORY_ID'].str.split('/')[-1] == requested_sensor_id)
+      data = data[data['HISTORY_ID'] == requested_sensor_id]
     elif requested_sensor_type is not None:
-      data = data.where(data['sensor_type'] == requested_sensor_type)
+      data = data[data['sensor_type'] == requested_sensor_type]
     else:
       #Nothing is known, raise error
       pass
-
     data.dropna(inplace=True)
 
     if len(data) > 0:
@@ -127,7 +136,7 @@ class ActionMetricAggregate(Action):
     # TODO: More assumption magic needed
 
     # Either one can be set
-    requested_sensor_id = None
+    requested_sensor_id = get_sensor_id(user_req_metric,user_req_location)
     requested_sensor_type = user_to_sensor_type(user_req_metric)
 
     # Default aggregation if none of the below cases match
