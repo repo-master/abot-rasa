@@ -67,4 +67,6 @@ def user_to_aggregation_type(name: Optional[str]) -> AggregationMethod:
             aggregation = AggregationMethod.MAXIMUM
         elif m == "average":
             aggregation = AggregationMethod.AVERAGE
+        elif m == 'summary':
+            aggregation = AggregationMethod.SUMMARY
     return aggregation

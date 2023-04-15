@@ -12,6 +12,27 @@ nlu:
     - rh
     - RH    
     - relative humidity
+- synonym: maximum
+  examples: |
+    - max
+    - maximum
+    - highest
+    - greatest
+    - largest
+    - extreme high
+- synonym: minimum
+  examples : |
+    - least
+    - lowest
+    - min
+    - minimum
+    - extreme low
+- synonym: summary
+  examples : |
+    - sum
+    - summary
+
+
 - intent: greet
   examples: |
     - hey
@@ -147,6 +168,8 @@ nlu:
     - What is the [temperature](metric)?
     - What about [rh](metric)?
     - please give me the [average](aggregation)
+    - Give [summary](aggregation) for temprature in room3
+    - Fetch [summary](aggregation) for [room 2](location) [humidity](metric)
 
 - intent: change_sensor
   examples: |

@@ -9,12 +9,13 @@ class AggregationMethod(Enum):
     AVERAGE = 'average'
     MINIMUM = 'minimum'
     MAXIMUM = 'maximum'
-
+    SUMMARY = 'summary'
 
 class AggregationResult(TypedDict):
     sensor_name: str
     result_value: str
     aggregation_method: str
+    outliers : dict
 
 
 class SensorMetadata(TypedDict):
