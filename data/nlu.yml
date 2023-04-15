@@ -21,21 +21,26 @@ nlu:
     - largest
     - extreme high
 - synonym: minimum
-  examples : |
+  examples: |
     - least
     - lowest
     - min
     - minimum
     - extreme low
 - synonym: summary
-  examples : |
+  examples: |
     - sum
     - summary
-- synonym : average
+    - summarize
+    - stats
+    - statistic
+    - faring
+    - brief me about
+- synonym: average
   examples: |
-  - avg
-  - mean
-  - average
+    - avg
+    - mean
+    - average
 
 - intent: greet
   examples: |
@@ -172,7 +177,7 @@ nlu:
     - What is the [temperature](metric)?
     - What about [rh](metric)?
     - please give me the [average](aggregation)
-    - Give [summary](aggregation) for temprature in room3
+    - Give [summary](aggregation) for temperature
     - Fetch [summary](aggregation) for [room 2](location) [humidity](metric)
 
 - intent: change_sensor
@@ -219,6 +224,23 @@ nlu:
     - What about [outside](location)?
     - And the [unit 1](location)?
     - also at [unit 2](location)?
+
+# TODO: Time period (today's, yesterday's, etc.)
+# - intent: summarize_sensor_data
+#   examples: |
+#     - Can you [summarize](summary) that for me?
+#     - Can you briefly tell me the [stats](summary) of [humidity](metric)?
+#     - How is the [temperature](metric) sensor [faring](summary)?
+#     - How is the [humidity](metric) sensor [faring](summary)?
+#     - How is the [energy](metric) sensor [faring](summary)?
+#     - Please [summarize](summary) that.
+#     - Please [summarize](summary) [temperature](metric) sensor
+#     - Please [summarize](summary) the [humidity](metric) sensor
+#     - Please [summarize](summary) yesterday's events.
+#     - Please [brief me about](summary) today's data.
+#     - Please [brief me about](summary) yesterday's data.
+#     - How was the [energy](metric) sensor [faring](summary) yesterday?
+#     - How was the [temperature](metric) sensor [faring](summary) yesterday?
 
 - intent: out_of_scope
   examples: |

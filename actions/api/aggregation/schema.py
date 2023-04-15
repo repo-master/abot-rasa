@@ -1,6 +1,6 @@
 
 from enum import Enum
-from typing import Optional
+from typing import Optional, List, Dict
 from typing_extensions import TypedDict, NotRequired
 
 
@@ -11,11 +11,12 @@ class AggregationMethod(Enum):
     MAXIMUM = 'maximum'
     SUMMARY = 'summary'
 
+
 class AggregationResult(TypedDict):
     sensor_name: str
     result_value: str
     aggregation_method: str
-    outliers : dict
+    outliers: dict
 
 
 class SensorMetadata(TypedDict):
@@ -24,4 +25,9 @@ class SensorMetadata(TypedDict):
     sensor_name: NotRequired[str]
     sensor_alias: NotRequired[str]
     sensor_type: str
-    sensor_unit: str
+    display_unit: str
+
+
+class SensorDataResponse(TypedDict):
+    metadata: Dict
+    data: List[Dict]

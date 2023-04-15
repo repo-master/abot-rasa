@@ -19,6 +19,14 @@ stories:
     #     - previous_action
     #   - action: "{previous_action}"
 
+  # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
+  #   steps:
+  #   - intent: summarize_sensor_data
+  #   - slot_was_set:
+  #     - metric
+  #   - action: utter_summarize_affirm
+  #   - action: action_metric_summarize
+
   # - story: User did not want the response that they received
   #   steps:
   #   #TODO: Use action_two_stage_fallback and action_default_ask_rephrase default actions

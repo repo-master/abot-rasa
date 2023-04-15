@@ -31,6 +31,9 @@ intents:
     - metric
     - location
     - aggregation
+- summarize_sensor_data:
+    use_entities:
+    - metric
 
 
 entities:
@@ -60,6 +63,7 @@ slots:
 
 actions:
 - action_metric_aggregate
+- action_metric_summarize
 - utter_did_that_help
 - utter_greet
 - utter_happy
@@ -86,6 +90,8 @@ responses:
   - text: Okay, let me try again...
   utter_default:
   - text: Sorry I didn't get that. Can you rephrase?
+  utter_summarize_affirm:
+  - text: "Sure! Here is a summary of {metric}:"
 
 session_config:
   session_expiration_time: 60
