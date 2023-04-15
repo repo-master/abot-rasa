@@ -31,7 +31,11 @@ nlu:
   examples : |
     - sum
     - summary
-
+- synonym : average
+  examples: |
+  - avg
+  - mean
+  - average
 
 - intent: greet
   examples: |

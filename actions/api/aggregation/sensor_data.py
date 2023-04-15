@@ -61,9 +61,9 @@ def user_to_aggregation_type(name: Optional[str]) -> AggregationMethod:
     aggregation = AggregationMethod.CURRENT
     if name is not None:
         m = name.lower()
-        if m == "min":
+        if m == "minimum":
             aggregation = AggregationMethod.MINIMUM
-        elif m == "max":
+        elif m == "maximum":
             aggregation = AggregationMethod.MAXIMUM
         elif m == "average":
             aggregation = AggregationMethod.AVERAGE
