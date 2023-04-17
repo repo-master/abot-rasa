@@ -1,5 +1,5 @@
 
-from .schema import SensorMetadata, AggregationMethod
+from .schema import SensorMetadata, AggregationMethod, SensorDataResponse
 from .loader import fetch_sensor_data
 
 import pandas as pd
@@ -7,34 +7,16 @@ import pandas as pd
 from typing import Optional, Tuple, List, Dict
 
 
-async def get_sensor_data(requested_sensor_id: str) -> Tuple[pd.DataFrame, SensorMetadata]:
-    sensor_data = await fetch_sensor_data(requested_sensor_id)
+async def get_sensor_data(requested_sensor_id: int) -> Tuple[pd.DataFrame, SensorMetadata]:
+    sensor_data: SensorDataResponse = await fetch_sensor_data(requested_sensor_id)
 
-    metadata: Dict = sensor_data.get('metadata', {})
+    metadata: SensorMetadata = sensor_data.get('metadata', {})
     values: List[Dict] = sensor_data.get('data', [])
 
-    metadata: SensorMetadata = {
-        'sensor_urn': metadata.get('sensor_urn'),
-        'sensor_type': metadata.get('sensor_type'),
-        'sensor_id': metadata.get('sensor_id'),
-        'sensor_unit': metadata.get('display_unit', ''),
-        'sensor_name': metadata.get('sensor_name'),
-        'sensor_alias': metadata.get('sensor_alias')
-    }
-
+    # Create a DataFrame from the above data
     data = pd.DataFrame(values, index=None)
 
-    '''
-    # Filter the sensor required (only one for now)
-    if requested_sensor_id is not None:
-        data = data.where(data['HISTORY_ID'].str.split('/')[-1] == requested_sensor_id)
-    elif requested_sensor_type is not None:
-        data = data.where(data['sensor_type'] == requested_sensor_type)
-    else:
-        # Nothing is known, raise error
-        pass
-    '''
-
+    # Remove rows with NaN in them
     data.dropna(inplace=True, axis=1)
 
     if len(data) > 0:
@@ -56,6 +38,7 @@ def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
         return 'rh'
     elif name == 'em' or name == 'energy' or name == 'power':
         return 'em'
+
 
 def user_to_aggregation_type(name: Optional[str]) -> AggregationMethod:
     aggregation = AggregationMethod.CURRENT

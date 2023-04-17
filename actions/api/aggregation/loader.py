@@ -1,9 +1,10 @@
 
 from .. import Client
-from typing import Optional, Dict, Any
+from .schema import SensorDataResponse
+from typing import Optional
 
 
-async def fetch_sensor_data(requested_sensor_id: str) -> Dict[str, Any]:
+async def fetch_sensor_data(requested_sensor_id: int) -> SensorDataResponse:
     async with Client() as client:
         params = {}
 
@@ -21,15 +22,14 @@ async def fetch_sensor_data(requested_sensor_id: str) -> Dict[str, Any]:
         return response.json()
 
 
-async def determine_user_request_sensor_id(sensor_type=None, sensor_name=None, location=None):
+async def determine_user_request_sensor_id(sensor_type=None, sensor_name=None, location=None) -> Optional[int]:
     print(f"looking into sensor master to find {sensor_type} sensor in {location}")
     if sensor_type == 'temperature':
-        sensor_id = '1'
+        sensor_id = 1
     elif sensor_type == 'humidity':
-        sensor_id = '2'
+        sensor_id = 2
     else:
         sensor_id = None
-    print("sensor_id is : ", sensor_id)
+    print("sensor_id is:", sensor_id)
 
     return sensor_id
-
