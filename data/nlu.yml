@@ -33,9 +33,9 @@ nlu:
     - summary
 - synonym : average
   examples: |
-  - avg
-  - mean
-  - average
+    - avg
+    - mean
+    - average
 
 - intent: greet
   examples: |
