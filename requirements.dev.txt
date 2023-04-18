@@ -1,6 +1,2 @@
-rasa~=3.4.5
-uvicorn
-sqlalchemy~=1.4.47
-aiosqlite
-pandas
 flake8~=6.0.0
+autopep8~=2.0.2

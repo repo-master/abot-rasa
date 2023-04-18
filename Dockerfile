@@ -1,7 +1,5 @@
-# Run the Abot Rasa Actions server
-FROM rasa/rasa-sdk:3.4.1
-
-USER root
+# Run the Abot Rasa model/channel server
+FROM python:3.9
 
 WORKDIR /app
 COPY ./requirements.txt /app/requirements.txt
@@ -9,4 +7,4 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY . /app
 
-CMD ["rasa", "run", "actions"]
+CMD ["rasa", "run"]
