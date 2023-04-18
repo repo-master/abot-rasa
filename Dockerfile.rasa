@@ -4,6 +4,8 @@ FROM rasa/rasa:3.4.5
 ARG ENDPOINTS_FILE=endpoints.yml
 ARG CREDENTIALS_FILE=credentials.yml
 
+ENV RASA_ACTION_ENDPOINT=http://localhost:5055/webhook
+
 WORKDIR /app
 
 COPY . /app

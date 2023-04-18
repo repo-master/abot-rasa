@@ -3,7 +3,7 @@ models:
   wait_time_between_pulls: 10   # [optional](default: 100)
 
 action_endpoint:
-  url: "http://localhost:5055/webhook"
+  url: !env_var ${RASA_ACTION_ENDPOINT}
 
 #tracker_store:
 #    type: redis
