@@ -1,2 +1,2 @@
 -r ./requirements.rasa.txt
--r requirements.actions.txt
+-r ./requirements.actions.txt
