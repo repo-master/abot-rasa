@@ -1,6 +1,2 @@
-rasa~=3.4.5
-rasa-sdk~=3.4.1
-pandas
-websockets~=10.4
-httpx~=0.24.0
-aiogram~=2.23.1
+-r ./requirements.rasa.txt
+-r requirements.actions.txt

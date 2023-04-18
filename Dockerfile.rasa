@@ -1,0 +1,11 @@
+# Run the Abot Rasa model/channel server
+FROM rasa/rasa:3.4.5
+
+ARG ENDPOINTS_FILE=endpoints.yml
+ARG CREDENTIALS_FILE=credentials.yml
+
+WORKDIR /app
+
+COPY . /app
+
+CMD ["run", "--endpoints", "endpoints.test.yml", "--credentials", "credentials.test.yml"]

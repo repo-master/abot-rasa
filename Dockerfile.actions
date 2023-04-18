@@ -4,9 +4,10 @@ FROM rasa/rasa-sdk:3.4.1
 USER root
 
 WORKDIR /app
-COPY ./requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+COPY ./requirements.actions.txt /app/requirements.actions.txt
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.actions.txt
 
 COPY . /app
 
-CMD ["rasa", "run", "actions"]
+# Don't use root user to run code
+USER 1001
