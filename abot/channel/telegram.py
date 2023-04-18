@@ -6,7 +6,7 @@ from rasa.core.channels import InputChannel, OutputChannel, UserMessage
 from asyncio import AbstractEventLoop, Task
 from sanic import Sanic, Blueprint
 
-from typing import Optional, Callable, Coroutine, Awaitable, Dict, Any
+from typing import Callable, Coroutine, Awaitable, Dict, Any
 
 
 class TelegramOutput(OutputChannel):
@@ -83,5 +83,5 @@ class TelegramInput(InputChannel):
 
         return telegram_blueprint
 
-    def get_output_channel(self) -> Optional["OutputChannel"]:
+    def get_output_channel(self) -> OutputChannel:
         return self._outchannel
