@@ -1,5 +1,7 @@
 # Run the Abot Rasa Actions server
-FROM python:3.9
+FROM rasa/rasa-sdk:3.4.1
+
+USER root
 
 WORKDIR /app
 COPY ./requirements.txt /app/requirements.txt
