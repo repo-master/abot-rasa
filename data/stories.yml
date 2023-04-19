@@ -19,6 +19,16 @@ stories:
     #     - previous_action
     #   - action: "{previous_action}"
 
+  - story : show logo
+    steps:
+      - intent : get_phaidelta_logo
+      - action: action_show_image
+
+  - story : report fetching story
+    steps:
+      - intent : get_report
+      - action : fetch_report
+
   # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
   #   steps:
   #   - intent: summarize_sensor_data

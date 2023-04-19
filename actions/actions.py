@@ -18,7 +18,10 @@ from .api.aggregation import (
 )
 
 from rasa_sdk.types import DomainDict
-from typing import Any, Text, Dict, List
+from typing import Any, Text, Dict, List, Union
+from io import BytesIO
+from PIL import Image
+import base64
 
 
 class ActionMetricAggregate(Action):
@@ -89,6 +92,48 @@ class ActionMetricSummarize(Action):
             user_req_metric, user_req_location), flush=True)
 
         # Either one can be set
+        requested_sensor_id = await determine_user_request_sensor_id(
+            sensor_type=user_req_metric,
+            sensor_name=None,  # TODO: Get from slot
+            location=user_req_location
+        )
+
+        # Could not determine the sensor to get info on (or no info provided at all)
+        if requested_sensor_id is None:
+            dispatcher.utter_message("Which sensor do you want to get information on?")
+            return [ActionExecutionRejected(self.name())]
+
+        return []
+
+class ActionShowImage(Action):
+    def name(self) -> Text:
+        return "action_show_image"
+    
+    def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        # dispatcher.utter_message(response="utter_show_image")
+        img = Image.open("actions/logo-phAIdelta.png")
+
+        data = BytesIO()
+        img.save(data, "JPEG")
+        data64 = base64.b64encode(data.getvalue()).decode('utf-8')
+        uri = "data:image/jpeg;base64," + data64
+
+        # Send the image to the user
+        dispatcher.utter_message(image=uri)
+
+
+
+        return []
+    
+
+class ActionShowImage(Action):
+    def name(self) -> Text:
+        return "fetch_report"
+    
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        user_req_metric = tracker.get_slot("metric")
+        user_req_location = tracker.get_slot("location")
+
         requested_sensor_id = await determine_user_request_sensor_id(
             sensor_type=user_req_metric,
             sensor_name=None,  # TODO: Get from slot

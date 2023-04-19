@@ -225,6 +225,16 @@ nlu:
     - And the [unit 1](location)?
     - also at [unit 2](location)?
 
+- intent : get_phaidelta_logo
+  examples: |
+    - Can you show me the logo?
+
+- intent : get_report
+  examples: |
+    - Give me Report 
+    - can i Have report of this
+    - Generate a Report out of this
+
 # TODO: Time period (today's, yesterday's, etc.)
 # - intent: summarize_sensor_data
 #   examples: |

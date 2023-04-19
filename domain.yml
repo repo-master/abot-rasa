@@ -34,7 +34,8 @@ intents:
 - summarize_sensor_data:
     use_entities:
     - metric
-
+- get_phaidelta_logo
+- get_report
 
 entities:
 - metric
@@ -71,6 +72,8 @@ actions:
 - utter_iamabot
 - utter_mistake
 - utter_corrected
+- action_show_image
+- fetch_report
 
 
 responses:
@@ -92,6 +95,9 @@ responses:
   - text: Sorry I didn't get that. Can you rephrase?
   utter_summarize_affirm:
   - text: "Sure! Here is a summary of {metric}:"
+  utter_show_image:
+  - text: "Here's the phAIdelta log :"
+    image: "https://img.freepik.com/free-photo/red-white-cat-i-white-studio_155003-13189.jpg"
 
 session_config:
   session_expiration_time: 60

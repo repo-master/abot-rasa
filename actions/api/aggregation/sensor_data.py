@@ -5,9 +5,9 @@ from .loader import fetch_sensor_data
 import pandas as pd
 
 from typing import Optional, Tuple, List, Dict
+from datetime import datetime
 
-
-async def get_sensor_data(requested_sensor_id: int) -> Tuple[pd.DataFrame, SensorMetadata]:
+async def get_sensor_data(requested_sensor_id: int, from_date = datetime.now() - datetime.timedelta(days= 1), to_date = datetime.now()) -> Tuple[pd.DataFrame, SensorMetadata]:
     sensor_data: SensorDataResponse = await fetch_sensor_data(requested_sensor_id)
 
     metadata: SensorMetadata = sensor_data.get('metadata', {})
