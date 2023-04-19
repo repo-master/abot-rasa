@@ -1,10 +1,15 @@
 # Run the Abot Rasa Actions server
-FROM python:3.9
+FROM rasa/rasa-sdk:3.4.1
+
+ENV BACKEND_ENDPOINT_BASE=$BACKEND_ENDPOINT_BASE
+
+USER root
 
 WORKDIR /app
-COPY ./requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+COPY ./requirements.actions.txt /app/requirements.actions.txt
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.actions.txt
 
 COPY . /app
 
-CMD ["rasa", "run", "actions"]
+# Don't use root user to run code
+USER 1001

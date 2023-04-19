@@ -1,2 +1,2 @@
 
-API_BASE = "http://localhost:8000"
+from ..config import BACKEND_ENDPOINT_BASE

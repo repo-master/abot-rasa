@@ -1,0 +1,14 @@
+models:
+  url: https://github.com/repo-master/abot-rasa/releases/latest/download/stable-model.tar.gz
+  wait_time_between_pulls: 10   # [optional](default: 100)
+
+action_endpoint:
+  url: !env_var ${RASA_ACTION_ENDPOINT}
+
+#tracker_store:
+#    type: redis
+#    url: <host of the redis instance, e.g. localhost>
+#    port: <port of your redis instance, usually 6379>
+#    db: <number of your database within redis, e.g. 0>
+#    password: <password used for authentication>
+#    use_ssl: <whether or not the communication is encrypted, default false>
