@@ -2,13 +2,17 @@
 from .. import Client
 from .schema import SensorDataResponse
 from typing import Optional
+from datetime import datetime , timedelta
 
-
-async def fetch_sensor_data(requested_sensor_id: int) -> SensorDataResponse:
+async def fetch_sensor_data(requested_sensor_id: int, 
+                      timestamp_from: Optional[datetime] = None,
+                      timestamp_to: Optional[datetime] = None) -> SensorDataResponse:
     async with Client() as client:
         params = {}
 
-        params.update({'sensor_id': requested_sensor_id})
+        params.update({'sensor_id': requested_sensor_id, 'timestamp_from': timestamp_from.isoformat(), 'timestamp_to': timestamp_to.isoformat()})
+
+
         # This is the parameters that should be passed to guess sensor id from any known items (type, name, alias, location, etc.)
         # This will go into `user_guess_sensor_id`
         '''elif requested_sensor_type is not None:

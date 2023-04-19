@@ -3,7 +3,7 @@
 #
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
-
+from datetime import datetime, timedelta
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import ActionExecutionRejected
@@ -33,6 +33,9 @@ class ActionMetricAggregate(Action):
         user_req_location = tracker.get_slot("location")
         user_req_agg_method: str = tracker.get_slot("aggregation")
 
+        timestamp_from = datetime.today() - timedelta(days=365)
+        timestamp_to = datetime.now()
+
         print("Got slots: Metric: %s, Location: %s, Aggregation: %s" % (
             user_req_metric, user_req_location, user_req_agg_method), flush=True)
 
@@ -54,7 +57,7 @@ class ActionMetricAggregate(Action):
         aggregation = user_to_aggregation_type(user_req_agg_method)
 
         # Load data
-        data, metadata = await get_sensor_data(requested_sensor_id)
+        data, metadata = await get_sensor_data(requested_sensor_id, timestamp_from , timestamp_to)
 
         # Run aggregation
         agg_response = perform_aggregation_on_data(data, aggregation, metadata)
@@ -126,7 +129,7 @@ class ActionShowImage(Action):
         return []
     
 
-class ActionShowImage(Action):
+class ActionFetchReport(Action):
     def name(self) -> Text:
         return "fetch_report"
     
