@@ -50,7 +50,7 @@ class ActionMetricAggregate(Action):
 
         # Could not determine the sensor to get info on (or no info provided at all)
         if requested_sensor_id is None:
-            dispatcher.utter_message("Which sensor do you want to get information on?")
+            dispatcher.utter_message(f" Sensor: {user_req_metric} Does not exist at location : {user_req_location}, please Enter proper data for the same")
             return [ActionExecutionRejected(self.name())]
 
         # Check aggregation method provided by the user

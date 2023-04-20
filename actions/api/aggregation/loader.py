@@ -4,6 +4,8 @@ from .schema import SensorDataResponse
 from typing import Optional
 from datetime import datetime , timedelta
 
+import json
+
 async def fetch_sensor_data(requested_sensor_id: int, 
                       timestamp_from: Optional[datetime] = None,
                       timestamp_to: Optional[datetime] = None) -> SensorDataResponse:
@@ -27,13 +29,14 @@ async def fetch_sensor_data(requested_sensor_id: int,
 
 
 async def determine_user_request_sensor_id(sensor_type=None, sensor_name=None, location=None) -> Optional[int]:
-    print(f"looking into sensor master to find {sensor_type} sensor in {location}")
-    if sensor_type == 'temperature':
-        sensor_id = 1
-    elif sensor_type == 'humidity':
-        sensor_id = 2
-    else:
-        sensor_id = None
-    print("sensor_id is:", sensor_id)
+    async with Client() as client:
+        params = {}
+        params.update({'sensor_type': sensor_type,  'location': location})
 
-    return sensor_id
+        response = await client.get("/query/sensor_id", params=params)
+        return response.json()['sensor_id']
+        
+
+
+
+
