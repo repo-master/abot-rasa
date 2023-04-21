@@ -1,54 +1,5 @@
 version: "3.1"
 nlu:
-- synonym: temp
-  examples: |
-    - temp
-    - temps
-    - cold
-    - hot
-    - temperature
-- synonym: rh
-  examples: |
-    - humid
-    - rh
-    - RH    
-    - relative humidity
-    - humidity
-- synonym: unit
-  examples: |
-    - unit
-    - room
-    - area  
-- synonym: maximum
-  examples: |
-    - max
-    - maximum
-    - highest
-    - greatest
-    - largest
-    - extreme high
-- synonym: minimum
-  examples: |
-    - least
-    - lowest
-    - min
-    - minimum
-    - extreme low
-- synonym: summary
-  examples: |
-    - sum
-    - summary
-    - summarize
-    - stats
-    - statistic
-    - faring
-    - brief me about
-- synonym: average
-  examples: |
-    - avg
-    - mean
-    - average
-
 - intent: greet
   examples: |
     - hey
@@ -65,7 +16,6 @@ nlu:
     - goodevening
     - good afternoon
     - Hello!
-
 - intent: goodbye
   examples: |
     - cu
@@ -78,7 +28,6 @@ nlu:
     - see you around
     - bye bye
     - see you later
-
 - intent: affirm
   examples: |
     - yes
@@ -87,7 +36,6 @@ nlu:
     - of course
     - that sounds good
     - correct
-
 - intent: deny
   examples: |
     - no
@@ -97,7 +45,6 @@ nlu:
     - don't like that
     - no way
     - not really
-
 - intent: mood_great
   examples: |
     - perfect
@@ -114,7 +61,6 @@ nlu:
     - so so perfect
     - so good
     - so perfect
-
 - intent: mood_unhappy
   examples: |
     - my day was horrible
@@ -131,14 +77,12 @@ nlu:
     - extremly sad
     - so saad
     - so sad
-
 - intent: bot_challenge
   examples: |
     - are you a bot?
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
-
 - intent: query_metric_aggregate
   examples: |
     - What is the [temperature](metric)?
@@ -181,12 +125,10 @@ nlu:
     - What is the current [temperature](metric)?
     - What is the [maximum](aggregation) [energy reading](metric)?
     - Give me the [average](aggregation) [humidity reading](metric)
-    - What is the [temperature](metric)?
     - What about [rh](metric)?
     - please give me the [average](aggregation)
     - Give [summary](aggregation) for temperature
     - Fetch [summary](aggregation) for [room 2](location) [humidity](metric)
-
 - intent: change_sensor
   examples: |
     - The [temperature](metric) metric.
@@ -198,7 +140,6 @@ nlu:
     - Same calculation but for [energy](metric)
     - Can you tell me for [power meter](metric)?
     - now the [minimum](aggregation) for [temperature](metric)
-
 - intent: change_aggregation
   examples: |
     - The [average](aggregation).
@@ -216,7 +157,6 @@ nlu:
     - What is the [max](aggregation)?
     - and [min](aggregation)?
     - give me the [min](aggregation)
-
 - intent: change_location
   examples: |
     - The [outside](location) value.
@@ -231,34 +171,14 @@ nlu:
     - What about [outside](location)?
     - And the [unit 1](location)?
     - also at [unit 2](location)?
-
-- intent : get_phaidelta_logo
+- intent: get_phaidelta_logo
   examples: |
     - Can you show me the logo?
-
-- intent : get_report
+- intent: get_report
   examples: |
-    - Give me Report 
+    - Give me Report
     - can i Have report of this
     - Generate a Report out of this
-
-# TODO: Time period (today's, yesterday's, etc.)
-# - intent: summarize_sensor_data
-#   examples: |
-#     - Can you [summarize](summary) that for me?
-#     - Can you briefly tell me the [stats](summary) of [humidity](metric)?
-#     - How is the [temperature](metric) sensor [faring](summary)?
-#     - How is the [humidity](metric) sensor [faring](summary)?
-#     - How is the [energy](metric) sensor [faring](summary)?
-#     - Please [summarize](summary) that.
-#     - Please [summarize](summary) [temperature](metric) sensor
-#     - Please [summarize](summary) the [humidity](metric) sensor
-#     - Please [summarize](summary) yesterday's events.
-#     - Please [brief me about](summary) today's data.
-#     - Please [brief me about](summary) yesterday's data.
-#     - How was the [energy](metric) sensor [faring](summary) yesterday?
-#     - How was the [temperature](metric) sensor [faring](summary) yesterday?
-
 - intent: out_of_scope
   examples: |
     - I want to order food
@@ -268,7 +188,85 @@ nlu:
     - Tell me a joke
     - I am bored
     - Let's play a game
-
+- intent: network_issue
+  examples: |
+    - Actually, I gave a call regarding the network issues.
+    - I called regarding network issue
+    - I am facing the network issue
+    - i am facing network issue
+- intent: my_name_is
+  examples: |
+    - My name is [Ashpak](NAME)
+    - [Ashpak](NAME) this side
+    - its [Ashpak](NAME)
+    - [Ashpak](NAME) is my name
+    - you can call me [Ashpak](NAME)
+    - [Ashpak](NAME)
+- intent: headset
+  examples: |
+    - I am using a [samsung](BRAND) phone.
+    - I have [one plus]{"entity": "BRAND", "value": " One plus"} mobile.
+    - i am using [one +]{"entity": "BRAND", "value": " One plus"}
+    - i use [i-phone](BRAND)
+    - i prefer [i phone](BRAND)
+    - i am using [one plus]{"entity": "BRAND", "value": " One plus"} mobile
+    - i am using [samsung](BRAND)
+    - i am using [oneplus]{"entity": "BRAND", "value": " One plus"} mobile
+    - i am using [nokia](BRAND) mobile
+    - i am using [samsung](BRAND)
+- synonym: temp
+  examples: |
+    - temp
+    - temps
+    - cold
+    - hot
+    - temperature
+- synonym: rh
+  examples: |
+    - humid
+    - rh
+    - RH
+    - relative humidity
+    - humidity
+- synonym: unit
+  examples: |
+    - unit
+    - room
+    - area
+- synonym: maximum
+  examples: |
+    - max
+    - maximum
+    - highest
+    - greatest
+    - largest
+    - extreme high
+- synonym: minimum
+  examples: |
+    - least
+    - lowest
+    - min
+    - minimum
+    - extreme low
+- synonym: summary
+  examples: |
+    - sum
+    - summary
+    - summarize
+    - stats
+    - statistic
+    - faring
+    - brief me about
+- synonym: average
+  examples: |
+    - avg
+    - mean
+    - average
+- synonym: ' One plus'
+  examples: |
+    - one plus
+    - one +
+    - oneplus
 - synonym: latest_period
   examples: |
     - Current

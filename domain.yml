@@ -1,6 +1,4 @@
 version: '3.1'
-
-
 intents:
 - affirm
 - bot_challenge
@@ -20,11 +18,16 @@ intents:
     - location
     - aggregation
 - deny
+- get_phaidelta_logo
+- get_report
 - goodbye
 - greet
+- headset
 - inform
 - mood_great
 - mood_unhappy
+- my_name_is
+- network_issue
 - out_of_scope
 - query_metric_aggregate:
     use_entities:
@@ -34,16 +37,13 @@ intents:
 - summarize_sensor_data:
     use_entities:
     - metric
-- get_phaidelta_logo
-- get_report
-
 entities:
+- BRAND
 - metric
 - aggregation
 - latest_period
 - location
-
-
+- NAME
 slots:
   metric:
     type: text
@@ -60,9 +60,30 @@ slots:
     mappings:
     - type: from_entity
       entity: location
-
-
+  BRAND:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: form_info
+        requested_slot: BRAND
+  NAME:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: from_info
+        requested_slot: NAME
+forms:
+  form_info:
+    required_slots:
+    - BRAND
+    - NAME
 actions:
+- utter_ask_name
+- utter_submit
+- action_show_image
 - action_metric_aggregate
 - action_metric_summarize
 - utter_did_that_help
@@ -72,10 +93,8 @@ actions:
 - utter_iamabot
 - utter_mistake
 - utter_corrected
-- action_show_image
 - fetch_report
-
-
+- utter_wrong_value
 responses:
   utter_greet:
   - text: Hey! What would you like to know?
@@ -94,11 +113,18 @@ responses:
   utter_default:
   - text: Sorry I didn't get that. Can you rephrase?
   utter_summarize_affirm:
-  - text: "Sure! Here is a summary of {metric}:"
+  - text: 'Sure! Here is a summary of {metric}:'
   utter_show_image:
   - text: "Here's the phAIdelta log :"
-    image: "https://img.freepik.com/free-photo/red-white-cat-i-white-studio_155003-13189.jpg"
-
+    image: https://img.freepik.com/free-photo/red-white-cat-i-white-studio_155003-13189.jpg
+  utter_ask_BRAND:
+  - text: Could we please know which handset you are using?
+  utter_ask_NAME:
+  - text: Ok, please provide your first name
+  utter_solution:
+  - text: That's why u are facing problem while calling
+  utter_submit:
+  - text: Your name is {NAME} and your headset is {BRAND}. Is this Correct?
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

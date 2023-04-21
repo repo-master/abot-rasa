@@ -29,6 +29,16 @@ stories:
       - intent : get_report
       - action : fetch_report
 
+  - story : network_complain
+    steps:
+      - intent : network_issue
+      - action: form_info
+      - active_loop: form_info
+      - action: form_info
+      - active_loop: null
+      - intent: affirm      
+      - action : action_show_image
+
   # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
   #   steps:
   #   - intent: summarize_sensor_data
@@ -48,3 +58,13 @@ stories:
   #     - intent: change_location
   #   - action: action_metric_aggregate
   #   - action: utter_corrected
+
+  - story: interactive_story_1
+    steps:
+    - intent: network_issue
+    - action: form_info
+    - active_loop: form_info
+    - action: form_info
+    - active_loop: null
+    - action: utter_submit
+    - action: action_show_image
