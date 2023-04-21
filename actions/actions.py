@@ -137,6 +137,12 @@ class ActionFetchReport(Action):
         user_req_metric = tracker.get_slot("metric")
         user_req_location = tracker.get_slot("location")
 
+        timestamp_from = datetime.today() - timedelta(days=365)
+        timestamp_to = datetime.now()
+
+        print("Got slots: Metric: %s, Location: %s" % (
+            user_req_metric, user_req_location), flush=True)
+
         requested_sensor_id = await determine_user_request_sensor_id(
             sensor_type=user_req_metric,
             sensor_name=None,  # TODO: Get from slot
@@ -147,5 +153,9 @@ class ActionFetchReport(Action):
         if requested_sensor_id is None:
             dispatcher.utter_message("Which sensor do you want to get information on?")
             return [ActionExecutionRejected(self.name())]
+
+        # Load data
+        data, metadata = await get_sensor_data(requested_sensor_id, timestamp_from , timestamp_to)
+
 
         return []
