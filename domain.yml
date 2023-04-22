@@ -4,21 +4,6 @@ version: '3.1'
 intents:
 - affirm
 - bot_challenge
-- change_aggregation:
-    use_entities:
-    - metric
-    - location
-    - aggregation
-- change_location:
-    use_entities:
-    - metric
-    - location
-    - aggregation
-- change_sensor:
-    use_entities:
-    - metric
-    - location
-    - aggregation
 - deny
 - goodbye
 - greet
@@ -26,45 +11,15 @@ intents:
 - mood_great
 - mood_unhappy
 - out_of_scope
-- query_metric_aggregate:
-    use_entities:
-    - metric
-    - location
-    - aggregation
-- summarize_sensor_data:
-    use_entities:
-    - metric
+
 - get_phaidelta_logo
 - get_report
 
 entities:
-- metric
-- aggregation
-- latest_period
-- location
-
-
-slots:
-  metric:
-    type: text
-    mappings:
-    - type: from_entity
-      entity: metric
-  aggregation:
-    type: text
-    mappings:
-    - type: from_entity
-      entity: aggregation
-  location:
-    type: text
-    mappings:
-    - type: from_entity
-      entity: location
+- time
 
 
 actions:
-- action_metric_aggregate
-- action_metric_summarize
 - utter_did_that_help
 - utter_greet
 - utter_happy
@@ -93,11 +48,10 @@ responses:
   - text: Okay, let me try again...
   utter_default:
   - text: Sorry I didn't get that. Can you rephrase?
-  utter_summarize_affirm:
-  - text: "Sure! Here is a summary of {metric}:"
   utter_show_image:
   - text: "Here's the phAIdelta log :"
     image: "https://img.freepik.com/free-photo/red-white-cat-i-white-studio_155003-13189.jpg"
+
 
 session_config:
   session_expiration_time: 60

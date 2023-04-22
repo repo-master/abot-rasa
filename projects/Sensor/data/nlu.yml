@@ -1,24 +1,17 @@
 version: "3.1"
 nlu:
-- synonym: temp
+- synonym: temperature
   examples: |
     - temp
     - temps
     - cold
     - hot
-    - temperature
-- synonym: rh
+- synonym: humidity
   examples: |
     - humid
     - rh
     - RH    
     - relative humidity
-    - humidity
-- synonym: unit
-  examples: |
-    - unit
-    - room
-    - area  
 - synonym: maximum
   examples: |
     - max
@@ -186,6 +179,25 @@ nlu:
     - please give me the [average](aggregation)
     - Give [summary](aggregation) for temperature
     - Fetch [summary](aggregation) for [room 2](location) [humidity](metric)
+
+    - What is the [humidity](metric) [currently](latest_period) [today](time)?
+    - What is the [average](aggregation) [temperature](metric) [today](time)?
+    - What is the [average](aggregation) [humidity](metric) [today](time)?
+    - What is the [temperature](metric) [outside](location) [today](time)?
+    - What is the [humidity](metric) [outside](location) [today](time)?
+    - What was the [temperature](metric) [currently](latest_period) [outside](location) [yesterday](time)?
+    - What is the [rh](metric) [currently](latest_period) [outside](location) [today](time)?
+    - What is the [average](aggregation) [temperature](metric) [outside](location) [today](time)?
+    - What is the [average](aggregation) [humidity](metric) [outside](location) [today](time)?
+    - Give me the [temperature](metric) for [today](time)
+    - Give me the [humidity](metric) for [yesterday](time)
+    - Give me the current [energy reading](metric) for [yesterday](time)
+    - Give me the [energy reading](metric) for [yesterday](time)
+    - Give me the [power reading](metric) for [yesterday](time)
+    - Give me the [temperature](metric) for [yesterday](time)
+    - Give me the [humidity](metric) for [last week](time)
+    - Give me the [average](aggregation) [temperature](metric)
+    - Give me [last week](time)'s [average](aggregation) [humidity](metric)
 
 - intent: change_sensor
   examples: |

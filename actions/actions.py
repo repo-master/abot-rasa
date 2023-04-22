@@ -3,10 +3,12 @@
 #
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
+
 from datetime import datetime, timedelta
-from rasa_sdk import Action, Tracker
+
+from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import ActionExecutionRejected
+from rasa_sdk.events import ActionExecutionRejected, SlotSet
 
 from .api.aggregation import (
     get_sensor_data,
@@ -29,15 +31,19 @@ class ActionMetricAggregate(Action):
         return "action_metric_aggregate"
 
     async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
+
         user_req_metric = tracker.get_slot("metric")
         user_req_location = tracker.get_slot("location")
         user_req_agg_method: str = tracker.get_slot("aggregation")
+        user_req_timeperiod: str = tracker.get_slot("timestamp_agg")
 
         timestamp_from = datetime.today() - timedelta(days=365)
         timestamp_to = datetime.now()
 
         print("Got slots: Metric: %s, Location: %s, Aggregation: %s" % (
             user_req_metric, user_req_location, user_req_agg_method), flush=True)
+        print("Time period:", user_req_timeperiod, type(user_req_timeperiod))
 
         # TODO: More assumption magic needed
 
@@ -55,6 +61,12 @@ class ActionMetricAggregate(Action):
 
         # Check aggregation method provided by the user
         aggregation = user_to_aggregation_type(user_req_agg_method)
+
+        if user_req_timeperiod is None:
+            user_req_timeperiod = ""
+            events.append(SlotSet("", user_req_timeperiod))
+
+        requested_timeperiod: datetime = datetime.fromisoformat(user_req_timeperiod)
 
         # Load data
         data, metadata = await get_sensor_data(requested_sensor_id, timestamp_from , timestamp_to)
@@ -79,7 +91,7 @@ class ActionMetricAggregate(Action):
                 sensor_type=metadata['sensor_type']
             ))
 
-        return []
+        return events
 
 
 class ActionMetricSummarize(Action):

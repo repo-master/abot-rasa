@@ -1,0 +1,61 @@
+version: '3.1'
+
+intents:
+- change_aggregation:
+    use_entities:
+    - metric
+    - location
+    - aggregation
+- change_location:
+    use_entities:
+    - metric
+    - location
+    - aggregation
+- change_sensor:
+    use_entities:
+    - metric
+    - location
+    - aggregation
+- query_metric_aggregate:
+    use_entities:
+    - metric
+    - location
+    - aggregation
+- summarize_sensor_data:
+    use_entities:
+    - metric
+
+
+entities:
+- metric
+- aggregation
+- latest_period
+- location
+
+
+slots:
+  metric:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: metric
+  aggregation:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: aggregation
+  location:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: location
+  timestamp_agg:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: time
+
+actions:
+- action_metric_aggregate
+- action_metric_summarize
+

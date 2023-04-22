@@ -15,6 +15,7 @@ stories:
       - intent: change_aggregation
       - intent: change_location
     - action: action_metric_aggregate
+
     # - slot_was_set:
     #     - previous_action
     #   - action: "{previous_action}"
