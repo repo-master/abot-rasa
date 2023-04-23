@@ -12,6 +12,7 @@ importers:
 # Enabled projects
 imports:
 - projects/Sensor
+- projects/ChitChat
 
 
 pipeline:

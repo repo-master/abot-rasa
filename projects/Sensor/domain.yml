@@ -49,7 +49,10 @@ slots:
     mappings:
     - type: from_entity
       entity: location
-  timestamp_agg:
+  
+  # Timestamp for aggregation. Either ISO8601 string of entered time,
+  # or a dict of {'from': '...', 'to': '...'} for range.
+  timestamp_agg_period:
     type: text
     mappings:
     - type: from_entity

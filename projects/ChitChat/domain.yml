@@ -1,0 +1,23 @@
+version: '3.1'
+
+intents:
+- affirm
+- bot_challenge
+- deny
+- goodbye
+- greet
+- inform
+- mood_great
+- mood_unhappy
+- out_of_scope
+
+
+responses:
+  utter_greet:
+  - text: Hey! What would you like to know?
+  utter_happy:
+  - text: Great, carry on!
+  utter_goodbye:
+  - text: Thank you for using me!
+  utter_iamabot:
+  - text: I am Abot, a chat bot powered by Rasa.

@@ -1,47 +1,20 @@
 version: '3.1'
 
-
 intents:
-- affirm
-- bot_challenge
-- deny
-- goodbye
-- greet
-- inform
-- mood_great
-- mood_unhappy
-- out_of_scope
-
 - get_phaidelta_logo
 - get_report
 
 entities:
 - time
 
-
 actions:
-- utter_did_that_help
-- utter_greet
-- utter_happy
-- utter_goodbye
-- utter_iamabot
-- utter_mistake
-- utter_corrected
 - action_show_image
 - fetch_report
 
 
 responses:
-  utter_greet:
-  - text: Hey! What would you like to know?
   utter_did_that_help:
   - text: Did that help you?
-  utter_happy:
-  - text: Great, carry on!
-  utter_goodbye:
-  - text: Thank you for using me!
-  utter_iamabot:
-  - text: I am Abot, a chat bot powered by Rasa.
   utter_mistake:
   - text: I am sorry for that. Can you tell me what you wanted?
   utter_corrected:
