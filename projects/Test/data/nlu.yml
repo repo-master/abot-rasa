@@ -1,0 +1,16 @@
+version: "3.1"
+
+nlu:
+- intent: show_test
+  examples: |
+    - Show me the test message
+    - Test
+    - Example
+    - Show me a cat
+    - Abot test message
+    - Testing
+    - Hello, test
+    - Demo test
+    - Markdown message
+    - Image message
+    - Test message with markdown and image
