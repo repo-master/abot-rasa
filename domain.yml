@@ -9,7 +9,6 @@ entities:
 
 actions:
 - action_show_image
-- fetch_report
 
 
 responses:

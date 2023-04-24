@@ -161,7 +161,7 @@ class ActionShowImage(Action):
 
 class ActionFetchReport(Action):
     def name(self) -> Text:
-        return "fetch_report"
+        return "action_fetch_report"
     
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         # user_req_metric = tracker.get_slot("metric")
@@ -188,5 +188,7 @@ class ActionFetchReport(Action):
         # data, metadata = await get_sensor_data(requested_sensor_id, timestamp_from , timestamp_to)
 
         # TODO: Above logic into here
+
+        dispatcher.utter_message(image="https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")
 
         return []

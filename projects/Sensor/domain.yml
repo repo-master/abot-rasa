@@ -61,4 +61,4 @@ slots:
 actions:
 - action_metric_aggregate
 - action_metric_summarize
-
+- action_fetch_report
