@@ -5,5 +5,6 @@ intents:
 responses:
   utter_test_message:
   - text: "Hello! This is a test message from Abot! (Repo link)[https://github.com/repo-master/abot]. Here is a cat for your comfort."
+  utter_test_message_2:
   - text: Cat :3 !
     image: https://img.freepik.com/free-photo/red-white-cat-i-white-studio_155003-13189.jpg

@@ -5,3 +5,4 @@ rules:
   steps:
   - intent: show_test
   - action: utter_test_message
+  - action: utter_test_message_2
