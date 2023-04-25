@@ -13,6 +13,8 @@ from rasa_sdk.events import ActionExecutionRejected, SlotSet
 
 from .api.aggregation import (
     get_sensor_data,
+    get_report_generate_preview,
+
     determine_user_request_sensor,
     perform_aggregation_on_data,
 
@@ -231,20 +233,18 @@ class ActionFetchReport(Action):
         # Time period of aggregation
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
 
-        report_params = {
-            'sensor_id': requested_sensor_id,
-            'time_from': requested_timeperiod["from"].isoformat(),
-            'time_to': requested_timeperiod["to"].isoformat()
-        }
+        # URI or Data URI of preview image
+        report_data: dict = await get_report_generate_preview()
 
         # TODO: Somehow get public URL of report. localhost won't work obviously. Don't hardcode it.
-        report_url = 'https://example.com/report/?%s' % urllib.parse.urlencode(report_params)
+        report_url: str = report_data['interactive_report_route']
+        preview_image_url: str = report_data['preview_image']
 
         dispatcher.utter_message(
             text="Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report.".format(
                 report_url=report_url
             ),
-            image="https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            image=preview_image_url
         )
 
         return []
