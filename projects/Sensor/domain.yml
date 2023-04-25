@@ -16,6 +16,7 @@ intents:
     - metric
     - location
     - aggregation
+- change_time_period
 - query_metric_aggregate:
     use_entities:
     - metric
@@ -24,7 +25,6 @@ intents:
 - summarize_sensor_data:
     use_entities:
     - metric
-
 
 entities:
 - metric
