@@ -5,6 +5,7 @@
 # https://rasa.com/docs/rasa/custom-actions
 
 from datetime import datetime, timedelta
+import urllib.parse
 
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
@@ -18,7 +19,8 @@ from .api.aggregation import (
     user_to_sensor_type,
     user_to_aggregation_type,
 
-    SensorMetadata
+    SensorMetadata,
+    AggregationMethod
 )
 
 from rasa_sdk.types import DomainDict
@@ -28,8 +30,8 @@ from PIL import Image
 import base64
 
 
-TimeRangeIn = TypedDict("TimeRange", {"from": str, "to": str})
-TimeRange = TypedDict("TimeRange", {"from": str, "to": str})
+TimeRangeIn = TypedDict("TimeRangeIn", {"from": str, "to": str})
+TimeRange = TypedDict("TimeRange", {"from": datetime, "to": datetime})
 
 
 async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> Tuple[Dict, List[Dict[Text, Any]]]:
@@ -122,7 +124,7 @@ class ActionMetricAggregate(Action):
         requested_sensor_id: int = requested_sensor['sensor_id']
 
         # Check aggregation method provided by the user
-        aggregation = user_input.get('aggregation')
+        aggregation: AggregationMethod = user_input.get('aggregation')
 
         # Time period of aggregation
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
@@ -229,13 +231,18 @@ class ActionFetchReport(Action):
         # Time period of aggregation
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
 
+        report_params = {
+            'sensor_id': requested_sensor_id,
+            'time_from': requested_timeperiod["from"].isoformat(),
+            'time_to': requested_timeperiod["to"].isoformat()
+        }
+
+        # TODO: Somehow get public URL of report. localhost won't work obviously. Don't hardcode it.
+        report_url = 'https://example.com/report/?%s' % urllib.parse.urlencode(report_params)
+
         dispatcher.utter_message(
             text="Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report.".format(
-                report_url="http://uat.phaidelta.com:8090/report/sensor?sensor_id={sensor_id}&from={time_from}&to={time_to}".format(
-                    sensor_id = requested_sensor_id,
-                    time_from = requested_timeperiod["from"],
-                    time_to = requested_timeperiod["to"]
-                )
+                report_url=report_url
             ),
             image="https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
         )
