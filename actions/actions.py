@@ -9,9 +9,13 @@ from datetime import datetime, timedelta
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
 <<<<<<< HEAD
+<<<<<<< HEAD
 from rasa_sdk.events import ActionExecutionRejected
 # from rasa_sdk.forms import FormAction
 from rasa_sdk.forms import FormValidationAction
+=======
+from rasa_sdk.events import ActionExecutionRejected, SlotSet
+>>>>>>> master
 =======
 from rasa_sdk.events import ActionExecutionRejected, SlotSet
 >>>>>>> master

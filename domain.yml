@@ -1,5 +1,6 @@
 version: '3.1'
 <<<<<<< HEAD
+<<<<<<< HEAD
 intents:
 - affirm
 - bot_challenge
@@ -106,6 +107,17 @@ entities:
 - time
 
 actions:
+=======
+
+intents:
+- get_phaidelta_logo
+- get_report
+
+entities:
+- time
+
+actions:
+>>>>>>> master
 - action_show_image
 
 
@@ -119,6 +131,7 @@ responses:
   - text: Okay, let me try again...
   utter_default:
   - text: Sorry I didn't get that. Can you rephrase?
+<<<<<<< HEAD
 <<<<<<< HEAD
   utter_summarize_affirm:
   - text: 'Sure! Here is a summary of {metric}:'
@@ -134,11 +147,16 @@ responses:
   utter_submit:
   - text: Your name is {NAME} and your headset is {BRAND}. Is this Correct?
 =======
+=======
+>>>>>>> master
   utter_show_image:
   - text: "Here's the phAIdelta log :"
     image: "https://img.freepik.com/free-photo/red-white-cat-i-white-studio_155003-13189.jpg"
 
 
+<<<<<<< HEAD
+>>>>>>> master
+=======
 >>>>>>> master
 session_config:
   session_expiration_time: 60
