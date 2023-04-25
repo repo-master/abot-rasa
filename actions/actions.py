@@ -16,11 +16,13 @@ from .api.aggregation import (
     perform_aggregation_on_data,
 
     user_to_sensor_type,
-    user_to_aggregation_type
+    user_to_aggregation_type,
+
+    SensorMetadata
 )
 
 from rasa_sdk.types import DomainDict
-from typing import Any, Text, Dict, List, Union, TypedDict, Optional
+from typing import Any, Text, Dict, List, Tuple, Union, TypedDict, Optional
 from io import BytesIO
 from PIL import Image
 import base64
@@ -30,47 +32,37 @@ TimeRangeIn = TypedDict("TimeRange", {"from": str, "to": str})
 TimeRange = TypedDict("TimeRange", {"from": str, "to": str})
 
 
-class ActionMetricAggregate(Action):
-    def name(self):
-        return "action_metric_aggregate"
+async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> Tuple[Dict, List[Dict[Text, Any]]]:
+    events: List[Dict[str, Any]] = []
+    user_input = {}
 
-    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
-        events: List[Dict[str, Any]] = []
+    # We need these slots
+    user_req_metric: Optional[str] = tracker.get_slot("metric")
+    user_req_location: Optional[str] = tracker.get_slot("location")
+    user_req_agg_method: Optional[str] = tracker.get_slot("aggregation")
+    user_req_timeperiod: Optional[Union[TimeRangeIn, str]] = tracker.get_slot("timestamp_agg_period")
 
-        user_req_metric = tracker.get_slot("metric")
-        user_req_location = tracker.get_slot("location")
-        user_req_agg_method: str = tracker.get_slot("aggregation")
-        user_req_timeperiod: Optional[Union[TimeRangeIn, str]] = tracker.get_slot("timestamp_agg_period")
+    user_input.update({
+        'user_req_metric': user_req_metric,
+        'user_req_location': user_req_location,
+        'user_req_agg_method': user_req_agg_method,
+        'user_req_timeperiod': user_req_timeperiod
+    })
 
-        print("Got slots: Metric: %s, Location: %s, Aggregation: %s" % (
-            user_req_metric, user_req_location, user_req_agg_method), flush=True)
-        print("Time period:", user_req_timeperiod)
+    # Debug output
+    print("Got slots: Metric: %s, Location: %s, Aggregation: %s" % (
+        user_req_metric, user_req_location, user_req_agg_method), flush=True)
+    print("Time period:", user_req_timeperiod)
 
-        # TODO: More assumption magic needed
-
-        # Either one can be set
-        requested_sensor = await determine_user_request_sensor(
-            sensor_type=user_req_metric,
-            sensor_name=None,  # TODO: Get from slot
-            location=user_req_location
-        )
-
-        # Could not determine the sensor to get info on (or no info provided at all)
-        if requested_sensor is None:
-            # TODO: Please improve the sentence to be more friendly.
-            dispatcher.utter_message(f" Sensor: {user_req_metric} Does not exist at location : {user_req_location}, please Enter proper data for the same")
-            # HACK: Had to disable this due to above message dispatch
-            return [] # [ActionExecutionRejected(self.name())]
-
-        # Recover sensor id field
-        requested_sensor_id: int = requested_sensor['sensor_id']
-
+    try:
         # Check aggregation method provided by the user
-        aggregation = user_to_aggregation_type(user_req_agg_method)
+        user_input['aggregation'] = user_to_aggregation_type(user_req_agg_method)
 
         if user_req_timeperiod is None:
+            # TODO: This is kind-of wrong. It should not store timestamp of today, but rather calculate "today"'s time every request
             # If nothing provided (no slot set), assume today
             user_req_timeperiod = {"from": datetime.today().isoformat(), "to": datetime.now().isoformat()}
+            # Update slot with this info for future conversations
             events.append(SlotSet("timestamp_agg_period", user_req_timeperiod))
 
         if isinstance(user_req_timeperiod, str):
@@ -79,10 +71,63 @@ class ActionMetricAggregate(Action):
             user_req_timeperiod = {"from": user_req_timeperiod, "to": datetime.now().isoformat()}
             events.append(SlotSet("timestamp_agg_period", user_req_timeperiod))
 
-        requested_timeperiod: TimeRange = {
+        user_input['timeperiod'] = {
             'from': datetime.fromisoformat(user_req_timeperiod['from']),
             'to': datetime.fromisoformat(user_req_timeperiod['to'])
         }
+
+        # TODO: More assumption magic needed
+
+        # Either one can be set
+        user_input['sensor'] = await determine_user_request_sensor(
+            sensor_type=user_req_metric,
+            sensor_name=None,  # TODO: Get from slot
+            location=user_req_location
+        )
+    finally:
+        return user_input, events
+
+def exit_reject_sensor_data_incorrect(
+        action_name: str,
+        dispatcher: CollectingDispatcher,
+        events: List,
+        data: Dict[str, str],
+        message: str = None):
+
+    # TODO: Please improve the sentence to be more friendly.
+    if message is None:
+        message = "Sensor: {user_req_metric} Does not exist at location : {user_req_location}, please Enter proper data for the same"
+
+    dispatcher.utter_message(text=message.format(**data))
+
+    # HACK: Had to disable this due to above message dispatch
+    # events.extend([ActionExecutionRejected(action_name)])
+
+    return events
+
+class ActionMetricAggregate(Action):
+    def name(self):
+        return "action_metric_aggregate"
+
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+        user_input, events = await parse_input_sensor_operation(dispatcher, tracker, domain)
+
+        requested_sensor: SensorMetadata = user_input.get('sensor')
+
+        # Could not determine the sensor to get info on (or no info provided at all)
+        if requested_sensor is None:
+            return exit_reject_sensor_data_incorrect(self.name(), dispatcher, events, user_input)
+
+        # Recover sensor id field
+        requested_sensor_id: int = requested_sensor['sensor_id']
+
+        # Check aggregation method provided by the user
+        aggregation = user_input.get('aggregation')
+
+        # Time period of aggregation
+        requested_timeperiod: TimeRange = user_input.get('timeperiod')
+
+        # TODO: Aggregation must be done on backend. Move all this to backend with API
 
         # Load data
         data, metadata = await get_sensor_data(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
@@ -162,33 +207,37 @@ class ActionShowImage(Action):
 class ActionFetchReport(Action):
     def name(self) -> Text:
         return "action_fetch_report"
-    
+
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-        # user_req_metric = tracker.get_slot("metric")
-        # user_req_location = tracker.get_slot("location")
+        user_input, events = await parse_input_sensor_operation(dispatcher, tracker, domain)
 
-        # timestamp_from = datetime.today() - timedelta(days=365)
-        # timestamp_to = datetime.now()
+        requested_sensor: SensorMetadata = user_input.get('sensor')
 
-        # print("Got slots: Metric: %s, Location: %s" % (
-        #     user_req_metric, user_req_location), flush=True)
+        # Could not determine the sensor to get info on (or no info provided at all)
+        if requested_sensor is None:
+            return exit_reject_sensor_data_incorrect(
+                self.name(),
+                dispatcher,
+                events,
+                user_input,
+                message="Sensor information isn't provided. Unable to generate the report."
+            )
 
-        # requested_sensor_id = await determine_user_request_sensor(
-        #     sensor_type=user_req_metric,
-        #     sensor_name=None,  # TODO: Get from slot
-        #     location=user_req_location
-        # )
+        # Recover sensor id field
+        requested_sensor_id: int = requested_sensor['sensor_id']
 
-        # # Could not determine the sensor to get info on (or no info provided at all)
-        # if requested_sensor_id is None:
-        #     dispatcher.utter_message("Which sensor do you want to get information on?")
-        #     return [ActionExecutionRejected(self.name())]
+        # Time period of aggregation
+        requested_timeperiod: TimeRange = user_input.get('timeperiod')
 
-        # # Load data
-        # data, metadata = await get_sensor_data(requested_sensor_id, timestamp_from , timestamp_to)
-
-        # TODO: Above logic into here
-
-        dispatcher.utter_message(image="https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")
+        dispatcher.utter_message(
+            text="Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report.".format(
+                report_url="http://uat.phaidelta.com:8090/report/sensor?sensor_id={sensor_id}&from={time_from}&to={time_to}".format(
+                    sensor_id = requested_sensor_id,
+                    time_from = requested_timeperiod["from"],
+                    time_to = requested_timeperiod["to"]
+                )
+            ),
+            image="https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+        )
 
         return []
