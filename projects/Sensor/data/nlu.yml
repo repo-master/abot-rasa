@@ -1,5 +1,7 @@
 version: "3.1"
+
 nlu:
+<<<<<<< HEAD:data/nlu.yml
 - intent: greet
   examples: |
     - hey
@@ -83,6 +85,50 @@ nlu:
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
+=======
+- synonym: temperature
+  examples: |
+    - temp
+    - temps
+    - cold
+    - hot
+- synonym: humidity
+  examples: |
+    - humid
+    - rh
+    - RH    
+    - relative humidity
+- synonym: maximum
+  examples: |
+    - max
+    - maximum
+    - highest
+    - greatest
+    - largest
+    - extreme high
+- synonym: minimum
+  examples: |
+    - least
+    - lowest
+    - min
+    - minimum
+    - extreme low
+- synonym: summary
+  examples: |
+    - sum
+    - summary
+    - summarize
+    - stats
+    - statistic
+    - faring
+    - brief me about
+- synonym: average
+  examples: |
+    - avg
+    - mean
+    - average
+
+>>>>>>> master:projects/Sensor/data/nlu.yml
 - intent: query_metric_aggregate
   examples: |
     - What is the [temperature](metric)?
@@ -125,10 +171,55 @@ nlu:
     - What is the current [temperature](metric)?
     - What is the [maximum](aggregation) [energy reading](metric)?
     - Give me the [average](aggregation) [humidity reading](metric)
+<<<<<<< HEAD:data/nlu.yml
+=======
+    - what is the [temperature](metric) in [Ground floor](location)?
+    - what is the [humidity](metric) in [Ground floor](location)?
+    - what is the [humidity](metric) in [First floor](location)?
+    - what is the [humidity](metric) in [Basement](location)?
+    - what is the [temperature](metric) [Outside](location)?
+    - what is the [temperature](metric) [N1 Ground floor B](location)?
+    - what is the [humidity](metric) on [N1 Ground floor B](location)?
+    - what is the [rh](metric) at [N1 Ground floor B](location)?
+    - What is the [Outside](location) [temperature](metric)?
+    - what is the [rh](metric) at [B1 Ground floor A](location)?
+>>>>>>> master:projects/Sensor/data/nlu.yml
     - What about [rh](metric)?
     - please give me the [average](aggregation)
     - Give [summary](aggregation) for temperature
     - Fetch [summary](aggregation) for [room 2](location) [humidity](metric)
+<<<<<<< HEAD:data/nlu.yml
+=======
+    - What is the [humidity](metric) [currently](latest_period) [today](time)?
+    - What is the [average](aggregation) [temperature](metric) [today](time)?
+    - What is the [average](aggregation) [humidity](metric) [today](time)?
+    - What is the [temperature](metric) [outside](location) [today](time)?
+    - What is the [humidity](metric) [outside](location) [today](time)?
+    - What was the [temperature](metric) [currently](latest_period) [outside](location) [yesterday](time)?
+    - What is the [rh](metric) [currently](latest_period) [outside](location) [today](time)?
+    - What is the [average](aggregation) [temperature](metric) [outside](location) [today](time)?
+    - What is the [average](aggregation) [humidity](metric) [outside](location) [today](time)?
+    - What is the [average](aggregation) [temperature](metric) between [last week](time) and [today](time)?
+    - What is the [max](aggregation) [humidity](metric) between [01/01/2020](time) till [today](time)?
+    - What is the [max](aggregation) [temperature](metric) between [31/01/2022](time) and [yesterday](time)?
+
+- intent: change_time_period
+  examples: |
+    - Give me for [today](time)
+    - Give me for [yesterday](time)
+    - [yesterday](time)'s
+    - [whole week](time)'s
+    - From [yesterday](time)?
+    - From [last year](time)?
+    - From [01/01/2022](time)?
+    - From [31/01/2021](time)?
+    - till [yesterday](time)?
+    - till [last week](time)?
+    - till [12/03/2022](time)?
+    - between [01/01/2020](time) till [today](time)?
+    - between [31/01/2022](time) and [yesterday](time)?
+
+>>>>>>> master:projects/Sensor/data/nlu.yml
 - intent: change_sensor
   examples: |
     - The [temperature](metric) metric.
@@ -174,6 +265,7 @@ nlu:
 - intent: get_phaidelta_logo
   examples: |
     - Can you show me the logo?
+<<<<<<< HEAD:data/nlu.yml
 - intent: get_report
   examples: |
     - Give me Report
@@ -267,6 +359,38 @@ nlu:
     - one plus
     - one +
     - oneplus
+=======
+    - Send me the logo
+
+- intent : get_report
+  examples: |
+    - Give me Report 
+    - can i Have report of this?
+    - Generate a Report out of this
+    - Give a report on [door](metric) status.
+    - [temperature](metric) metric's report
+    - [humidity](metric) metric's report
+    - Plot graph of [temperature](metric) metric
+    - Plot graph of [humidity](metric) metric
+
+# TODO: Time period (today's, yesterday's, etc.)
+# - intent: summarize_sensor_data
+#   examples: |
+#     - Can you [summarize](summary) that for me?
+#     - Can you briefly tell me the [stats](summary) of [humidity](metric)?
+#     - How is the [temperature](metric) sensor [faring](summary)?
+#     - How is the [humidity](metric) sensor [faring](summary)?
+#     - How is the [energy](metric) sensor [faring](summary)?
+#     - Please [summarize](summary) that.
+#     - Please [summarize](summary) [temperature](metric) sensor
+#     - Please [summarize](summary) the [humidity](metric) sensor
+#     - Please [summarize](summary) yesterday's events.
+#     - Please [brief me about](summary) today's data.
+#     - Please [brief me about](summary) yesterday's data.
+#     - How was the [energy](metric) sensor [faring](summary) yesterday?
+#     - How was the [temperature](metric) sensor [faring](summary) yesterday?
+
+>>>>>>> master:projects/Sensor/data/nlu.yml
 - synonym: latest_period
   examples: |
     - Current

@@ -29,5 +29,5 @@ class SensorMetadata(TypedDict):
 
 
 class SensorDataResponse(TypedDict):
-    metadata: Dict
+    metadata: SensorMetadata
     data: List[Dict]

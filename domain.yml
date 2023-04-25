@@ -1,4 +1,5 @@
 version: '3.1'
+<<<<<<< HEAD
 intents:
 - affirm
 - bot_challenge
@@ -95,23 +96,30 @@ actions:
 - utter_corrected
 - fetch_report
 - utter_wrong_value
+=======
+
+intents:
+- get_phaidelta_logo
+- get_report
+
+entities:
+- time
+
+actions:
+- action_show_image
+
+
+>>>>>>> master
 responses:
-  utter_greet:
-  - text: Hey! What would you like to know?
   utter_did_that_help:
   - text: Did that help you?
-  utter_happy:
-  - text: Great, carry on!
-  utter_goodbye:
-  - text: Thank you for using me!
-  utter_iamabot:
-  - text: I am Abot, a chat bot powered by Rasa.
   utter_mistake:
   - text: I am sorry for that. Can you tell me what you wanted?
   utter_corrected:
   - text: Okay, let me try again...
   utter_default:
   - text: Sorry I didn't get that. Can you rephrase?
+<<<<<<< HEAD
   utter_summarize_affirm:
   - text: 'Sure! Here is a summary of {metric}:'
   utter_show_image:
@@ -125,6 +133,13 @@ responses:
   - text: That's why u are facing problem while calling
   utter_submit:
   - text: Your name is {NAME} and your headset is {BRAND}. Is this Correct?
+=======
+  utter_show_image:
+  - text: "Here's the phAIdelta log :"
+    image: "https://img.freepik.com/free-photo/red-white-cat-i-white-studio_155003-13189.jpg"
+
+
+>>>>>>> master
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

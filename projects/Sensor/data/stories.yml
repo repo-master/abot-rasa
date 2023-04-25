@@ -15,6 +15,7 @@ stories:
       - intent: change_aggregation
       - intent: change_location
     - action: action_metric_aggregate
+
     # - slot_was_set:
     #     - previous_action
     #   - action: "{previous_action}"
@@ -27,7 +28,7 @@ stories:
   - story : report fetching story
     steps:
       - intent : get_report
-      - action : fetch_report
+      - action : action_fetch_report
 
   - story : network_complain
     steps:
