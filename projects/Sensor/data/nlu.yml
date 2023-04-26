@@ -89,6 +89,94 @@ nlu:
 =======
 =======
 >>>>>>> master
+<<<<<<< HEAD
+<<<<<<< HEAD:data/nlu.yml
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+    - Hello!
+- intent: goodbye
+  examples: |
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - feeling like a king
+    - wonderful
+    - I am feeling very good
+    - I am great
+    - I am amazing
+    - I am going to save the world
+    - super stoked
+    - extremely good
+    - so so perfect
+    - so good
+    - so perfect
+- intent: mood_unhappy
+  examples: |
+    - my day was horrible
+    - I am sad
+    - I don't feel very well
+    - I am disappointed
+    - super sad
+    - I'm so sad
+    - sad
+    - very sad
+    - unhappy
+    - not good
+    - not very good
+    - extremly sad
+    - so saad
+    - so sad
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+=======
+=======
+>>>>>>> master
 - synonym: temperature
   examples: |
     - temp
@@ -217,32 +305,6 @@ nlu:
     - What is the [average](aggregation) [temperature](metric) between [last week](time) and [today](time)?
     - What is the [max](aggregation) [humidity](metric) between [01/01/2020](time) till [today](time)?
     - What is the [max](aggregation) [temperature](metric) between [31/01/2022](time) and [yesterday](time)?
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-- intent: change_time_period
-  examples: |
-    - Give me for [today](time)
-    - Give me for [yesterday](time)
-    - [yesterday](time)'s
-    - [whole week](time)'s
-    - From [yesterday](time)?
-    - From [last year](time)?
-    - From [01/01/2022](time)?
-    - From [31/01/2021](time)?
-    - till [yesterday](time)?
-    - till [last week](time)?
-    - till [12/03/2022](time)?
-    - between [01/01/2020](time) till [today](time)?
-    - between [31/01/2022](time) and [yesterday](time)?
->>>>>>> master
-=======
-    - what is the [humidity](metric) in [GF_A](location)?
-    - what is the [temperature](metric) in [GF_B](location)?
->>>>>>> master
-    - what is the [humidity](metric) in [GF_A](location)?
-    - what is the [temperature](metric) in [GF_B](location)?
 
 - intent: change_time_period
   examples: |

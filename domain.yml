@@ -105,6 +105,115 @@ intents:
 
 entities:
 - time
+
+actions:
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+intents:
+- affirm
+- bot_challenge
+- change_aggregation:
+    use_entities:
+    - metric
+    - location
+    - aggregation
+- change_location:
+    use_entities:
+    - metric
+    - location
+    - aggregation
+- change_sensor:
+    use_entities:
+    - metric
+    - location
+    - aggregation
+- deny
+- get_phaidelta_logo
+- get_report
+- goodbye
+- greet
+- headset
+- inform
+- mood_great
+- mood_unhappy
+- my_name_is
+- network_issue
+- out_of_scope
+- query_metric_aggregate:
+    use_entities:
+    - metric
+    - location
+    - aggregation
+- summarize_sensor_data:
+    use_entities:
+    - metric
+entities:
+- BRAND
+- metric
+- aggregation
+- latest_period
+- location
+- NAME
+slots:
+  metric:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: metric
+  aggregation:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: aggregation
+  location:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: location
+  BRAND:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: form_info
+        requested_slot: BRAND
+  NAME:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: from_info
+        requested_slot: NAME
+forms:
+  form_info:
+    required_slots:
+    - BRAND
+    - NAME
+actions:
+- utter_ask_name
+- utter_submit
+- action_show_image
+- action_metric_aggregate
+- action_metric_summarize
+- utter_did_that_help
+- utter_greet
+- utter_happy
+- utter_goodbye
+- utter_iamabot
+- utter_mistake
+- utter_corrected
+- fetch_report
+- utter_wrong_value
+=======
+
+intents:
+- get_phaidelta_logo
+- get_report
+
+entities:
+- time
 - number
 
 actions:

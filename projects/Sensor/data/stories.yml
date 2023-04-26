@@ -53,6 +53,19 @@ stories:
       - action : utter_did_that_help
 >>>>>>> master
       - action : utter_did_that_help
+<<<<<<< HEAD
+
+  - story : network_complain
+    steps:
+      - intent : network_issue
+      - action: form_info
+      - active_loop: form_info
+      - action: form_info
+      - active_loop: null
+      - intent: affirm      
+      - action : action_show_image
+=======
+>>>>>>> master
 
   # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
   #   steps:

@@ -11,7 +11,17 @@ from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
 # from rasa_sdk.forms import FormAction
 from rasa_sdk.forms import FormValidationAction
+<<<<<<< HEAD
+<<<<<<< HEAD
+from rasa_sdk.events import ActionExecutionRejected
+# from rasa_sdk.forms import FormAction
+from rasa_sdk.forms import FormValidationAction
+=======
 from rasa_sdk.events import ActionExecutionRejected, SlotSet
+>>>>>>> master
+=======
+from rasa_sdk.events import ActionExecutionRejected, SlotSet
+>>>>>>> master
 
 from .api.aggregation import (
     get_sensor_data,
@@ -250,43 +260,3 @@ class ActionFetchReport(Action):
         )
 
         return []
-
-class ActionFormMetricData(FormValidationAction):
-    def name(self) -> Text:
-        return "form_metric_data"
-
-    @staticmethod
-    def required_slots(tracker: Tracker) -> List[Text]:
-        """A list of required slots that the form has to fill"""
-
-        return ["metric", "location"]
-
-    def submit(
-            self,
-            dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: Dict[Text, Any],
-    ) -> List[Dict]:
-        """Define what the form has to do
-            after all required slots are filled"""
-
-        # utter submit template
-        dispatcher.utter_message(template="action_metric_aggregate", metric=tracker.get_slot('metric'),
-                                 location=tracker.get_slot('location'))
-        return []
-
-    def slot_mappings(self) -> Dict[Text, Union[Dict, List[Dict]]]:
-        """A dictionary to map required slots to
-            - an extracted entity
-            - intent: value pairs
-            - a whole message
-            or a list of them, where a first match will be picked"""
-        print("MAppping slots")
-
-        return {
-            "metric": [self.from_entity(entity="metric", intent='query_metric_aggregate'),
-                     self.from_text()],
-            "location": [self.from_entity(entity="location", intent="query_metric_aggregate"),
-                        self.from_text()],
-        }
-
