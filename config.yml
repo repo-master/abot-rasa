@@ -40,8 +40,8 @@ pipeline:
     # url of the running duckling server
     url: "http://uat.phaidelta.com:8092"
     # dimensions to extract
-    # commented for all dimensions
-    # dimensions: ["time", "number", "amount-of-money", "distance"]
+    # comment for all dimensions - ["time", "number", "amount-of-money", "distance"]
+    dimensions: ["time", "number"]
     # allows you to configure the locale, by default the language is
     # used
     locale: "en_IN"
