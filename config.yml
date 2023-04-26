@@ -21,6 +21,25 @@ pipeline:
 # # If you'd like to customize it, uncomment and adjust the pipeline.
 # # See https://rasa.com/docs/rasa/tuning-your-model for more information.
 
+<<<<<<< HEAD
+- name: WhitespaceTokenizer
+- name: RegexFeaturizer
+- name: LexicalSyntacticFeaturizer
+- name: CountVectorsFeaturizer
+  analyzer: char_wb
+  min_ngram: 1
+  max_ngram: 4
+- name: DIETClassifier
+  epochs: 100
+  constrain_similarities: true
+- name: EntitySynonymMapper
+- name: ResponseSelector
+  epochs: 100
+  constrain_similarities: true
+- name: FallbackClassifier
+  threshold: 0.3
+  ambiguity_threshold: 0.1
+=======
   - name: WhitespaceTokenizer
 
   - name: RegexFeaturizer
@@ -40,8 +59,8 @@ pipeline:
     # url of the running duckling server
     url: "http://uat.phaidelta.com:8092"
     # dimensions to extract
-    # commented for all dimensions
-    # dimensions: ["time", "number", "amount-of-money", "distance"]
+    # comment for all dimensions - ["time", "number", "amount-of-money", "distance"]
+    dimensions: ["time", "number"]
     # allows you to configure the locale, by default the language is
     # used
     locale: "en_IN"
@@ -61,6 +80,7 @@ pipeline:
   - name: FallbackClassifier
     threshold: 0.3
     ambiguity_threshold: 0.1
+>>>>>>> master
 
 
 # Configuration for Rasa Core.
@@ -70,18 +90,19 @@ policies:
 # # If you'd like to customize them, uncomment and adjust the policies.
 # # See https://rasa.com/docs/rasa/policies for more information.
 
-- name: MemoizationPolicy
+  - name: MemoizationPolicy
 
-- name: RulePolicy
-  core_fallback_threshold: 0.8
-  core_fallback_action_name: action_default_fallback
-  enable_fallback_prediction: true
+  - name: RulePolicy
+    core_fallback_threshold: 0.8
+    core_fallback_action_name: action_default_fallback
+    enable_fallback_prediction: true
 
-- name: UnexpecTEDIntentPolicy
-  max_history: 5
-  epochs: 100
+  - name: UnexpecTEDIntentPolicy
+    max_history: 5
+    epochs: 100
 
-- name: TEDPolicy
-  max_history: 5
-  epochs: 500
-  constrain_similarities: true
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 500
+    constrain_similarities: true
+

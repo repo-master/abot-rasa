@@ -4,6 +4,9 @@ stories:
   - story: User asks or queries sensor data with optional aggregate and location
     steps:
     - intent: query_metric_aggregate
+    - action : form_metric_data
+    - active_loop: form_metric_data
+    - active_loop : null
     - action: action_metric_aggregate
     # - slot_was_set:
     #   - previous_action: "action_metric_aggregate"
@@ -29,6 +32,23 @@ stories:
     steps:
       - intent : get_report
       - action : action_fetch_report
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+  - story : network_complain
+    steps:
+      - intent : network_issue
+      - action: form_info
+      - active_loop: form_info
+      - action: form_info
+      - active_loop: null
+      - intent: affirm      
+      - action : action_show_image
+=======
+>>>>>>> master
+=======
+      - action : utter_did_that_help
+>>>>>>> master
 
   # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
   #   steps:
@@ -49,3 +69,13 @@ stories:
   #     - intent: change_location
   #   - action: action_metric_aggregate
   #   - action: utter_corrected
+
+  - story: interactive_story_1
+    steps:
+    - intent: network_issue
+    - action: form_info
+    - active_loop: form_info
+    - action: form_info
+    - active_loop: null
+    - action: utter_submit
+    - action: action_show_image

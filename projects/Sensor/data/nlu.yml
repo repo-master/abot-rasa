@@ -1,6 +1,94 @@
 version: "3.1"
 
 nlu:
+<<<<<<< HEAD
+<<<<<<< HEAD:data/nlu.yml
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+    - Hello!
+- intent: goodbye
+  examples: |
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - feeling like a king
+    - wonderful
+    - I am feeling very good
+    - I am great
+    - I am amazing
+    - I am going to save the world
+    - super stoked
+    - extremely good
+    - so so perfect
+    - so good
+    - so perfect
+- intent: mood_unhappy
+  examples: |
+    - my day was horrible
+    - I am sad
+    - I don't feel very well
+    - I am disappointed
+    - super sad
+    - I'm so sad
+    - sad
+    - very sad
+    - unhappy
+    - not good
+    - not very good
+    - extremly sad
+    - so saad
+    - so sad
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+=======
+=======
+>>>>>>> master
 - synonym: temperature
   examples: |
     - temp
@@ -43,6 +131,10 @@ nlu:
     - mean
     - average
 
+<<<<<<< HEAD
+>>>>>>> master:projects/Sensor/data/nlu.yml
+=======
+>>>>>>> master
 - intent: query_metric_aggregate
   examples: |
     - What is the [temperature](metric)?
@@ -85,6 +177,11 @@ nlu:
     - What is the current [temperature](metric)?
     - What is the [maximum](aggregation) [energy reading](metric)?
     - Give me the [average](aggregation) [humidity reading](metric)
+<<<<<<< HEAD
+<<<<<<< HEAD:data/nlu.yml
+=======
+=======
+>>>>>>> master
     - what is the [temperature](metric) in [Ground floor](location)?
     - what is the [humidity](metric) in [Ground floor](location)?
     - what is the [humidity](metric) in [First floor](location)?
@@ -95,10 +192,19 @@ nlu:
     - what is the [rh](metric) at [N1 Ground floor B](location)?
     - What is the [Outside](location) [temperature](metric)?
     - what is the [rh](metric) at [B1 Ground floor A](location)?
+<<<<<<< HEAD
+>>>>>>> master:projects/Sensor/data/nlu.yml
+=======
+>>>>>>> master
     - What about [rh](metric)?
     - please give me the [average](aggregation)
     - Give [summary](aggregation) for temperature
     - Fetch [summary](aggregation) for [room 2](location) [humidity](metric)
+<<<<<<< HEAD
+<<<<<<< HEAD:data/nlu.yml
+=======
+=======
+>>>>>>> master
     - What is the [humidity](metric) [currently](latest_period) [today](time)?
     - What is the [average](aggregation) [temperature](metric) [today](time)?
     - What is the [average](aggregation) [humidity](metric) [today](time)?
@@ -111,6 +217,30 @@ nlu:
     - What is the [average](aggregation) [temperature](metric) between [last week](time) and [today](time)?
     - What is the [max](aggregation) [humidity](metric) between [01/01/2020](time) till [today](time)?
     - What is the [max](aggregation) [temperature](metric) between [31/01/2022](time) and [yesterday](time)?
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+- intent: change_time_period
+  examples: |
+    - Give me for [today](time)
+    - Give me for [yesterday](time)
+    - [yesterday](time)'s
+    - [whole week](time)'s
+    - From [yesterday](time)?
+    - From [last year](time)?
+    - From [01/01/2022](time)?
+    - From [31/01/2021](time)?
+    - till [yesterday](time)?
+    - till [last week](time)?
+    - till [12/03/2022](time)?
+    - between [01/01/2020](time) till [today](time)?
+    - between [31/01/2022](time) and [yesterday](time)?
+>>>>>>> master
+=======
+    - what is the [humidity](metric) in [GF_A](location)?
+    - what is the [temperature](metric) in [GF_B](location)?
+>>>>>>> master
 
 - intent: change_time_period
   examples: |
@@ -128,6 +258,7 @@ nlu:
     - between [01/01/2020](time) till [today](time)?
     - between [31/01/2022](time) and [yesterday](time)?
 
+>>>>>>> master:projects/Sensor/data/nlu.yml
 - intent: change_sensor
   examples: |
     - The [temperature](metric) metric.
@@ -139,7 +270,6 @@ nlu:
     - Same calculation but for [energy](metric)
     - Can you tell me for [power meter](metric)?
     - now the [minimum](aggregation) for [temperature](metric)
-
 - intent: change_aggregation
   examples: |
     - The [average](aggregation).
@@ -157,7 +287,6 @@ nlu:
     - What is the [max](aggregation)?
     - and [min](aggregation)?
     - give me the [min](aggregation)
-
 - intent: change_location
   examples: |
     - The [outside](location) value.
@@ -172,10 +301,107 @@ nlu:
     - What about [outside](location)?
     - And the [unit 1](location)?
     - also at [unit 2](location)?
-
-- intent : get_phaidelta_logo
+- intent: get_phaidelta_logo
   examples: |
     - Can you show me the logo?
+<<<<<<< HEAD
+<<<<<<< HEAD:data/nlu.yml
+- intent: get_report
+  examples: |
+    - Give me Report
+    - can i Have report of this
+    - Generate a Report out of this
+- intent: out_of_scope
+  examples: |
+    - I want to order food
+    - What is 2 + 2?
+    - Who's the US President?
+    - What is the time?
+    - Tell me a joke
+    - I am bored
+    - Let's play a game
+- intent: network_issue
+  examples: |
+    - Actually, I gave a call regarding the network issues.
+    - I called regarding network issue
+    - I am facing the network issue
+    - i am facing network issue
+- intent: my_name_is
+  examples: |
+    - My name is [Ashpak](NAME)
+    - [Ashpak](NAME) this side
+    - its [Ashpak](NAME)
+    - [Ashpak](NAME) is my name
+    - you can call me [Ashpak](NAME)
+    - [Ashpak](NAME)
+- intent: headset
+  examples: |
+    - I am using a [samsung](BRAND) phone.
+    - I have [one plus]{"entity": "BRAND", "value": " One plus"} mobile.
+    - i am using [one +]{"entity": "BRAND", "value": " One plus"}
+    - i use [i-phone](BRAND)
+    - i prefer [i phone](BRAND)
+    - i am using [one plus]{"entity": "BRAND", "value": " One plus"} mobile
+    - i am using [samsung](BRAND)
+    - i am using [oneplus]{"entity": "BRAND", "value": " One plus"} mobile
+    - i am using [nokia](BRAND) mobile
+    - i am using [samsung](BRAND)
+- synonym: temp
+  examples: |
+    - temp
+    - temps
+    - cold
+    - hot
+    - temperature
+- synonym: rh
+  examples: |
+    - humid
+    - rh
+    - RH
+    - relative humidity
+    - humidity
+- synonym: unit
+  examples: |
+    - unit
+    - room
+    - area
+- synonym: maximum
+  examples: |
+    - max
+    - maximum
+    - highest
+    - greatest
+    - largest
+    - extreme high
+- synonym: minimum
+  examples: |
+    - least
+    - lowest
+    - min
+    - minimum
+    - extreme low
+- synonym: summary
+  examples: |
+    - sum
+    - summary
+    - summarize
+    - stats
+    - statistic
+    - faring
+    - brief me about
+- synonym: average
+  examples: |
+    - avg
+    - mean
+    - average
+- synonym: ' One plus'
+  examples: |
+    - one plus
+    - one +
+    - oneplus
+=======
+=======
+>>>>>>> master
     - Send me the logo
 
 - intent : get_report
@@ -206,6 +432,10 @@ nlu:
 #     - How was the [energy](metric) sensor [faring](summary) yesterday?
 #     - How was the [temperature](metric) sensor [faring](summary) yesterday?
 
+<<<<<<< HEAD
+>>>>>>> master:projects/Sensor/data/nlu.yml
+=======
+>>>>>>> master
 - synonym: latest_period
   examples: |
     - Current

@@ -5,20 +5,26 @@
 # https://rasa.com/docs/rasa/custom-actions
 
 from datetime import datetime, timedelta
+import urllib.parse
 
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
+# from rasa_sdk.forms import FormAction
+from rasa_sdk.forms import FormValidationAction
 from rasa_sdk.events import ActionExecutionRejected, SlotSet
 
 from .api.aggregation import (
     get_sensor_data,
+    get_report_generate_preview,
+
     determine_user_request_sensor,
     perform_aggregation_on_data,
 
     user_to_sensor_type,
     user_to_aggregation_type,
 
-    SensorMetadata
+    SensorMetadata,
+    AggregationMethod
 )
 
 from rasa_sdk.types import DomainDict
@@ -28,8 +34,8 @@ from PIL import Image
 import base64
 
 
-TimeRangeIn = TypedDict("TimeRange", {"from": str, "to": str})
-TimeRange = TypedDict("TimeRange", {"from": str, "to": str})
+TimeRangeIn = TypedDict("TimeRangeIn", {"from": str, "to": str})
+TimeRange = TypedDict("TimeRange", {"from": datetime, "to": datetime})
 
 
 async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> Tuple[Dict, List[Dict[Text, Any]]]:
@@ -50,8 +56,8 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
     })
 
     # Debug output
-    print("Got slots: Metric: %s, Location: %s, Aggregation: %s" % (
-        user_req_metric, user_req_location, user_req_agg_method), flush=True)
+    print("Got slots: Metric: %s, Location: %s, Aggregation: %s, timestamp_agg_period: %s" % (
+        user_req_metric, user_req_location, user_req_agg_method, user_req_timeperiod), flush=True)
     print("Time period:", user_req_timeperiod)
 
     try:
@@ -122,7 +128,7 @@ class ActionMetricAggregate(Action):
         requested_sensor_id: int = requested_sensor['sensor_id']
 
         # Check aggregation method provided by the user
-        aggregation = user_input.get('aggregation')
+        aggregation: AggregationMethod = user_input.get('aggregation')
 
         # Time period of aggregation
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
@@ -229,15 +235,58 @@ class ActionFetchReport(Action):
         # Time period of aggregation
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
 
+        # URI or Data URI of preview image
+        report_data: dict = await get_report_generate_preview()
+
+        # TODO: Somehow get public URL of report. localhost won't work obviously. Don't hardcode it.
+        report_url: str = report_data['interactive_report_route']
+        preview_image_url: str = report_data['preview_image']
+
         dispatcher.utter_message(
             text="Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report.".format(
-                report_url="http://uat.phaidelta.com:8090/report/sensor?sensor_id={sensor_id}&from={time_from}&to={time_to}".format(
-                    sensor_id = requested_sensor_id,
-                    time_from = requested_timeperiod["from"],
-                    time_to = requested_timeperiod["to"]
-                )
+                report_url=report_url
             ),
-            image="https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            image=preview_image_url
         )
 
         return []
+
+class ActionFormMetricData(FormValidationAction):
+    def name(self) -> Text:
+        return "form_metric_data"
+
+    @staticmethod
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
+        return ["metric", "location"]
+
+    def submit(
+            self,
+            dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any],
+    ) -> List[Dict]:
+        """Define what the form has to do
+            after all required slots are filled"""
+
+        # utter submit template
+        dispatcher.utter_message(template="action_metric_aggregate", metric=tracker.get_slot('metric'),
+                                 location=tracker.get_slot('location'))
+        return []
+
+    def slot_mappings(self) -> Dict[Text, Union[Dict, List[Dict]]]:
+        """A dictionary to map required slots to
+            - an extracted entity
+            - intent: value pairs
+            - a whole message
+            or a list of them, where a first match will be picked"""
+        print("MAppping slots")
+
+        return {
+            "metric": [self.from_entity(entity="metric", intent='query_metric_aggregate'),
+                     self.from_text()],
+            "location": [self.from_entity(entity="location", intent="query_metric_aggregate"),
+                        self.from_text()],
+        }
+
