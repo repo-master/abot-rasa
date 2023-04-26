@@ -116,6 +116,7 @@ intents:
 
 entities:
 - time
+- number
 
 actions:
 >>>>>>> master

@@ -241,6 +241,8 @@ nlu:
     - what is the [humidity](metric) in [GF_A](location)?
     - what is the [temperature](metric) in [GF_B](location)?
 >>>>>>> master
+    - what is the [humidity](metric) in [GF_A](location)?
+    - what is the [temperature](metric) in [GF_B](location)?
 
 - intent: change_time_period
   examples: |

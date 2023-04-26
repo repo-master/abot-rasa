@@ -7,6 +7,9 @@ stories:
     - action : form_metric_data
     - active_loop: form_metric_data
     - active_loop : null
+    - action : form_metric_data
+    - active_loop: form_metric_data
+    - active_loop : null
     - action: action_metric_aggregate
     # - slot_was_set:
     #   - previous_action: "action_metric_aggregate"
@@ -49,6 +52,7 @@ stories:
 =======
       - action : utter_did_that_help
 >>>>>>> master
+      - action : utter_did_that_help
 
   # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
   #   steps:
