@@ -50,8 +50,8 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
     })
 
     # Debug output
-    print("Got slots: Metric: %s, Location: %s, Aggregation: %s" % (
-        user_req_metric, user_req_location, user_req_agg_method), flush=True)
+    print("Got slots: Metric: %s, Location: %s, Aggregation: %s, timestamp_agg_period: %s" % (
+        user_req_metric, user_req_location, user_req_agg_method, user_req_timeperiod), flush=True)
     print("Time period:", user_req_timeperiod)
 
     try:
@@ -241,3 +241,43 @@ class ActionFetchReport(Action):
         )
 
         return []
+
+class ActionFormMetricData(FormValidationAction):
+    def name(self) -> Text:
+        return "form_metric_data"
+
+    @staticmethod
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
+        return ["metric", "location"]
+
+    def submit(
+            self,
+            dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any],
+    ) -> List[Dict]:
+        """Define what the form has to do
+            after all required slots are filled"""
+
+        # utter submit template
+        dispatcher.utter_message(template="action_metric_aggregate", metric=tracker.get_slot('metric'),
+                                 location=tracker.get_slot('location'))
+        return []
+
+    def slot_mappings(self) -> Dict[Text, Union[Dict, List[Dict]]]:
+        """A dictionary to map required slots to
+            - an extracted entity
+            - intent: value pairs
+            - a whole message
+            or a list of them, where a first match will be picked"""
+        print("MAppping slots")
+
+        return {
+            "metric": [self.from_entity(entity="metric", intent='query_metric_aggregate'),
+                     self.from_text()],
+            "location": [self.from_entity(entity="location", intent="query_metric_aggregate"),
+                        self.from_text()],
+        }
+

@@ -49,7 +49,6 @@ slots:
     mappings:
     - type: from_entity
       entity: location
-  
   # Timestamp for aggregation. Either ISO8601 string of entered time,
   # or a dict of {'from': '...', 'to': '...'} for range.
   timestamp_agg_period:
@@ -58,7 +57,24 @@ slots:
     - type: from_entity
       entity: time
 
+forms:
+  form_metric_data:
+    required_slots:
+    - metric
+    - location
+    - aggregation
+
 actions:
 - action_metric_aggregate
 - action_metric_summarize
 - action_fetch_report
+
+responses:
+  utter_ask_metric:
+  - text: Could we please know Sensor are you looking for?
+  utter_ask_location:
+  - text: Ok, please provide location where you are looking for this data
+  utter_ask_timestamp_agg_period :
+  - text : Please Specify time period
+  utter_ask_aggregation:
+  - text : What type of aggregation type should be done?

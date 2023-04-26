@@ -111,6 +111,8 @@ nlu:
     - What is the [average](aggregation) [temperature](metric) between [last week](time) and [today](time)?
     - What is the [max](aggregation) [humidity](metric) between [01/01/2020](time) till [today](time)?
     - What is the [max](aggregation) [temperature](metric) between [31/01/2022](time) and [yesterday](time)?
+    - what is the [humidity](metric) in [GF_A](location)?
+    - what is the [temperature](metric) in [GF_B](location)?
 
 - intent: change_time_period
   examples: |
