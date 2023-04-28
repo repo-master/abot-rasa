@@ -32,7 +32,7 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
 
     if user_req_timeperiod is None and 'from' not in sys_timerange:
         # No timestamp given. Assume for today.
-        sys_timerange.update({"from": datetime.now().min})
+        sys_timerange.update({"from": datetime.combine(datetime.now(), datetime.min.time())})
         if 'to' not in sys_timerange:
             sys_timerange.update({"to": datetime.now()})
 
