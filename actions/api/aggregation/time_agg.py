@@ -32,14 +32,11 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
 
     if user_req_timeperiod is None and 'from' not in sys_timerange:
         # No timestamp given. Assume for today.
-        print('aaaa')
         sys_timerange.update({"from": datetime.now().min})
         if 'to' not in sys_timerange:
-            print("bbbb")
             sys_timerange.update({"to": datetime.now()})
 
     if isinstance(user_req_timeperiod, str):
-        print("cccc")
         # ISO 8601 timestamp received.
         # This may be start time ("today", "yesterday"), or starting point with a grain (last month => whole last month).
         if grain_size is None:
@@ -60,7 +57,6 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
         })
 
     if isinstance(user_req_timeperiod, dict):
-        print("dddd")
         sys_timerange.update({
             "from": datetime.fromisoformat(user_req_timeperiod['from']),
             "to": datetime.fromisoformat(user_req_timeperiod['to'])
@@ -71,8 +67,3 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
     ])
 
     return sys_timerange
-    {
-        'from': datetime.fromisoformat(user_req_timeperiod['from']),
-        'to': datetime.fromisoformat(user_req_timeperiod['to']),
-        'user_time_entity': duckling_time_entity.get('value')
-    }
