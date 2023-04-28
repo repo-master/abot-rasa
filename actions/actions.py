@@ -187,7 +187,7 @@ class ActionMetricAggregate(Action):
                 ))
         else:
             dispatcher.utter_message("Sorry, data for {sensor_req} isn't available.".format(
-                sensor_req=requested_sensor.get('user_req_metric')
+                sensor_req=user_input.get('user_req_metric')
             ))
 
         return events
