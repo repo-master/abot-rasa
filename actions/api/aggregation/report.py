@@ -12,9 +12,9 @@ async def get_report_generate_preview(requested_sensor_id: int,
         params = {}
 
         params.update({
-            'sensor_id': requested_sensor_id
-            # 'timestamp_from': timestamp_from.isoformat(),
-            # 'timestamp_to': timestamp_to.isoformat()
+            'sensor_id': requested_sensor_id,
+            'timestamp_from': timestamp_from.isoformat(),
+            'timestamp_to': timestamp_to.isoformat()
         })
             # TO DO timestamp error need to fix
 
