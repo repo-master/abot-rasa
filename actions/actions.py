@@ -4,8 +4,7 @@
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
 
-from datetime import datetime, timedelta
-import urllib.parse
+import logging
 
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
@@ -20,31 +19,62 @@ from .api.aggregation import (
 
     user_to_sensor_type,
     user_to_aggregation_type,
+    user_to_timeperiod,
 
     SensorMetadata,
-    AggregationMethod
+    AggregationMethod,
+    TimeRangeIn,
+    TimeRange
 )
 
 from rasa_sdk.types import DomainDict
-from typing import Any, Text, Dict, List, Tuple, Union, TypedDict, Optional
+from typing import Any, Text, Dict, List, Union, Optional, Callable
+
 from io import BytesIO
 from PIL import Image
 import base64
 
 
-TimeRangeIn = TypedDict("TimeRangeIn", {"from": str, "to": str})
-TimeRange = TypedDict("TimeRange", {"from": datetime, "to": datetime})
+LOG = logging.getLogger(__name__)
 
 
-async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> Tuple[Dict, List[Dict[Text, Any]]]:
-    events: List[Dict[str, Any]] = []
+class ServerException(Exception):
+    def __init__(self, msg, original_exc):
+        super().__init__(msg)
+        self._msg = msg
+        self.exc = original_exc
+    def __str__(self):
+        return "Woops! {msg}\nPlease try again after some time.\nError reason: \"{reason}\"".format(
+            msg=self._msg,
+            reason="%s: %s" % (type(self.exc).__name__, str(self.exc))
+        )
+
+def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker, DomainDict], List[Dict[str, Any]]]):
+    async def _wrapper_fn(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[str, Any]]:
+        try:
+            return await fn(self, dispatcher, tracker, domain)
+        # Add any specific exceptions here to send response to that need a different response.
+        except Exception as exc:
+            LOG.exception("Unhandled exception:", exc_info=exc)
+            LOG.info("[for above exception] Current state:\n%s", str(tracker.current_state()))
+
+            # Send exception to user. If it is `ServerException` the message will be more user-friendly.
+            if not isinstance(exc, ServerException):
+                # wrap exception into `ServerException`
+                exc = ServerException("Something went wrong while performing your request.", exc)
+            dispatcher.utter_message(text=str(exc))
+            # No events are sent since it failed
+            return []
+    return _wrapper_fn
+
+async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict, events: List[Dict[Text, Any]]) -> Dict:
     user_input = {}
 
     # We need these slots
     user_req_metric: Optional[str] = tracker.get_slot("metric")
     user_req_location: Optional[str] = tracker.get_slot("location")
     user_req_agg_method: Optional[str] = tracker.get_slot("aggregation")
-    user_req_timeperiod: Optional[Union[TimeRangeIn, str]] = tracker.get_slot("timestamp_agg_period")
+    user_req_timeperiod: Optional[TimeRangeIn] = tracker.get_slot("timestamp_agg_period")
 
     user_input.update({
         'user_req_metric': user_req_metric,
@@ -55,41 +85,30 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
 
     # Debug output
     print("Got slots: Metric: %s, Location: %s, Aggregation: %s, timestamp_agg_period: %s" % (
-        user_req_metric, user_req_location, user_req_agg_method, user_req_timeperiod), flush=True)
-    print("Time period:", user_req_timeperiod)
+        user_req_metric, user_req_location, user_req_agg_method, str(user_req_timeperiod)))
 
+    # Check aggregation method provided by the user
+    user_input['aggregation'] = user_to_aggregation_type(user_req_agg_method)
+
+    user_input['timeperiod'] = user_to_timeperiod(tracker, events)
+
+    print("Aggregation time range:", tracker.slots.get("timestamp_agg_timerange"))
+
+    # TODO: More assumption magic needed
+
+    # Either one can be set
     try:
-        # Check aggregation method provided by the user
-        user_input['aggregation'] = user_to_aggregation_type(user_req_agg_method)
-
-        if user_req_timeperiod is None:
-            # TODO: This is kind-of wrong. It should not store timestamp of today, but rather calculate "today"'s time every request
-            # If nothing provided (no slot set), assume today
-            user_req_timeperiod = {"from": datetime.today().isoformat(), "to": datetime.now().isoformat()}
-            # Update slot with this info for future conversations
-            events.append(SlotSet("timestamp_agg_period", user_req_timeperiod))
-
-        if isinstance(user_req_timeperiod, str):
-            # Single time is found, this may be start time ("today", "yesterday").
-            # TODO: It may also be end time ("give me result of previous week", end time is end of week)
-            user_req_timeperiod = {"from": user_req_timeperiod, "to": datetime.now().isoformat()}
-            events.append(SlotSet("timestamp_agg_period", user_req_timeperiod))
-
-        user_input['timeperiod'] = {
-            'from': datetime.fromisoformat(user_req_timeperiod['from']),
-            'to': datetime.fromisoformat(user_req_timeperiod['to'])
-        }
-
-        # TODO: More assumption magic needed
-
-        # Either one can be set
         user_input['sensor'] = await determine_user_request_sensor(
             sensor_type=user_req_metric,
             sensor_name=None,  # TODO: Get from slot
             location=user_req_location
         )
-    finally:
-        return user_input, events
+    except Exception as e: # TODO: Capture specific exceptions
+        raise ServerException("Something went wrong while looking up sensor data.", e)
+
+    print("Input:", user_input)
+
+    return user_input
 
 def exit_reject_sensor_data_incorrect(
         action_name: str,
@@ -113,8 +132,10 @@ class ActionMetricAggregate(Action):
     def name(self):
         return "action_metric_aggregate"
 
+    @action_exception_handle_graceful
     async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
-        user_input, events = await parse_input_sensor_operation(dispatcher, tracker, domain)
+        events: List[Dict[str, Any]] = []
+        user_input = await parse_input_sensor_operation(dispatcher, tracker, domain, events)
 
         requested_sensor: SensorMetadata = user_input.get('sensor')
 
@@ -212,8 +233,10 @@ class ActionFetchReport(Action):
     def name(self) -> Text:
         return "action_fetch_report"
 
+    @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-        user_input, events = await parse_input_sensor_operation(dispatcher, tracker, domain)
+        events: List[Dict[str, Any]] = []
+        user_input = await parse_input_sensor_operation(dispatcher, tracker, domain, events)
 
         requested_sensor: SensorMetadata = user_input.get('sensor')
 
@@ -236,7 +259,6 @@ class ActionFetchReport(Action):
         # URI or Data URI of preview image
         report_data: dict = await get_report_generate_preview()
 
-        # TODO: Somehow get public URL of report. localhost won't work obviously. Don't hardcode it.
         report_url: str = report_data['interactive_report_route']
         preview_image_url: str = report_data['preview_image']
 

@@ -7,6 +7,7 @@ import pandas as pd
 from typing import Optional, Tuple, List, Dict
 from datetime import datetime
 
+
 async def get_sensor_data(requested_sensor_id: int, 
                       timestamp_from: Optional[datetime] = None,
                       timestamp_to: Optional[datetime] = None) -> Tuple[pd.DataFrame, SensorMetadata]:
