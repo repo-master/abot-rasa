@@ -10,8 +10,11 @@ from datetime import datetime
 
 async def get_sensor_data(requested_sensor_id: int,
                           timestamp_from: Optional[datetime] = None,
-                          timestamp_to: Optional[datetime] = None) -> Tuple[pd.DataFrame, SensorMetadata]:
+                          timestamp_to: Optional[datetime] = None) -> Optional[Tuple[pd.DataFrame, SensorMetadata]]:
     sensor_data: SensorDataResponse = await fetch_sensor_data(requested_sensor_id, timestamp_from, timestamp_to)
+
+    if not ('data' in sensor_data and 'metadata' in sensor_data):
+        return
 
     metadata: SensorMetadata = sensor_data.get('metadata', {})
     values: List[Dict] = sensor_data.get('data', [])

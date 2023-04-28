@@ -160,28 +160,34 @@ class ActionMetricAggregate(Action):
         # TODO: Aggregation must be done on backend. Move all this to backend with API
 
         # Load data
-        data, metadata = await get_sensor_data(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
+        response_data = await get_sensor_data(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
 
         # TODO: Run checks on above
 
-        # Run aggregation
-        agg_response = perform_aggregation_on_data(data, aggregation, metadata)
+        if response_data is not None:
+            data, metadata = response_data
+            # Run aggregation
+            agg_response = perform_aggregation_on_data(data, aggregation, metadata)
 
-        if agg_response:
-            response_string, aggregated_result = agg_response
-            # Generate response sentence
-            fmt_options = {
-                # Add any other options here to pass to the below format string
-                **aggregated_result
-            }
+            if agg_response:
+                response_string, aggregated_result = agg_response
+                # Generate response sentence
+                fmt_options = {
+                    # Add any other options here to pass to the below format string
+                    **aggregated_result
+                }
 
-            response_text = response_string.format(**fmt_options)
+                response_text = response_string.format(**fmt_options)
 
-            # Say the sentence
-            dispatcher.utter_message(response_text)
+                # Say the sentence
+                dispatcher.utter_message(response_text)
+            else:
+                dispatcher.utter_message("Sorry, data for {sensor_type} isn't available yet.".format(
+                    sensor_type=metadata['sensor_type']
+                ))
         else:
-            dispatcher.utter_message("Sorry, data for {sensor_type} isn't available yet.".format(
-                sensor_type=metadata['sensor_type']
+            dispatcher.utter_message("Sorry, data for {sensor_req} isn't available.".format(
+                sensor_req=requested_sensor.get('user_req_metric')
             ))
 
         return events
