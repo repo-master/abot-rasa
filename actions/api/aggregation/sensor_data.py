@@ -8,9 +8,9 @@ from typing import Optional, Tuple, List, Dict
 from datetime import datetime
 
 
-async def get_sensor_data(requested_sensor_id: int, 
-                      timestamp_from: Optional[datetime] = None,
-                      timestamp_to: Optional[datetime] = None) -> Tuple[pd.DataFrame, SensorMetadata]:
+async def get_sensor_data(requested_sensor_id: int,
+                          timestamp_from: Optional[datetime] = None,
+                          timestamp_to: Optional[datetime] = None) -> Tuple[pd.DataFrame, SensorMetadata]:
     sensor_data: SensorDataResponse = await fetch_sensor_data(requested_sensor_id, timestamp_from, timestamp_to)
 
     metadata: SensorMetadata = sensor_data.get('metadata', {})

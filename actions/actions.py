@@ -43,11 +43,13 @@ class ServerException(Exception):
         super().__init__(msg)
         self._msg = msg
         self.exc = original_exc
+
     def __str__(self):
         return "Woops! {msg}\nPlease try again after some time.\nError reason: \"{reason}\"".format(
             msg=self._msg,
             reason="%s: %s" % (type(self.exc).__name__, str(self.exc))
         )
+
 
 def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker, DomainDict], List[Dict[str, Any]]]):
     async def _wrapper_fn(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[str, Any]]:
@@ -66,6 +68,7 @@ def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker
             # No events are sent since it failed
             return []
     return _wrapper_fn
+
 
 async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict, events: List[Dict[Text, Any]]) -> Dict:
     user_input = {}
@@ -103,12 +106,13 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
             sensor_name=None,  # TODO: Get from slot
             location=user_req_location
         )
-    except Exception as e: # TODO: Capture specific exceptions
+    except Exception as e:  # TODO: Capture specific exceptions
         raise ServerException("Something went wrong while looking up sensor data.", e)
 
     print("Input:", user_input)
 
     return user_input
+
 
 def exit_reject_sensor_data_incorrect(
         action_name: str,
@@ -127,6 +131,7 @@ def exit_reject_sensor_data_incorrect(
     # events.extend([ActionExecutionRejected(action_name)])
 
     return events
+
 
 class ActionMetricAggregate(Action):
     def name(self):
@@ -208,10 +213,11 @@ class ActionMetricSummarize(Action):
 
         return []
 
+
 class ActionShowImage(Action):
     def name(self) -> Text:
         return "action_show_image"
-    
+
     def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         # dispatcher.utter_message(response="utter_show_image")
         img = Image.open("actions/logo-phAIdelta.png")
@@ -224,10 +230,8 @@ class ActionShowImage(Action):
         # Send the image to the user
         dispatcher.utter_message(image=uri)
 
-
-
         return []
-    
+
 
 class ActionFetchReport(Action):
     def name(self) -> Text:
@@ -271,6 +275,7 @@ class ActionFetchReport(Action):
 
         return []
 
+
 class ActionFormMetricData(FormValidationAction):
     def name(self) -> Text:
         return "form_metric_data"
@@ -305,8 +310,7 @@ class ActionFormMetricData(FormValidationAction):
 
         return {
             "metric": [self.from_entity(entity="metric", intent='query_metric_aggregate'),
-                     self.from_text()],
+                       self.from_text()],
             "location": [self.from_entity(entity="location", intent="query_metric_aggregate"),
-                        self.from_text()],
+                         self.from_text()],
         }
-

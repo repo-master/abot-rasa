@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 import json
 
 
-async def fetch_sensor_data(requested_sensor_id: int, 
-                      timestamp_from: Optional[datetime] = None,
-                      timestamp_to: Optional[datetime] = None) -> SensorDataResponse:
+async def fetch_sensor_data(requested_sensor_id: int,
+                            timestamp_from: Optional[datetime] = None,
+                            timestamp_to: Optional[datetime] = None) -> SensorDataResponse:
     async with Client() as client:
         params = {}
 

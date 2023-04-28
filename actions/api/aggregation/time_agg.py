@@ -76,4 +76,3 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
         'to': datetime.fromisoformat(user_req_timeperiod['to']),
         'user_time_entity': duckling_time_entity.get('value')
     }
-
