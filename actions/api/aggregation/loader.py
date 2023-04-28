@@ -2,7 +2,7 @@
 from .. import Client
 from .schema import SensorDataResponse, SensorMetadata
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import json
 

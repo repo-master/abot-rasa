@@ -267,7 +267,7 @@ class ActionFetchReport(Action):
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
 
         # URI or Data URI of preview image
-        report_data: dict = await get_report_generate_preview()
+        report_data: dict = await get_report_generate_preview(requested_sensor_id,requested_timeperiod["from"], requested_timeperiod["to"])
 
         report_url: str = report_data['interactive_report_route']
         preview_image_url: str = report_data['preview_image']
@@ -312,7 +312,6 @@ class ActionFormMetricData(FormValidationAction):
             - intent: value pairs
             - a whole message
             or a list of them, where a first match will be picked"""
-        print("MAppping slots")
 
         return {
             "metric": [self.from_entity(entity="metric", intent='query_metric_aggregate'),
