@@ -192,10 +192,6 @@ nlu:
     - And the [unit 1](location)?
     - also at [unit 2](location)?
 
-- intent : get_phaidelta_logo
-  examples: |
-    - Can you show me the logo?
-    - Send me the logo
 
 - intent : get_report
   examples: |
