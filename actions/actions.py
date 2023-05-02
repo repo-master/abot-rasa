@@ -30,10 +30,6 @@ from .api.aggregation import (
 from rasa_sdk.types import DomainDict
 from typing import Any, Text, Dict, List, Union, Optional, Callable
 
-from io import BytesIO
-from PIL import Image
-import base64
-
 
 LOG = logging.getLogger(__name__)
 
@@ -216,25 +212,6 @@ class ActionMetricSummarize(Action):
         # if requested_sensor_id is None:
         #     dispatcher.utter_message("Which sensor do you want to get information on?")
         #     return [ActionExecutionRejected(self.name())]
-
-        return []
-
-
-class ActionShowImage(Action):
-    def name(self) -> Text:
-        return "action_show_image"
-
-    def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-        # dispatcher.utter_message(response="utter_show_image")
-        img = Image.open("actions/logo-phAIdelta.png")
-
-        data = BytesIO()
-        img.save(data, "JPEG")
-        data64 = base64.b64encode(data.getvalue()).decode('utf-8')
-        uri = "data:image/jpeg;base64," + data64
-
-        # Send the image to the user
-        dispatcher.utter_message(image=uri)
 
         return []
 

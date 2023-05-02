@@ -8,9 +8,6 @@ entities:
 - time
 - number
 
-actions:
-- action_show_image
-
 
 responses:
   utter_did_that_help:
@@ -21,10 +18,6 @@ responses:
   - text: Okay, let me try again...
   utter_default:
   - text: Sorry I didn't get that. Can you rephrase?
-  utter_show_image:
-  - text: "Here's the phAIdelta log :"
-    image: "https://img.freepik.com/free-photo/red-white-cat-i-white-studio_155003-13189.jpg"
-
 
 session_config:
   session_expiration_time: 60
