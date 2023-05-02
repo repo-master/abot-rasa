@@ -13,7 +13,8 @@ importers:
 imports:
 - projects/Sensor
 - projects/ChitChat
-- projects/Test
+- projects/Statistics
+# - projects/Test
 
 
 pipeline:
