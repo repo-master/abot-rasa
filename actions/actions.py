@@ -167,10 +167,10 @@ class ActionMetricAggregate(Action):
         if response_data is not None:
             data, metadata = response_data
             # Run aggregation
-            agg_response = perform_aggregation_on_data(data, aggregation, metadata)
+            aggregated_result = perform_aggregation_on_data(data, aggregation, metadata)
 
-            if agg_response:
-                response_string, aggregated_result = agg_response
+            if aggregated_result:
+                response_string: str = aggregated_result.pop('result_format', '')
                 # Generate response sentence
                 fmt_options = {
                     # Add any other options here to pass to the below format string

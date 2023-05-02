@@ -13,8 +13,8 @@ class AggregationMethod(Enum):
 
 
 class AggregationResult(TypedDict):
+    result_format: str
     sensor_name: str
-    result_value: str
     aggregation_method: str
     outliers: dict
 

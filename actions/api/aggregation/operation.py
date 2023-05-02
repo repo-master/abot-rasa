@@ -32,30 +32,46 @@ def get_outliner(df, key_row='timestamp', value_row='value'):
 def perform_aggregation_on_data(
         data: pd.DataFrame,
         agg_method: AggregationMethod,
-        metadata: SensorMetadata) -> Optional[Tuple[str, AggregationResult]]:
-    result: str
-    response_string = "The {aggregation_method} value of {sensor_name} is {result_value}"
+        metadata: SensorMetadata) -> Optional[AggregationResult]:
 
     if len(data) == 0:
         return
 
+    result_current = "%.2f%s" % (data['value'].iloc[0], metadata['display_unit'])
+    result_mean = "%.2f%s" % (data['value'].mean(), metadata['display_unit'])
+    result_max = "%.2f%s" % (data['value'].max(), metadata['display_unit'])
+    result_min = "%.2f%s" % (data['value'].min(), metadata['display_unit'])
+
     if agg_method == AggregationMethod.CURRENT:
-        result = "%.2f%s" % (data['value'].iloc[0], metadata['display_unit'])
+        response_string = "The current value of {sensor_name} is {result_current}"
+
     if agg_method == AggregationMethod.AVERAGE:
-        result = "%.2f%s" % (data['value'].mean(), metadata['display_unit'])
+        response_string = "The average value of {sensor_name} is {result_mean}"
+
     if agg_method == AggregationMethod.MAXIMUM:
-        result = "%.2f%s" % (data['value'].max(), metadata['display_unit'])
+        response_string = "The maximum value of {sensor_name} is {result_max}"
+
     if agg_method == AggregationMethod.MINIMUM:
-        result = "%.2f%s" % (data['value'].min(), metadata['display_unit'])
+        response_string = "The minimum value of {sensor_name} is {result_min}"
+
     if agg_method == AggregationMethod.SUMMARY:
-        response_string = "Here is the summary for {sensor_name}:\n{result_value}"
-        unit = metadata['display_unit']
-        result = f"Current value: {data['value'].iloc[0]}{unit} \n\tAverage value :{data['value'].mean()}{unit} \n\tMax value : {data['value'].max()}{unit} \n\tMinimum value : {data['value'].min()}{unit}"
+        response_string = """
+Here is the summary for {sensor_name}:
+    Current value: {result_current}
+    Average value: {result_mean}
+    Maximum value: {result_max}
+    Minimum value: {result_min}
+""".strip()
 
     outliers = get_outliner(data)
-    return response_string, {
+    return {
+        'result_format': response_string,
         'sensor_name': sensor_name_coalesce(metadata),
-        'result_value': result,
         'aggregation_method': agg_method.value,
-        'outliers': outliers
+        'outliers': outliers,
+
+        'result_current': result_current,
+        'result_mean': result_mean,
+        'result_max': result_max,
+        'result_min': result_min
     }
