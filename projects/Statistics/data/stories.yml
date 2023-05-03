@@ -1,0 +1,7 @@
+version: "3.1"
+
+stories:
+  - story:
+    steps:
+    - intent: ask_followup_summary_details
+    - action : action_describe_event_details

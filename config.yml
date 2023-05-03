@@ -13,7 +13,7 @@ importers:
 imports:
 - projects/Sensor
 - projects/ChitChat
-# - projects/Statistics
+- projects/Statistics
 # - projects/Test
 
 

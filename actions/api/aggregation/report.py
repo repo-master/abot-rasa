@@ -20,5 +20,6 @@ async def get_report_generate_preview(requested_sensor_id: int,
 
 
         response = await client.get("/data/report", params=params)
+        response.raise_for_status()
 
         return response.json()

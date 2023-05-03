@@ -1,0 +1,11 @@
+version: "3.1"
+
+stories:
+- story: Chat bot gave a response that the user didn't ask for
+  steps:
+  - intent: incorrect_response
+  - action: utter_sorry_response
+  - intent: incorrect_response
+  - action: utter_sorry_response
+  - intent: incorrect_response
+  - action: action_human_handoff

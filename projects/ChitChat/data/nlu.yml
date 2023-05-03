@@ -100,3 +100,23 @@ nlu:
     - Tell me a joke
     - I am bored
     - Let's play a game
+
+- intent: incorrect_response
+  examples: |
+    - I didn't ask for that
+    - What is this? I didn't ask for this
+    - This is not what I wanted
+    - Why did you give me this?
+    - That is not what I want
+    - This is nonsense
+    - Why did you give me [report](specific_item)? I didn't ask for this
+    - I didn't ask for [chart](specific_item)
+    - Please give me the correct response
+    - Please give me the correct answer
+    - Please give me the right thing
+    - No I wanted [report](specific_item)
+    - No I wanted [report](specific_item), not this
+    - What?
+    - No not this
+    - Give me the right thing
+    - Give me the right thing, not [report](specific_item)

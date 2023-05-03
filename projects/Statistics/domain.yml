@@ -1,3 +1,7 @@
 version: '3.1'
 
 intents:
+- ask_followup_summary_details
+
+actions:
+- action_describe_event_details
