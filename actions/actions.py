@@ -27,6 +27,8 @@ from .api.aggregation import (
     TimeRange
 )
 
+from .api import HTTPStatusError
+
 from rasa_sdk.types import DomainDict
 from typing import Any, Text, Dict, List, Union, Optional, Callable
 
@@ -47,10 +49,16 @@ class ServerException(Exception):
         )
 
 
+class ClientException(Exception):
+    pass
+
 def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker, DomainDict], List[Dict[str, Any]]]):
     async def _wrapper_fn(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[str, Any]]:
         try:
             return await fn(self, dispatcher, tracker, domain)
+        except ClientException as exc:
+            dispatcher.utter_message(str(exc))
+            return []
         # Add any specific exceptions here to send response to that need a different response.
         except Exception as exc:
             LOG.exception("Unhandled exception:", exc_info=exc)
@@ -102,10 +110,11 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
             sensor_name=None,  # TODO: Get from slot
             location=user_req_location
         )
+    except HTTPStatusError as exc:
+        if exc.response.is_client_error:
+            raise ClientException("Requested data does not exist.")
     except Exception as e:  # TODO: Capture specific exceptions
         raise ServerException("Something went wrong while looking up sensor data.", e)
-
-    print("Input:", user_input)
 
     return user_input
 

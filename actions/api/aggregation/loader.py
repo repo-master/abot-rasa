@@ -20,6 +20,7 @@ async def fetch_sensor_data(requested_sensor_id: int,
         })
 
         response = await client.get("/data/sensor", params=params)
+        response.raise_for_status()
         return response.json()
 
 
@@ -33,6 +34,7 @@ async def determine_user_request_sensor(sensor_type=None, sensor_name=None, loca
         })
 
         response = await client.get("/query/sensor_id", params=params)
+        response.raise_for_status()
         try:
             data: dict = response.json()
             sensor: Optional[SensorMetadata] = data.get('sensor')

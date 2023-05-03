@@ -1,5 +1,6 @@
 
 from httpx import AsyncClient
+from httpx import HTTPStatusError
 
 from .config import BACKEND_ENDPOINT_BASE
 
