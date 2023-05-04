@@ -30,6 +30,7 @@ from .api.aggregation import (
 from rasa_sdk.types import DomainDict
 from typing import Any, Text, Dict, List, Union, Optional, Callable
 
+import pandas as pd
 
 LOG = logging.getLogger(__name__)
 
@@ -177,10 +178,20 @@ class ActionMetricAggregate(Action):
 
                 # Say the sentence
                 dispatcher.utter_message(response_text)
+                outliers : dict = aggregated_result.pop("outliers")
+                if outliers == {}:
+                    dispatcher.utter_message("Data is clean and no outlier is found in data")
+                else:
+                    df_outlier = pd.DataFrame(list(outliers.items()), columns=['timestamp', 'value'])
+                    dispatcher.utter_message(f"Found {df_outlier['value'].count()} outlier values")
+                    dispatcher.utter_message(f"Minimum value of outlier is {df_outlier['value'].min()}")
+                    dispatcher.utter_message(f"Maximum value of outlier is {df_outlier['value'].max()}")
             else:
                 dispatcher.utter_message("Sorry, data for {sensor_type} isn't available yet.".format(
                     sensor_type=metadata['sensor_type']
                 ))
+
+            
         else:
             dispatcher.utter_message("Sorry, data for {sensor_req} isn't available.".format(
                 sensor_req=user_input.get('user_req_metric')

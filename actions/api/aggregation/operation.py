@@ -22,10 +22,9 @@ def get_outliner(df, key_row='timestamp', value_row='value'):
 
     # Identify the outliers
     outliers = df[(df[value_row] < threshold[0]) | (df[value_row] > threshold[1])]
-    print("outlier data frame /n", outliers)
     result = {}
     for i, row in outliers.iterrows():
-        result[row[key_row]] = row[value_row]
+        result[row[key_row].strftime('%Y-%m-%d %H:%M:%S.%f')] = row[value_row]
     return result
 
 
