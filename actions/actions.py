@@ -8,7 +8,12 @@ import logging
 
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import ActionExecutionRejected, SlotSet
+from rasa_sdk.events import (
+    ActionExecutionRejected,
+    SlotSet,
+    ConversationPaused,
+    UserUtteranceReverted
+)
 
 from .api.aggregation import (
     get_sensor_data,
@@ -26,6 +31,8 @@ from .api.aggregation import (
     TimeRangeIn,
     TimeRange
 )
+
+from .api import HTTPStatusError
 
 from rasa_sdk.types import DomainDict
 from typing import Any, Text, Dict, List, Union, Optional, Callable
@@ -48,10 +55,16 @@ class ServerException(Exception):
         )
 
 
+class ClientException(Exception):
+    pass
+
 def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker, DomainDict], List[Dict[str, Any]]]):
     async def _wrapper_fn(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[str, Any]]:
         try:
             return await fn(self, dispatcher, tracker, domain)
+        except ClientException as exc:
+            dispatcher.utter_message(str(exc))
+            return []
         # Add any specific exceptions here to send response to that need a different response.
         except Exception as exc:
             LOG.exception("Unhandled exception:", exc_info=exc)
@@ -103,10 +116,11 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
             sensor_name=None,  # TODO: Get from slot
             location=user_req_location
         )
+    except HTTPStatusError as exc:
+        if exc.response.is_client_error:
+            raise ClientException("Requested data does not exist.")
     except Exception as e:  # TODO: Capture specific exceptions
         raise ServerException("Something went wrong while looking up sensor data.", e)
-
-    print("Input:", user_input)
 
     return user_input
 
@@ -186,6 +200,13 @@ class ActionMetricAggregate(Action):
                     dispatcher.utter_message(f"Found {df_outlier['value'].count()} outlier values")
                     dispatcher.utter_message(f"Minimum value of outlier is {df_outlier['value'].min()}")
                     dispatcher.utter_message(f"Maximum value of outlier is {df_outlier['value'].max()}")
+
+                dispatcher.utter_button_message("Additional actions", [
+                    {"title": "Min", "payload": "minimum"},
+                    {"title": "Max", "payload": "maximum"},
+                    {"title": "Average", "payload": "average"},
+                    {"title": "Current", "payload": "current"}
+                ])
             else:
                 dispatcher.utter_message("Sorry, data for {sensor_type} isn't available yet.".format(
                     sensor_type=metadata['sensor_type']
@@ -307,3 +328,37 @@ class ActionFormMetricData(FormValidationAction):
             "location": [self.from_entity(entity="location", intent="query_metric_aggregate"),
                          self.from_text()],
         }
+
+
+class ActionDescribeEventDetails(Action):
+    def name(self):
+        return "action_describe_event_details"
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
+
+        dispatcher.utter_message("This is an extreme point for the given time range, and it occured on xyz with a value of abc.")
+
+        dispatcher.utter_button_message("Additional actions", [
+            {"title": "Min", "payload": "minimum"},
+            {"title": "Max", "payload": "maximum"},
+            {"title": "Average", "payload": "average"},
+            {"title": "Current", "payload": "current"}
+        ])
+
+        return events
+
+
+class ActionHumanHandoff(Action):
+    def name(self) -> Text:
+        return "action_human_handoff"
+
+    def run(self, dispatcher, tracker, domain):
+        # output a message saying that the conversation will now be
+        # continued by a human.
+
+        message = "Let me transfer you to a human..."
+        dispatcher.utter_message(text=message)
+        # pause tracker, undo last user interaction
+        return [ConversationPaused(), UserUtteranceReverted()]

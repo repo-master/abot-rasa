@@ -70,6 +70,7 @@ actions:
 - action_fetch_report
 
 responses:
+  # Uttered by form_metric_data automatically when an entity is missing.
   utter_ask_metric:
   - text: Could we please know Sensor are you looking for?
   utter_ask_location:

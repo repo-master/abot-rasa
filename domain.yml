@@ -7,6 +7,8 @@ entities:
 - time
 - number
 
+actions:
+- action_human_handoff
 
 responses:
   utter_did_that_help:
@@ -17,6 +19,10 @@ responses:
   - text: Okay, let me try again...
   utter_default:
   - text: Sorry I didn't get that. Can you rephrase?
+  utter_sorry_response:
+  - text: I am sorry about the previous response. Can you please clarify what was required?
+  - text: I am very sorry about the response
+  - text: I apologise for the previous response. Please let me know what you wanted?
 
 session_config:
   session_expiration_time: 60

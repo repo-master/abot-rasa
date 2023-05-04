@@ -1,0 +1,16 @@
+version: "3.1"
+
+nlu:
+- intent: ask_followup_summary_details
+  examples: |
+    - When did that happen?
+    - Tell me more about it
+    - What time did it occur?
+    - When did it occur?
+    - How did it occur?
+    - Give more details on the event
+    - When did the event occur?
+    - How did that happen?
+    - What does it mean?
+    - What do you mean?
+    - What do you mean by that?     
