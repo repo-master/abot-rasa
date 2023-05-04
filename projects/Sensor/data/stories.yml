@@ -17,6 +17,7 @@ stories:
       - intent: change_sensor
       - intent: change_aggregation
       - intent: change_location
+      - intent: change_time_period
     - action: action_metric_aggregate
 
     # - slot_was_set:

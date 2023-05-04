@@ -34,12 +34,25 @@ from .api.aggregation import (
 
 from .api import HTTPStatusError
 
+from .schema import StatementContext
+
 from rasa_sdk.types import DomainDict
 from typing import Any, Text, Dict, List, Union, Optional, Callable
 
 import pandas as pd
 
 LOG = logging.getLogger(__name__)
+ACTION_STATEMENT_CONTEXT_SLOT = "statement_context"
+
+
+def update_statement_context(tracker: Tracker, events: list, data: StatementContext):
+    curr_val = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT, {})
+    if curr_val is None:
+        curr_val = {}
+    curr_val.update(data)
+    ev = [SlotSet(ACTION_STATEMENT_CONTEXT_SLOT, curr_val)]
+    tracker.add_slots(ev)
+    events.extend(ev)
 
 
 class ServerException(Exception):
@@ -57,6 +70,7 @@ class ServerException(Exception):
 
 class ClientException(Exception):
     pass
+
 
 def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker, DomainDict], List[Dict[str, Any]]]):
     async def _wrapper_fn(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[str, Any]]:
@@ -192,60 +206,49 @@ class ActionMetricAggregate(Action):
 
                 # Say the sentence
                 dispatcher.utter_message(response_text)
-                outliers : dict = aggregated_result.pop("outliers")
-                if outliers == {}:
-                    dispatcher.utter_message("Data is clean and no outlier is found in data")
-                else:
-                    df_outlier = pd.DataFrame(list(outliers.items()), columns=['timestamp', 'value'])
-                    dispatcher.utter_message(f"Found {df_outlier['value'].count()} outlier values")
-                    dispatcher.utter_message(f"Minimum value of outlier is {df_outlier['value'].min()}")
-                    dispatcher.utter_message(f"Maximum value of outlier is {df_outlier['value'].max()}")
 
-                dispatcher.utter_button_message("Additional actions", [
+                aggregation_followup_response_buttons: List[Dict[str, str]] = [
                     {"title": "Min", "payload": "minimum"},
                     {"title": "Max", "payload": "maximum"},
                     {"title": "Average", "payload": "average"},
                     {"title": "Current", "payload": "current"}
-                ])
+                ]
+
+                outliers: dict = aggregated_result.pop("outliers")
+                if len(outliers) > 0:
+                    df_outlier = pd.DataFrame(list(outliers.items()), columns=['timestamp', 'value'])
+                    dispatcher.utter_message(f"Found {df_outlier['value'].count()} outlier values")
+                    dispatcher.utter_message(f"Minimum value of outlier is {df_outlier['value'].min()} at {df_outlier.loc[df_outlier['value'].idxmin(), 'timestamp']}")
+                    dispatcher.utter_message(f"Maximum value of outlier is {df_outlier['value'].max()}")
+                    aggregation_followup_response_buttons.append({
+                        "title": "Outlier details", "payload": "describe the outlier"
+                    })
+
+                dispatcher.utter_message(
+                    "Additional actions",
+                    buttons=aggregation_followup_response_buttons
+                )
+
+                update_statement_context(tracker, events, {
+                    "intent_used": tracker.latest_message.get('intent'),
+                    "action_performed": self.name(),
+                    "extra_data": {
+                        "operation": "aggregation",
+                        "result": aggregated_result,
+                        "outliers": outliers
+                    }
+                })
             else:
                 dispatcher.utter_message("Sorry, data for {sensor_type} isn't available yet.".format(
                     sensor_type=metadata['sensor_type']
                 ))
 
-            
         else:
             dispatcher.utter_message("Sorry, data for {sensor_req} isn't available.".format(
                 sensor_req=user_input.get('user_req_metric')
             ))
 
         return events
-
-
-class ActionMetricSummarize(Action):
-    def name(self):
-        return "action_metric_summarize"
-
-    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
-        # user_req_metric = tracker.get_slot("metric")
-        # user_req_location = tracker.get_slot("location")
-
-        # # FIXME: Copy-pasted from above. Do whatever changes here that is done above.
-        # print("Got slots: Metric: %s, Location: %s" % (
-        #     user_req_metric, user_req_location), flush=True)
-
-        # # Either one can be set
-        # requested_sensor_id = await determine_user_request_sensor(
-        #     sensor_type=user_req_metric,
-        #     sensor_name=None,  # TODO: Get from slot
-        #     location=user_req_location
-        # )
-
-        # # Could not determine the sensor to get info on (or no info provided at all)
-        # if requested_sensor_id is None:
-        #     dispatcher.utter_message("Which sensor do you want to get information on?")
-        #     return [ActionExecutionRejected(self.name())]
-
-        return []
 
 
 class ActionFetchReport(Action):
@@ -276,7 +279,7 @@ class ActionFetchReport(Action):
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
 
         # URI or Data URI of preview image
-        report_data: dict = await get_report_generate_preview(requested_sensor_id,requested_timeperiod["from"], requested_timeperiod["to"])
+        report_data: dict = await get_report_generate_preview(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
 
         report_url: str = report_data['interactive_report_route']
         preview_image_url: str = report_data['preview_image']
@@ -338,14 +341,28 @@ class ActionDescribeEventDetails(Action):
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
 
-        dispatcher.utter_message("This is an extreme point for the given time range, and it occured on xyz with a value of abc.")
+        bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
+        if bot_prev_statement_ctx is None:
+            dispatcher.utter_message(text="Don't know what to describe.")
+            return []
 
-        dispatcher.utter_button_message("Additional actions", [
-            {"title": "Min", "payload": "minimum"},
-            {"title": "Max", "payload": "maximum"},
-            {"title": "Average", "payload": "average"},
-            {"title": "Current", "payload": "current"}
-        ])
+        # agg_used = user_to_aggregation_type(user_req_agg_method)
+
+        action_performed = bot_prev_statement_ctx.get("action_performed")
+        if action_performed == 'action_metric_aggregate':
+            ex_data: dict = bot_prev_statement_ctx.get("extra_data")
+            if ex_data['operation'] == 'aggregation':
+                print(ex_data)
+
+        dispatcher.utter_message(
+            "This is an extreme point for the given time range, and it occured on xyz with a value of abc.",
+            buttons=[
+                {"title": "Min", "payload": "minimum"},
+                {"title": "Max", "payload": "maximum"},
+                {"title": "Average", "payload": "average"},
+                {"title": "Current", "payload": "current"}
+            ]
+        )
 
         return events
 

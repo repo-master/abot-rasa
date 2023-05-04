@@ -57,6 +57,11 @@ slots:
     - type: from_entity
       entity: time
 
+  timestamp_agg_timerange:
+    type: any
+    mappings:
+    - type: custom
+
 forms:
   form_metric_data:
     required_slots:

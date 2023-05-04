@@ -62,8 +62,18 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
             "to": datetime.fromisoformat(user_req_timeperiod['to'])
         })
 
-    tracker.add_slots([
-        SlotSet("timestamp_agg_timerange", sys_timerange)
-    ])
+    sys_timerange_slot = {
+        **sys_timerange
+    }
+    sys_timerange_slot.update({
+        "from": sys_timerange_slot['from'].isoformat(),
+        "to": sys_timerange_slot['to'].isoformat()
+    })
+
+    ev = [
+        SlotSet("timestamp_agg_timerange", sys_timerange_slot)
+    ]
+    tracker.add_slots(ev)
+    events.extend(ev)
 
     return sys_timerange
