@@ -20,3 +20,8 @@ nlu:
     - What caused this event?
     - What caused the outliers?
     - When did the outlier occur?
+    - Do you see any outliers in this data?
+    - Are there any outliers in the data?
+    - Is this data proper?
+    - Is this data proper? Is anything wrong with it?
+    - Are there any data points of significance?
