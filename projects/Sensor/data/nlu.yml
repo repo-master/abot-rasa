@@ -66,11 +66,11 @@ nlu:
     - What is the [average](aggregation) [humidity](metric) [outside](location)?
     - Give me the [temperature](metric)
     - Give me the [humidity](metric)
-    - Give me the current [energy reading](metric)
+    - Give me the [current](aggregation) [energy reading](metric)
     - Give me the latest [energy reading](metric)
     - Give me the latest [power reading](metric)
-    - Give me the current [temperature](metric)
-    - Give me the current [humidity](metric)
+    - Give me the [current](aggregation) [temperature](metric)
+    - Give me the [current](aggregation) [humidity](metric)
     - Give me the [average](aggregation) [temperature](metric)
     - Give me the [average](aggregation) [humidity](metric)
     - What is the [rh](metric) in [room 5](location)?

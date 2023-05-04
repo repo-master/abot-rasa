@@ -62,7 +62,6 @@ forms:
     required_slots:
     - metric
     - location
-    - aggregation
 
 actions:
 - action_metric_aggregate
