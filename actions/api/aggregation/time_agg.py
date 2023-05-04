@@ -14,9 +14,18 @@ TimeRange = TypedDict("TimeRange", {"from": datetime, "to": datetime, "user_time
 
 def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
     user_req_timeperiod: Optional[TimeRangeIn] = tracker.get_slot("timestamp_agg_period")
-    sys_timerange: Optional[TimeRange] = tracker.slots.get("timestamp_agg_timerange", {})
-    duckling_time_entity: Dict = {}
+    sys_timerange: Optional[TimeRange] = tracker.slots.get("timestamp_agg_timerange")
+    duckling_time_entity: Optional[Dict] = None
     grain_size: Optional[str] = None
+
+    if sys_timerange is None:
+        sys_timerange: TimeRange = {}
+    else:
+        # Decode 'from' and 'to' fields back to datetime from isoformat-ed string
+        if 'from' in sys_timerange.keys():
+            sys_timerange['from'] = datetime.fromisoformat(sys_timerange['from'])
+        if 'to' in sys_timerange.keys():
+            sys_timerange['to'] = datetime.fromisoformat(sys_timerange['to'])
 
     if user_req_timeperiod is not None:
         all_entities: List = tracker.latest_message['entities']
@@ -30,18 +39,21 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
 
                 break
 
-    if user_req_timeperiod is None and 'from' not in sys_timerange:
+    if user_req_timeperiod is None and 'from' not in sys_timerange.keys():
         # No timestamp given. Assume for today.
         sys_timerange.update({"from": datetime.combine(datetime.now(), datetime.min.time())})
-        if 'to' not in sys_timerange:
+        if 'to' not in sys_timerange.keys():
             sys_timerange.update({"to": datetime.now()})
 
-    if isinstance(user_req_timeperiod, str):
+    if isinstance(user_req_timeperiod, str) and duckling_time_entity is not None:
         # ISO 8601 timestamp received.
         # This may be start time ("today", "yesterday"), or starting point with a grain (last month => whole last month).
         if grain_size is None:
-            # This actually shouldn't happen, but if it does, choose a day delta
-            grain_size = 'day'
+            if 'user_time_grain' in sys_timerange.keys():
+                grain_size = sys_timerange['user_time_grain']
+            else:
+                # This actually shouldn't happen, but if it does, choose a day delta
+                grain_size = 'day'
 
         # The given time period is the starting point of the range
         timerange_start = datetime.fromisoformat(user_req_timeperiod)
@@ -66,8 +78,8 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
         **sys_timerange
     }
     sys_timerange_slot.update({
-        "from": sys_timerange_slot['from'].isoformat(),
-        "to": sys_timerange_slot['to'].isoformat()
+        "from": sys_timerange['from'].isoformat(),
+        "to": sys_timerange['to'].isoformat()
     })
 
     ev = [
