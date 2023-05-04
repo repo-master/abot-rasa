@@ -11,7 +11,7 @@ def sensor_name_coalesce(meta: SensorMetadata) -> str:
         meta.get('sensor_urn')
 
 
-def get_outliner(df, key_row='timestamp', value_row='value'):
+def get_outliner(df, key_row='timestamp', value_row='value') -> dict:
     # Calculate the IQR of the value column
     Q1 = df[value_row].quantile(0.25)
     Q3 = df[value_row].quantile(0.75)
