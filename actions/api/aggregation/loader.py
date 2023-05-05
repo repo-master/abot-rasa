@@ -1,10 +1,10 @@
 
+import json
+from datetime import datetime
+from typing import Optional
+
 from .. import Client
 from .schema import SensorDataResponse, SensorMetadata
-from typing import Optional
-from datetime import datetime
-
-import json
 
 
 async def fetch_sensor_data(requested_sensor_id: int,

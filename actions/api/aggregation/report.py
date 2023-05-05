@@ -1,9 +1,9 @@
 
+from datetime import datetime
+from typing import Optional
+
 from .. import Client
 from .schema import SensorDataResponse
-
-from typing import Optional
-from datetime import datetime
 
 
 async def get_report_generate_preview(requested_sensor_id: int,

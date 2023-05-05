@@ -1,11 +1,11 @@
 
-from .schema import SensorMetadata, AggregationMethod, SensorDataResponse
-from .loader import fetch_sensor_data
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from typing import Optional, Tuple, List, Dict
-from datetime import datetime
+from .loader import fetch_sensor_data
+from .schema import AggregationMethod, SensorDataResponse, SensorMetadata
 
 
 async def get_sensor_data(requested_sensor_id: int,

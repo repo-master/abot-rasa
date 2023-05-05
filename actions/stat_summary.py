@@ -1,9 +1,10 @@
 
+from typing import Any, Dict, List
+
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
 
-from typing import List, Dict, Any
 
 class ActionMetricSummarize(Action):
     def name(self):

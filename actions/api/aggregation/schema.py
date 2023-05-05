@@ -1,7 +1,8 @@
 
 from enum import Enum
-from typing import Optional, List, Dict
-from typing_extensions import TypedDict, NotRequired
+from typing import Dict, List, Optional
+
+from typing_extensions import NotRequired, TypedDict
 
 
 class AggregationMethod(Enum):

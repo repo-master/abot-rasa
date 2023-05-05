@@ -1,12 +1,11 @@
 
-from rasa_sdk.interfaces import Tracker
-from rasa_sdk.events import SlotSet
-
 from datetime import datetime
+from typing import Dict, List, Optional, TypedDict, Union
+
+from rasa_sdk.events import SlotSet
+from rasa_sdk.interfaces import Tracker
+
 from actions.duckling import GRAINS, relativedelta
-
-from typing import Optional, TypedDict, Union, Dict, List
-
 
 TimeRangeIn = Union[TypedDict("TimeRangeISO8601", {"from": str, "to": str}), str]
 TimeRange = TypedDict("TimeRange", {"from": datetime, "to": datetime, "user_time_entity": str, "user_time_grain": str})
