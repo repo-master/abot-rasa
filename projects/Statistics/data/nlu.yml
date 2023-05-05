@@ -25,3 +25,9 @@ nlu:
     - Is this data proper?
     - Is this data proper? Is anything wrong with it?
     - Are there any data points of significance?
+    - Give some insights on this.
+    - Provide me with insights on the result
+    - Provide me with insights on the data
+    - Give me insights on the result
+    - Anything funny with the data?
+    - Find anything strange with the data?
