@@ -307,7 +307,8 @@ class ActionFetchReport(Action):
             events.append(FollowupAction("utter_did_that_help"))
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
-                raise ClientException("Sorry, there isn't any data present for the given sensor at the given time range.")
+                raise ClientException(
+                    "Sorry, there isn't any data present for the given sensor at the given time range.")
 
         return events
 
@@ -380,132 +381,129 @@ class ActionDescribeEventDetails(Action):
 
 
 class ActionDescribeMinEventDetails(Action):
-  def name(self):
-    return "action_describe_min_event"
+    def name(self):
+        return "action_describe_min_event"
 
-  @action_exception_handle_graceful
-  async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-    events: List[Dict[str, Any]] = []
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
 
+        bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
+        if bot_prev_statement_ctx is None:
+            dispatcher.utter_message(text="Don't know what to describe.")
+            return []
 
-    bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
-    if bot_prev_statement_ctx is None:
-      dispatcher.utter_message(text="Don't know what to describe.")
-      return []
+        # agg_used = user_to_aggregation_type(user_req_agg_method)
 
-    # agg_used = user_to_aggregation_type(user_req_agg_method)
+        action_performed = bot_prev_statement_ctx.get("action_performed")
+        if action_performed == 'action_metric_aggregate':
+            ex_data: str = bot_prev_statement_ctx.get("extra_data")
+            extra_data: dict = json.loads(ex_data)
 
-    action_performed = bot_prev_statement_ctx.get("action_performed")
-    if action_performed == 'action_metric_aggregate':
-        ex_data: str = bot_prev_statement_ctx.get("extra_data")
-        extra_data: dict = json.loads(ex_data)
+            df = pd.DataFrame(extra_data['insights'])
+            # expand the data_point dictionary into separate columns
+            df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+            df = df[df['type'] == 'outlier']
+            min_value = df['value'].min()
 
-        df = pd.DataFrame(extra_data['insights'])
-        # expand the data_point dictionary into separate columns
-        df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-        df = df[df['type']=='outlier']
-        min_value = df['value'].min()
+            dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
+        return events
 
-        dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
-    return events
 
 class ActionDescribeMaxEventDetails(Action):
-  def name(self):
-    return "action_describe_max_event"
+    def name(self):
+        return "action_describe_max_event"
 
-  @action_exception_handle_graceful
-  async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-    events: List[Dict[str, Any]] = []
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
 
+        bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
+        if bot_prev_statement_ctx is None:
+            dispatcher.utter_message(text="Don't know what to describe.")
+            return []
 
-    bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
-    if bot_prev_statement_ctx is None:
-      dispatcher.utter_message(text="Don't know what to describe.")
-      return []
+        # agg_used = user_to_aggregation_type(user_req_agg_method)
 
-    # agg_used = user_to_aggregation_type(user_req_agg_method)
+        action_performed = bot_prev_statement_ctx.get("action_performed")
+        if action_performed == 'action_metric_aggregate':
+            ex_data: str = bot_prev_statement_ctx.get("extra_data")
+            extra_data: dict = json.loads(ex_data)
 
-    action_performed = bot_prev_statement_ctx.get("action_performed")
-    if action_performed == 'action_metric_aggregate':
-        ex_data: str = bot_prev_statement_ctx.get("extra_data")
-        extra_data: dict = json.loads(ex_data)
+            df = pd.DataFrame(extra_data['insights'])
+            # expand the data_point dictionary into separate columns
+            df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+            df = df[df['type'] == 'outlier']
+            max_value = df['value'].max()
 
-        df = pd.DataFrame(extra_data['insights'])
-        # expand the data_point dictionary into separate columns
-        df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-        df = df[df['type']=='outlier']
-        max_value = df['value'].max()
-
-        dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
-    return events
+            dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
+        return events
 
 
 class ActionDescribeCountEventDetails(Action):
-  def name(self):
-    return "action_describe_outlier_count"
+    def name(self):
+        return "action_describe_outlier_count"
 
-  @action_exception_handle_graceful
-  async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-    events: List[Dict[str, Any]] = []
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
 
+        bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
+        if bot_prev_statement_ctx is None:
+            dispatcher.utter_message(text="Don't know what to describe.")
+            return []
 
-    bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
-    if bot_prev_statement_ctx is None:
-      dispatcher.utter_message(text="Don't know what to describe.")
-      return []
+        # agg_used = user_to_aggregation_type(user_req_agg_method)
 
-    # agg_used = user_to_aggregation_type(user_req_agg_method)
+        action_performed = bot_prev_statement_ctx.get("action_performed")
+        if action_performed == 'action_metric_aggregate':
+            ex_data: str = bot_prev_statement_ctx.get("extra_data")
+            extra_data: dict = json.loads(ex_data)
 
-    action_performed = bot_prev_statement_ctx.get("action_performed")
-    if action_performed == 'action_metric_aggregate':
-        ex_data: str = bot_prev_statement_ctx.get("extra_data")
-        extra_data: dict = json.loads(ex_data)
+            df = pd.DataFrame(extra_data['insights'])
+            # expand the data_point dictionary into separate columns
+            df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+            df = df[df['type'] == 'outlier']
+            count_value = df['value'].count()
 
-        df = pd.DataFrame(extra_data['insights'])
-        # expand the data_point dictionary into separate columns
-        df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-        df = df[df['type']=='outlier']
-        count_value = df['value'].count()
-
-        dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
-    return events
-
+            dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+        return events
 
 
 class ActionDescribeSummaryEventDetails(Action):
-  def name(self):
-    return "action_outlier_summary"
+    def name(self):
+        return "action_outlier_summary"
 
-  @action_exception_handle_graceful
-  async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-    events: List[Dict[str, Any]] = []
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
 
+        bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
+        if bot_prev_statement_ctx is None:
+            dispatcher.utter_message(text="Don't know what to describe.")
+            return []
 
-    bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
-    if bot_prev_statement_ctx is None:
-      dispatcher.utter_message(text="Don't know what to describe.")
-      return []
+        # agg_used = user_to_aggregation_type(user_req_agg_method)
 
-    # agg_used = user_to_aggregation_type(user_req_agg_method)
+        action_performed = bot_prev_statement_ctx.get("action_performed")
+        if action_performed == 'action_metric_aggregate':
+            ex_data: str = bot_prev_statement_ctx.get("extra_data")
+            extra_data: dict = json.loads(ex_data)
+            dispatcher.utter_message(text="Sure!")
 
-    action_performed = bot_prev_statement_ctx.get("action_performed")
-    if action_performed == 'action_metric_aggregate':
-        ex_data: str = bot_prev_statement_ctx.get("extra_data")
-        extra_data: dict = json.loads(ex_data)
-        dispatcher.utter_message(text="Sure!")
+            df = pd.DataFrame(extra_data['insights'])
+            # expand the data_point dictionary into separate columns
+            df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+            df = df[df['type'] == 'outlier']
+            count_value = df['value'].count()
+            dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+            min_value = df['value'].min()
+            dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
+            max_value = df['value'].max()
+            dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
 
-        df = pd.DataFrame(extra_data['insights'])
-        # expand the data_point dictionary into separate columns
-        df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-        df = df[df['type']=='outlier']
-        count_value = df['value'].count()
-        dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
-        min_value = df['value'].min()
-        dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
-        max_value = df['value'].max()
-        dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
+        return events
 
-    return events
 
 class ActionHumanHandoff(Action):
     def name(self) -> Text:
