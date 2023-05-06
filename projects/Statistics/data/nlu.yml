@@ -31,3 +31,44 @@ nlu:
     - Give me insights on the result
     - Anything funny with the data?
     - Find anything strange with the data?
+
+- intent: ask_for_max_outlier
+  examples: |
+    - what is max value it went
+    - what is higest value in this outlier
+    - how high it went
+    - what is max outlier value in [last month](time)
+    - what is max outlier value in [last week](time)
+    - what is max outlier value in [yesterday](time)
+
+
+- intent: ask_for_min_outlier
+  examples: |
+    - what is min value it went
+    - what is lowest value in this outlier
+    - how low it went
+    - what is min outlier value in [last month](time)
+    - what is min outlier value in [last week](time)
+    - what is min outlier value in [yesterday](time)
+
+- intent: ask_count_of_outlier
+  examples: |
+    - how many time this occured?
+    - how many time this occured in [last month](time)?
+    - how many time this occured in [last week](time)?
+    - how many time this occured in [yesterday](time)?  
+    - did this occure many times?
+    - is this a one time event?
+    - How many outlier data points are there 
+
+- intent: ask_outlier_range
+  examples: |
+    - What is the range of values for the outlier data points?
+    - What is the distribution of the outlier data points?
+
+
+- intent: ask_outlier_summary
+  examples: |
+    - can i get summary of this extreme value?
+    - can i have more details on this value?
+    - what is min and max value in this?
