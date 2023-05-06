@@ -520,7 +520,7 @@ class ActionDescribeSummaryEventDetails(Action):
         return events
 
 
-class ActionDescribeSummaryEventDetails(Action):
+class ActionDescribeMeanEventDetails(Action):
     def name(self):
         return "action_outlier_mean"
 
