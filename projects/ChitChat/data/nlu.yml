@@ -120,3 +120,57 @@ nlu:
     - No not this
     - Give me the right thing
     - Give me the right thing, not [report](specific_item)
+
+- intent: query_capabilities
+  examples: |
+    - What can you do?
+    - What are you able to do?
+    - What tasks can you perform?
+    - What are your capabilities?
+    - Tell me what can you do.
+    - Tell me what tasks you can perform.
+    - What commands can you execute?
+    - What actions are you able to perform?
+    - What kind of tasks can you help with?  
+    - What are your abilities in terms of assisting me?
+    - What features do you have that can be helpful to me?
+    - What can I ask you to do?
+    - What are your skills that can be useful for me?
+    - What are your areas of expertise that can be beneficial for me?
+    - What kind of requests can you handle?
+    - What kind of functions do you have that can assist me?
+    - What are your capabilities in terms of answering questions?
+    - What can I tell you to do?
+    - What are your powers that I can make use of?
+    - What are the different things that you can help me with?
+    - What are your proficiencies that I can utilize?
+    - What kind of tasks can you execute on my behalf?
+    - What are the different services that you provide?
+    - What kind of support can you offer?
+    - What kind of assistance can I expect from you?
+    - What can you do to help me out?
+    - What functions do you have?
+    - What actions can you carry out?
+    - What are your abilities?
+    - What are your skills?
+    - What are your strengths?
+    - What kind of work can you do?
+    - What are your features?
+    - What is your range of capabilities?
+    - What are your talents?
+    - What are your capacities?
+    - What are your proficiencies?
+    - What are your competencies?
+    - What are your specialties?
+    - What are your aptitudes?
+    - What do you excel at?
+    - What are your areas of expertise?
+    - What can you accomplish?
+    - What are your functions?
+    - What are your powers?
+    - What are your abilities and skills?
+    - I'd like to know what commands you can execute.
+    - Your abilities in terms of assisting me are important to know.
+    - It's useful to know what kind of tasks you can help with.
+    - Your features may be able to help me out, can you tell me what they are?
+    - Please tell me what kind of requests I can make of you.
