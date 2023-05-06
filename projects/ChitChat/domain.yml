@@ -12,6 +12,7 @@ intents:
 - out_of_scope
 - incorrect_response
 - query_capabilities
+- user_thanks
 
 entities:
 - specific_item
@@ -27,5 +28,7 @@ responses:
   - text: I am Abot, a chat bot powered by Rasa.
   utter_capabilities:
   - text: |
-      I am a bot designed for solving statistical or data-related problems.
+      I am Abot, a chat bot designed for solving statistical or data-related problems.
       I can perform data analysis, perform aggregation on data, and even generate report charts.
+  utter_youre_welcome:
+  - text: You're welcome!

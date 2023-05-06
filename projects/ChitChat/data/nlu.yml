@@ -100,6 +100,7 @@ nlu:
     - Tell me a joke
     - I am bored
     - Let's play a game
+    - Why is the sky blue?
 
 - intent: incorrect_response
   examples: |
@@ -174,3 +175,28 @@ nlu:
     - It's useful to know what kind of tasks you can help with.
     - Your features may be able to help me out, can you tell me what they are?
     - Please tell me what kind of requests I can make of you.
+
+- intent: user_thanks
+  examples: |
+    - Thank you!
+    - Thank you very much
+    - Thank you for your help.
+    - I appreciate your assistance.
+    - Thanks for providing the information.
+    - I'm grateful for your support.
+    - I want to express my thanks.
+    - Thank you for being so helpful.
+    - I'm thankful for your guidance.
+    - I appreciate the prompt response.
+    - Thanks a lot for your input.
+    - I'm really grateful for your time and effort.
+    - Thank you for being responsive.
+    - I want to extend my thanks to you.
+    - Thanks for your valuable assistance.
+    - I'm thankful for the support you've provided.
+    - I truly appreciate your help.
+    - Thank you for being there to assist me.
+    - Thanks for going above and beyond.
+    - I'm thankful for your prompt and accurate response.
+    - I want to express my sincere gratitude.
+    - Thanks for being such a useful resource.

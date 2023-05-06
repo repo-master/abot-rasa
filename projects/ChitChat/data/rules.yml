@@ -31,3 +31,8 @@ rules:
   steps:
   - intent: query_capabilities
   - action: utter_capabilities
+
+- rule: User thanks the bot
+  steps:
+  - intent: user_thanks
+  - action: utter_youre_welcome

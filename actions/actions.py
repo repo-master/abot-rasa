@@ -251,7 +251,7 @@ class ActionMetricAggregate(Action):
                     }, cls=JSONCustomEncoder)
                 })
             else:
-                dispatcher.utter_message("Sorry, data for {sensor_type} isn't available yet.".format(
+                dispatcher.utter_message("Sorry, data for {sensor_type} isn't available for the time range.".format(
                     sensor_type=metadata['sensor_type']
                 ))
 
@@ -291,17 +291,21 @@ class ActionFetchReport(Action):
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
 
         # URI or Data URI of preview image
-        report_data: dict = await get_report_generate_preview(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
+        try:
+            report_data: dict = await get_report_generate_preview(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
 
-        report_url: str = report_data['interactive_report_route']
-        preview_image_url: str = report_data['preview_image']
+            report_url: str = report_data['interactive_report_route']
+            preview_image_url: str = report_data['preview_image']
 
-        dispatcher.utter_message(
-            text="Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report.".format(
-                report_url=report_url
-            ),
-            image=preview_image_url
-        )
+            dispatcher.utter_message(
+                text="Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report.".format(
+                    report_url=report_url
+                ),
+                image=preview_image_url
+            )
+        except HTTPStatusError as exc:
+            if exc.response.is_client_error:
+                raise ClientException("Sorry, there isn't any data present for the given sensor at the given time range.")
 
         return []
 
@@ -387,7 +391,7 @@ class ActionHumanHandoff(Action):
         return [ConversationPaused(), UserUtteranceReverted()]
 
 
-class ActionDescribeEventDetails(Action):
+class ActionShowSensorList(Action):
     def name(self):
         return "action_show_sensor_list"
 
