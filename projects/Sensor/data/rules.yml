@@ -1,3 +1,7 @@
 version: "3.1"
 
-rules: []
+rules:
+- rule: User queries for available sensors
+  steps:
+  - intent: query_sensor_list
+  - action: action_show_sensor_list

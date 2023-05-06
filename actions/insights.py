@@ -8,6 +8,20 @@ def describe_all_data_insights(insights: list) -> List[Dict[str, str]]:
     # TODO: Insights to string automatic using Transformers model
 
     messages: List[Dict[str, str]] = []
+
+    # Count
+    insight_type_counts: Dict[str, int] = {}
+    for detected_insight in insights:
+        if detected_insight['type'] not in insight_type_counts.keys():
+            insight_type_counts[detected_insight['type']] = 0
+        insight_type_counts[detected_insight['type']] += 1
+
+    if len(insight_type_counts) > 0:
+        '\n'.join([
+            "- %d %s(s)" % (v, k) for k, v in insight_type_counts.items()
+        ])
+        messages.append(dict(text="In the selected data, I've found:\n%s"))
+
     for detected_insight in insights:
         i_type = detected_insight['type']
         if i_type == 'outlier':
@@ -31,8 +45,7 @@ def describe_all_data_insights(insights: list) -> List[Dict[str, str]]:
                 value=outlier_value,
                 unit=display_unit,
                 high_or_low=dp_type
-            )
-            ))
+            )))
         break
     else:
         messages.append(dict(text="Sorry, I can't provide any insights on the data."))
