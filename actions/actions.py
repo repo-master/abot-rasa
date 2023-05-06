@@ -519,6 +519,40 @@ class ActionDescribeSummaryEventDetails(Action):
         return events
 
 
+class ActionDescribeSummaryEventDetails(Action):
+    def name(self):
+        return "action_outlier_mean"
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
+
+        bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
+        if bot_prev_statement_ctx is None:
+            dispatcher.utter_message(text="Don't know what to describe.")
+            return []
+
+        # agg_used = user_to_aggregation_type(user_req_agg_method)
+
+        action_performed = bot_prev_statement_ctx.get("action_performed")
+        if action_performed == 'action_metric_aggregate':
+            ex_data: str = bot_prev_statement_ctx.get("extra_data")
+            extra_data: dict = json.loads(ex_data)
+            dispatcher.utter_message(text="Sure!")
+
+            try:
+                df = pd.DataFrame(extra_data['insights'])
+                # expand the data_point dictionary into separate columns
+                df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+                df = df[df['type'] == 'outlier']
+                count_value = df['value'].mean()
+                dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+            except KeyError:
+                dispatcher.utter_message(text=f"there aren't any outliers found in data")
+
+        return events
+
+
 class ActionHumanHandoff(Action):
     def name(self) -> Text:
         return "action_human_handoff"

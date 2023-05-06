@@ -72,3 +72,9 @@ nlu:
     - can i get summary of this extreme value?
     - can i have more details on this value?
     - what is min and max value in this?
+
+- intent: ask_outlier_average
+  examples: |
+    - can i get average of this extreme value?
+    - what was the average value of outlier?
+    - what is average value in this?

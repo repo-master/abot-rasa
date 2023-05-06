@@ -6,6 +6,7 @@ intents:
 - ask_for_min_outlier
 - ask_count_of_outlier
 - ask_outlier_summary
+- ask_outlier_average
 
 slots:
   statement_context:
