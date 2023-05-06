@@ -22,7 +22,7 @@ from .api.aggregation import (AggregationMethod, SensorMetadata, TimeRange,
                               get_outliner, get_report_generate_preview,
                               get_sensor_data, perform_aggregation_on_data,
                               user_to_aggregation_type, user_to_sensor_type,
-                              user_to_timeperiod)
+                              user_to_timeperiod, query_sensor_list, sensor_name_coalesce)
 from .insights import describe_all_data_insights
 from .schema import StatementContext
 
@@ -385,3 +385,29 @@ class ActionHumanHandoff(Action):
         dispatcher.utter_message(text=message)
         # pause tracker, undo last user interaction
         return [ConversationPaused(), UserUtteranceReverted()]
+
+
+class ActionDescribeEventDetails(Action):
+    def name(self):
+        return "action_show_sensor_list"
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        try:
+            sensors = await query_sensor_list()
+        except ConnectError as e:
+            raise ServerException("Couldn't connect to Abot backend.", e)
+
+        if len(sensors) == 0:
+            dispatcher.utter_message(text="Presently there are no sensors that I can query.")
+        else:
+            dispatcher.utter_message(text="I found %d sensor(s) that I can query:" % len(sensors))
+            sensorlist_msg: str = ""
+            for sensor in sensors:
+                sensor_name = sensor_name_coalesce(sensor)
+                sensor_type = sensor["sensor_type"]
+                display_unit = sensor["display_unit"]
+                sensorlist_msg += f"- {sensor_name} [measures {sensor_type} ({display_unit})]\n"
+            dispatcher.utter_message(text=sensorlist_msg)
+
+        return []

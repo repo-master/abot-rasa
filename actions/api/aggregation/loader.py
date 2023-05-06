@@ -1,7 +1,7 @@
 
 import json
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from .. import Client
 from .schema import SensorDataResponse, SensorMetadata
@@ -43,3 +43,9 @@ async def determine_user_request_sensor(sensor_type=None, sensor_name=None, loca
             # TODO: Utter something, since the backend HAS to send JSON.
             # We reached here meaning data we got is not JSON
             pass
+
+async def fetch_sensor_list() -> List[SensorMetadata]:
+    async with Client() as client:
+        response = await client.get("/data/sensor/list")
+        response.raise_for_status()
+        return response.json()
