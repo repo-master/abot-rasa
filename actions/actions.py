@@ -408,9 +408,9 @@ class ActionDescribeMinEventDetails(Action):
                 df = df[df['type'] == 'outlier']
                 min_value = df['value'].min()
 
-                dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
+                dispatcher.utter_message(text=f"the minimum outlier value was found to be {min_value}")
             except KeyError:
-                dispatcher.utter_message(text=f"there aren't any outliers found in data")
+                dispatcher.utter_message(text=f"there aren't any outliers found in the data")
 
         return events
 
@@ -441,9 +441,9 @@ class ActionDescribeMaxEventDetails(Action):
                 df = df[df['type'] == 'outlier']
                 max_value = df['value'].max()
 
-                dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
+                dispatcher.utter_message(text=f"the maximum outlier value was found to be {max_value}")
             except KeyError:
-                dispatcher.utter_message(text=f"there aren't any outliers found in data")
+                dispatcher.utter_message(text=f"there aren't any outliers found in the data")
 
         return events
 
@@ -475,9 +475,9 @@ class ActionDescribeCountEventDetails(Action):
                 df = df[df['type'] == 'outlier']
                 count_value = df['value'].count()
 
-                dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+                dispatcher.utter_message(text=f"there where {count_value} extreme case(s)")
             except KeyError:
-                dispatcher.utter_message(text=f"there aren't any outliers found in data")
+                dispatcher.utter_message(text=f"there aren't any outliers found in the data")
 
         return events
 
@@ -509,13 +509,13 @@ class ActionDescribeSummaryEventDetails(Action):
                 df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
                 df = df[df['type'] == 'outlier']
                 count_value = df['value'].count()
-                dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+                dispatcher.utter_message(text=f"there where {count_value} extreme case(s)")
                 min_value = df['value'].min()
-                dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
+                dispatcher.utter_message(text=f"the minimum outlier value was found to be {min_value}")
                 max_value = df['value'].max()
-                dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
+                dispatcher.utter_message(text=f"the maximum outlier value was found to be {max_value}")
             except KeyError:
-                dispatcher.utter_message(text=f"there aren't any outliers found in data")
+                dispatcher.utter_message(text=f"there aren't any outliers found in the data")
 
         return events
 
@@ -547,9 +547,9 @@ class ActionDescribeMeanEventDetails(Action):
                 df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
                 df = df[df['type'] == 'outlier']
                 count_value = df['value'].mean()
-                dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+                dispatcher.utter_message(text=f"there were {count_value} extreme case(s)")
             except KeyError:
-                dispatcher.utter_message(text=f"there aren't any outliers found in data")
+                dispatcher.utter_message(text=f"there aren't any outliers found in the data")
 
         return events
 
