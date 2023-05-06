@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 
 import pandas as pd
 
-from .schema import AggregationMethod, AggregationResult, SensorMetadata
+from .schema import AggregationMethod, AggregationResult, SensorMetadata, UnitMetadata
 
 
 def sensor_name_coalesce(meta: SensorMetadata) -> str:
@@ -11,6 +11,9 @@ def sensor_name_coalesce(meta: SensorMetadata) -> str:
         meta.get('sensor_name') or \
         meta.get('sensor_urn')
 
+def unit_name_coalesce(meta: UnitMetadata) -> str:
+    return meta.get('unit_alias') or \
+        meta.get('unit_urn')
 
 def get_outliner(df: pd.DataFrame, metadata: SensorMetadata, key_row='timestamp', value_row='value') -> pd.DataFrame:
     # Calculate the IQR of the value column

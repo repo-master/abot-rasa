@@ -22,7 +22,8 @@ from .api.aggregation import (AggregationMethod, SensorMetadata, TimeRange,
                               get_outliner, get_report_generate_preview,
                               get_sensor_data, perform_aggregation_on_data,
                               user_to_aggregation_type, user_to_sensor_type,
-                              user_to_timeperiod, query_sensor_list, sensor_name_coalesce)
+                              user_to_timeperiod, query_sensor_list, sensor_name_coalesce,
+                              unit_name_coalesce)
 from .insights import describe_all_data_insights
 from .schema import StatementContext
 
@@ -236,10 +237,11 @@ class ActionMetricAggregate(Action):
                             "data_point": outlier_ser
                         })
 
-                dispatcher.utter_message(
-                    "Additional actions",
-                    buttons=aggregation_followup_response_buttons
-                )
+                # TODO: When UI is ready, enable this
+                # dispatcher.utter_message(
+                #     "Additional actions",
+                #     buttons=aggregation_followup_response_buttons
+                # )
 
                 update_statement_context(tracker, events, {
                     "intent_used": tracker.latest_message.get('intent'),
@@ -409,9 +411,10 @@ class ActionShowSensorList(Action):
             sensorlist_msg: str = ""
             for sensor in sensors:
                 sensor_name = sensor_name_coalesce(sensor)
+                sensor_location = unit_name_coalesce(sensor["sensor_location"])
                 sensor_type = sensor["sensor_type"]
                 display_unit = sensor["display_unit"]
-                sensorlist_msg += f"- {sensor_name} [measures {sensor_type} ({display_unit})]\n"
+                sensorlist_msg += f"- {sensor_name} [measures {sensor_type} ({display_unit})] at {sensor_location}\n"
             dispatcher.utter_message(text=sensorlist_msg)
 
         return []

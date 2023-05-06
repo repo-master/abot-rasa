@@ -19,6 +19,10 @@ class AggregationResult(TypedDict):
     aggregation_method: str
     outliers: dict
 
+class UnitMetadata(TypedDict):
+    unit_urn: str
+    unit_id: int
+    unit_alias: Optional[str]
 
 class SensorMetadata(TypedDict):
     sensor_urn: str
@@ -27,6 +31,7 @@ class SensorMetadata(TypedDict):
     sensor_alias: NotRequired[str]
     sensor_type: str
     display_unit: str
+    sensor_location: NotRequired[UnitMetadata]
 
 
 class SensorDataResponse(TypedDict):

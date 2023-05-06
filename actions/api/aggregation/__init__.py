@@ -1,6 +1,6 @@
 
 from .loader import determine_user_request_sensor, fetch_sensor_data, fetch_sensor_list
-from .operation import sensor_name_coalesce, get_outliner, perform_aggregation_on_data
+from .operation import sensor_name_coalesce, unit_name_coalesce, get_outliner, perform_aggregation_on_data
 from .report import get_report_generate_preview
 from .schema import (AggregationMethod, AggregationResult, SensorDataResponse,
                      SensorMetadata)
