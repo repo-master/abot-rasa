@@ -49,6 +49,8 @@ nlu:
     - What is the [humidity](metric)?
     - How [hot](metric) is it?
     - How [cold](metric) is it?
+    - [Humidity](metric) sensor [average](aggregation) for [last week](time)
+    - [Temperature](metric) sensor [min](aggregation) for [last week](time)
     - How is the [temp](metric) sensor faring?
     - How is the [climate](metric) is it?
     - What is the [current](latest_period) [energy reading](metric)?
@@ -111,7 +113,9 @@ nlu:
     - What is the [rh](metric) [currently](latest_period) [outside](location) [today](time)?
     - What is the [average](aggregation) [temperature](metric) [outside](location) [today](time)?
     - What is the [average](aggregation) [humidity](metric) [outside](location) [today](time)?
+    - What is the [min](aggregation) [temperature](metric) between [last week](time) and [today](time)?
     - What is the [average](aggregation) [temperature](metric) between [last week](time) and [today](time)?
+    - What is the [min](aggregation) [temperature](metric) between [31/01/2022](time) and [yesterday](time)?
     - What is the [max](aggregation) [humidity](metric) between [01/01/2020](time) till [today](time)?
     - What is the [max](aggregation) [temperature](metric) between [31/01/2022](time) and [yesterday](time)?
     - what is the [humidity](metric) in [GF_A](location)?

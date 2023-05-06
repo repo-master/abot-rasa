@@ -298,8 +298,9 @@ class ActionFetchReport(Action):
             report_url: str = report_data['interactive_report_route']
             preview_image_url: str = report_data['preview_image']
 
+            # "Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report."
             dispatcher.utter_message(
-                text="Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report.".format(
+                text="Okay, here is the report plot.".format(
                     report_url=report_url
                 ),
                 image=preview_image_url
