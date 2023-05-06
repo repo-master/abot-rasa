@@ -387,7 +387,6 @@ class ActionDescribeMinEventDetails(Action):
   async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
     events: List[Dict[str, Any]] = []
 
-    print("what is min value the it went")
 
     bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
     if bot_prev_statement_ctx is None:
@@ -418,7 +417,6 @@ class ActionDescribeMaxEventDetails(Action):
   async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
     events: List[Dict[str, Any]] = []
 
-    print("what is min value the it went")
 
     bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
     if bot_prev_statement_ctx is None:
@@ -450,7 +448,6 @@ class ActionDescribeCountEventDetails(Action):
   async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
     events: List[Dict[str, Any]] = []
 
-    print("what is min value the it went")
 
     bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
     if bot_prev_statement_ctx is None:
@@ -475,7 +472,7 @@ class ActionDescribeCountEventDetails(Action):
 
 
 
-class ActionDescribeCountEventDetails(Action):
+class ActionDescribeSummaryEventDetails(Action):
   def name(self):
     return "action_outlier_summary"
 
@@ -483,7 +480,6 @@ class ActionDescribeCountEventDetails(Action):
   async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
     events: List[Dict[str, Any]] = []
 
-    print("what is min value the it went")
 
     bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
     if bot_prev_statement_ctx is None:
@@ -509,37 +505,6 @@ class ActionDescribeCountEventDetails(Action):
         max_value = df['value'].max()
         dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
 
-    return events
-
-class ActionDescribeEventDetails(Action):
-  def name(self):
-    return "action_describe_outlier_count"
-
-  @action_exception_handle_graceful
-  async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-    events: List[Dict[str, Any]] = []
-
-    print("what is min value the it went")
-
-    bot_prev_statement_ctx: Optional[StatementContext] = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT)
-    if bot_prev_statement_ctx is None:
-      dispatcher.utter_message(text="Don't know what to describe.")
-      return []
-
-    # agg_used = user_to_aggregation_type(user_req_agg_method)
-
-    action_performed = bot_prev_statement_ctx.get("action_performed")
-    if action_performed == 'action_metric_aggregate':
-        ex_data: str = bot_prev_statement_ctx.get("extra_data")
-        extra_data: dict = json.loads(ex_data)
-
-        df = pd.DataFrame(extra_data['insights'])
-        # expand the data_point dictionary into separate columns
-        df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-        df = df[df['type']=='outlier']
-        count_value = df['value'].count()
-
-        dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
     return events
 
 class ActionHumanHandoff(Action):
