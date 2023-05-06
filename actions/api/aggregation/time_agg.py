@@ -5,6 +5,8 @@ from typing import Dict, List, Optional, TypedDict, Union
 from rasa_sdk.events import SlotSet, FollowupAction
 from rasa_sdk.interfaces import Tracker
 
+import pandas as pd
+
 from actions.duckling import GRAINS, relativedelta
 
 TimeRangeIn = Union[TypedDict("TimeRangeISO8601", {"from": str, "to": str}), str]
@@ -57,7 +59,11 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
                 grain_size = 'day'
 
         # The given time period is the starting point of the range
-        timerange_start = datetime.fromisoformat(user_req_timeperiod)
+        try:
+            timerange_start = datetime.fromisoformat(user_req_timeperiod)
+        except ValueError:
+            # Not received in isoformat somehow
+            timerange_start = pd.to_datetime(user_req_timeperiod)
 
         # We need to calculate end of the range via grain size.
         # Again, the grain_size *must* be present in this dict. But if for some reason it is not, we use 1 day.
@@ -73,10 +79,11 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
         #    pass
 
     if isinstance(user_req_timeperiod, dict):
-        sys_timerange.update({
-            "from": datetime.fromisoformat(user_req_timeperiod['from']),
-            "to": datetime.fromisoformat(user_req_timeperiod['to'])
-        })
+        if user_req_timeperiod['from'] is not None and user_req_timeperiod['to'] is not None:
+            sys_timerange.update({
+                "from": datetime.fromisoformat(user_req_timeperiod['from']),
+                "to": datetime.fromisoformat(user_req_timeperiod['to'])
+            })
 
     sys_timerange_slot = {
         **sys_timerange
