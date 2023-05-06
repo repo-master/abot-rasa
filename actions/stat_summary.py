@@ -31,4 +31,3 @@ class ActionMetricSummarize(Action):
         #     return [ActionExecutionRejected(self.name())]
 
         return []
-

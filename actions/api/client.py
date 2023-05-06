@@ -1,5 +1,5 @@
 
-from httpx import AsyncClient, HTTPStatusError
+from httpx import AsyncClient, HTTPStatusError, ConnectError
 
 from .config import BACKEND_ENDPOINT_BASE
 

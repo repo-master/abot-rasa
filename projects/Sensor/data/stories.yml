@@ -26,9 +26,15 @@ stories:
 
   - story : report fetching story
     steps:
-      - intent : get_report
-      - action : action_fetch_report
-      - action : utter_did_that_help
+    - intent : get_report
+    - action : action_fetch_report
+    - action : utter_did_that_help
+    - or:
+      - intent: change_sensor
+      - intent: change_aggregation
+      - intent: change_location
+      - intent: change_time_period
+    - action : action_fetch_report
 
   # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
   #   steps:

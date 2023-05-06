@@ -61,10 +61,10 @@ def perform_aggregation_on_data(
     if agg_method == AggregationMethod.SUMMARY:
         response_string = """
 Here is the summary for {sensor_name}:
-    Current value: {result_current}
-    Average value: {result_mean}
-    Maximum value: {result_max}
-    Minimum value: {result_min}
+- Current value: {result_current}
+- Average value: {result_mean}
+- Maximum value: {result_max}
+- Minimum value: {result_min}
 """.strip()
 
     return {
