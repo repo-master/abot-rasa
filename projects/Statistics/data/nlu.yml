@@ -31,6 +31,12 @@ nlu:
     - Give me insights on the result
     - Anything funny with the data?
     - Find anything strange with the data?
+    - can you tell me about the outlier?
+    - give me info on the outlier
+    - Give me some information on the outlier
+    - Give me information about the outlier
+    - Can you tell me about the outliers?
+    - Can you tell me about the problems?
 
 - intent: ask_for_max_outlier
   examples: |
