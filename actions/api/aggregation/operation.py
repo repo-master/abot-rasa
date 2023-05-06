@@ -12,7 +12,7 @@ def sensor_name_coalesce(meta: SensorMetadata) -> str:
         meta.get('sensor_urn')
 
 def unit_name_coalesce(meta: UnitMetadata) -> str:
-    return meta.get('unit_alias') or \
+    return meta.get('unit_alias').split(',')[0] or \
         meta.get('unit_urn')
 
 def get_outliner(df: pd.DataFrame, metadata: SensorMetadata, key_row='timestamp', value_row='value') -> pd.DataFrame:
