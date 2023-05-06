@@ -50,7 +50,7 @@ def perform_aggregation_on_data(
     result_min = "%.2f%s" % (data['value'].min(), metadata['display_unit'])
 
     if agg_method == AggregationMethod.CURRENT:
-        response_string = "The current value of {sensor_name} is {result_current}"
+        response_string = "The most recent value of {sensor_name} is {result_current}"
 
     if agg_method == AggregationMethod.AVERAGE:
         response_string = "The average value of {sensor_name} is {result_mean}"

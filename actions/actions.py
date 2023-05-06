@@ -153,7 +153,7 @@ def exit_reject_sensor_data_incorrect(
     dispatcher.utter_message(text=message.format(**data))
 
     # HACK: Had to disable this due to above message dispatch
-    # events.extend([ActionExecutionRejected(action_name)])
+    events.extend([ActionExecutionRejected(action_name)])
 
     return events
 
