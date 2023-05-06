@@ -26,3 +26,13 @@ rules:
   steps:
   - intent: nlu_fallback
   - action: utter_default
+
+- rule: User asks what tasks or functions the bot can perform
+  steps:
+  - intent: query_capabilities
+  - action: utter_capabilities
+
+- rule: User thanks the bot
+  steps:
+  - intent: user_thanks
+  - action: utter_youre_welcome

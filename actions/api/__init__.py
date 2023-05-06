@@ -1,2 +1,2 @@
 
-from .client import Client, HTTPStatusError
+from .client import Client, HTTPStatusError, ConnectError

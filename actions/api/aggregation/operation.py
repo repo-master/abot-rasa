@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 
 import pandas as pd
 
-from .schema import AggregationMethod, AggregationResult, SensorMetadata
+from .schema import AggregationMethod, AggregationResult, SensorMetadata, UnitMetadata
 
 
 def sensor_name_coalesce(meta: SensorMetadata) -> str:
@@ -11,6 +11,9 @@ def sensor_name_coalesce(meta: SensorMetadata) -> str:
         meta.get('sensor_name') or \
         meta.get('sensor_urn')
 
+def unit_name_coalesce(meta: UnitMetadata) -> str:
+    return meta.get('unit_alias') or \
+        meta.get('unit_urn')
 
 def get_outliner(df: pd.DataFrame, metadata: SensorMetadata, key_row='timestamp', value_row='value') -> pd.DataFrame:
     # Calculate the IQR of the value column
@@ -47,7 +50,7 @@ def perform_aggregation_on_data(
     result_min = "%.2f%s" % (data['value'].min(), metadata['display_unit'])
 
     if agg_method == AggregationMethod.CURRENT:
-        response_string = "The current value of {sensor_name} is {result_current}"
+        response_string = "The most recent value of {sensor_name} is {result_current}"
 
     if agg_method == AggregationMethod.AVERAGE:
         response_string = "The average value of {sensor_name} is {result_mean}"
@@ -61,10 +64,10 @@ def perform_aggregation_on_data(
     if agg_method == AggregationMethod.SUMMARY:
         response_string = """
 Here is the summary for {sensor_name}:
-    Current value: {result_current}
-    Average value: {result_mean}
-    Maximum value: {result_max}
-    Minimum value: {result_min}
+- Current value: {result_current}
+- Average value: {result_mean}
+- Maximum value: {result_max}
+- Minimum value: {result_min}
 """.strip()
 
     return {

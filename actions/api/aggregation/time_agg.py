@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Dict, List, Optional, TypedDict, Union
 
-from rasa_sdk.events import SlotSet
+from rasa_sdk.events import SlotSet, FollowupAction
 from rasa_sdk.interfaces import Tracker
 
 from actions.duckling import GRAINS, relativedelta
@@ -44,7 +44,9 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
         if 'to' not in sys_timerange.keys():
             sys_timerange.update({"to": datetime.now()})
 
-    if isinstance(user_req_timeperiod, str) and duckling_time_entity is not None:
+    # NOTE: There is a bug with Rasa's duckling binding that only sends the grain entity once, and not on subsequent utterances.
+    if isinstance(user_req_timeperiod, str):
+        #if duckling_time_entity is not None:
         # ISO 8601 timestamp received.
         # This may be start time ("today", "yesterday"), or starting point with a grain (last month => whole last month).
         if grain_size is None:
@@ -66,6 +68,9 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
             "from": timerange_start,
             "to": timerange_end
         })
+        #else:
+        #    # This happens if the timestamp is set previously but entity is not sent every time.
+        #    pass
 
     if isinstance(user_req_timeperiod, dict):
         sys_timerange.update({
@@ -76,10 +81,20 @@ def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
     sys_timerange_slot = {
         **sys_timerange
     }
-    sys_timerange_slot.update({
-        "from": sys_timerange['from'].isoformat(),
-        "to": sys_timerange['to'].isoformat()
-    })
+
+    if 'from' in sys_timerange.keys() and 'to' in sys_timerange.keys():
+        sys_timerange_slot.update({
+            "from": sys_timerange['from'].isoformat(),
+            "to": sys_timerange['to'].isoformat()
+        })
+
+    # If still slot didn't get set
+    if not ('from' in sys_timerange_slot.keys() and 'to' in sys_timerange_slot.keys()):
+        ev = [
+            FollowupAction("action_listen")
+        ]
+        events.extend(ev)
+        return
 
     ev = [
         SlotSet("timestamp_agg_timerange", sys_timerange_slot)

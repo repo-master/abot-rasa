@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from .loader import fetch_sensor_data
+from .loader import fetch_sensor_data, fetch_sensor_list
 from .schema import AggregationMethod, SensorDataResponse, SensorMetadata
 
 
@@ -59,3 +59,6 @@ def user_to_aggregation_type(name: Optional[str]) -> AggregationMethod:
         elif m == 'summary':
             aggregation = AggregationMethod.SUMMARY
     return aggregation
+
+async def query_sensor_list() -> List[SensorMetadata]:
+    return await fetch_sensor_list()

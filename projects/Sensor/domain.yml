@@ -25,6 +25,7 @@ intents:
 - summarize_sensor_data:
     use_entities:
     - metric
+- query_sensor_list
 
 entities:
 - metric
@@ -72,6 +73,7 @@ actions:
 - action_metric_aggregate
 - action_metric_summarize
 - action_fetch_report
+- action_show_sensor_list
 
 responses:
   # Uttered by form_metric_data automatically when an entity is missing.

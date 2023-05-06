@@ -204,6 +204,36 @@ nlu:
     - Plot graph of [temperature](metric) metric
     - Plot graph of [humidity](metric) metric
 
+- intent: query_sensor_list
+  examples: |
+    - Which sensors are available?
+    - What are the sensors present?
+    - Give a list of sensors available
+    - Provide a list of sensors
+    - Which sensors can I query?
+    - What data is available?
+    - Which sensors can I use?
+    - What are the available sensor options?
+    - Can you list the sensors that are currently present?
+    - I'm curious about the sensors that are available. Could you provide me with that information?
+    - I'd like to know the list of sensors that I can access.
+    - Are there any specific sensors that I can query?
+    - Can you provide me with a list of the available sensors?
+    - I'm interested in knowing which sensors are at my disposal.
+    - Could you please give me an overview of the sensors that are currently available?
+    - Which sensors am I able to utilize?
+    - What sensors are accessible for use?
+    - Can you provide details about the available sensors?
+    - Which sensors are included in the options?
+    - Is there a specific set of sensors that I can choose from?
+    - Please provide me with information on the sensors that I can use.
+    - I'd like to know which sensors I have the ability to interact with.
+    - Are there any sensors that I can utilize for gathering data?
+    - What are the options for sensors that I can access?
+    - Can you give me an idea of the sensors that I can employ?
+    - I'm interested in exploring the sensors that are at my disposal. Can you help me with that?
+    - Which sensors are made available for querying purposes?
+
 # TODO: Time period (today's, yesterday's, etc.)
 # - intent: summarize_sensor_data
 #   examples: |
