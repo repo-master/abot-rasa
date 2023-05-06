@@ -37,6 +37,9 @@ nlu:
     - Give me information about the outlier
     - Can you tell me about the outliers?
     - Can you tell me about the problems?
+    - what outliers are there?
+    - Which outliers are there?
+    - Where are the outliers?
 
 - intent: ask_for_max_outlier
   examples: |
