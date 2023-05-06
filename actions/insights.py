@@ -39,7 +39,7 @@ def describe_all_data_insights(insights: list) -> List[Dict[str, str]]:
             else:
                 dp_type = "comparable to"
 
-            outlier_format = "There is data point on {timestamp} with the value {value:.2f}{unit}. This seems to be an extreme value which is *{high_or_low}* the rest of the points in the timerange."
+            outlier_format = "There is a data point on {timestamp} with the value {value:.2f}{unit}. This seems to be an extreme value which is *{high_or_low}* the rest of the points in the timerange."
             messages.append(dict(text=outlier_format.format(
                 timestamp=occurrence_time_formatted,
                 value=outlier_value,
@@ -51,7 +51,7 @@ def describe_all_data_insights(insights: list) -> List[Dict[str, str]]:
             messages.append(dict(text="I've discovered more outliers, but can't display all of them."))
             break
     else:
-        messages.append(dict(text="There aren't any significant issue present in the data."))
+        messages.append(dict(text="There aren't any other significant issues present in the data."))
         if insight_type_counts.get('outlier', 0) == 0:
             messages.append(dict(text="I've found that there are no outliers present in the data, all values are within normal range."))
 
