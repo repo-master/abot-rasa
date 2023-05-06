@@ -51,6 +51,8 @@ def describe_all_data_insights(insights: list) -> List[Dict[str, str]]:
             messages.append(dict(text="I've discovered more outliers, but can't display all of them."))
             break
     else:
-        messages.append(dict(text="Sorry, I can't provide any insights on the data."))
+        messages.append(dict(text="There aren't any significant issue present in the data."))
+        if insight_type_counts.get('outlier', 0) == 0:
+            messages.append(dict(text="I've found that there are no outliers present in the data, all values are within normal range."))
 
     return messages

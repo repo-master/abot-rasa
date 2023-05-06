@@ -28,7 +28,7 @@ stories:
     steps:
     - intent : get_report
     - action : action_fetch_report
-    - action : utter_did_that_help
+    # - action : utter_did_that_help
     - or:
       - intent: change_sensor
       - intent: change_aggregation

@@ -11,7 +11,7 @@ from typing import Any, Callable, Dict, List, Optional, Text, Union
 import humanize
 import pandas as pd
 from rasa_sdk import Action, FormValidationAction, Tracker
-from rasa_sdk.events import (ActionExecutionRejected, ConversationPaused,
+from rasa_sdk.events import (FollowupAction, ConversationPaused,
                              SlotSet, UserUtteranceReverted)
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
@@ -146,14 +146,13 @@ def exit_reject_sensor_data_incorrect(
         data: Dict[str, str],
         message: str = None):
 
-    # TODO: Please improve the sentence to be more friendly.
     if message is None:
-        message = "Sensor: {user_req_metric} Does not exist at location : {user_req_location}, please Enter proper data for the same"
+        message = "The sensor {user_req_metric} does not exist at location \"{user_req_location}\". Please enter proper data for the same"
 
     dispatcher.utter_message(text=message.format(**data))
 
     # HACK: Had to disable this due to above message dispatch
-    events.extend([ActionExecutionRejected(action_name)])
+    # events.extend([ActionExecutionRejected(action_name)])
 
     return events
 
@@ -305,11 +304,12 @@ class ActionFetchReport(Action):
                 ),
                 image=preview_image_url
             )
+            events.append(FollowupAction("utter_did_that_help"))
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException("Sorry, there isn't any data present for the given sensor at the given time range.")
 
-        return []
+        return events
 
 
 class ActionFormMetricData(FormValidationAction):
