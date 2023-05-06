@@ -400,13 +400,17 @@ class ActionDescribeMinEventDetails(Action):
             ex_data: str = bot_prev_statement_ctx.get("extra_data")
             extra_data: dict = json.loads(ex_data)
 
-            df = pd.DataFrame(extra_data['insights'])
-            # expand the data_point dictionary into separate columns
-            df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-            df = df[df['type'] == 'outlier']
-            min_value = df['value'].min()
+            try:
+                df = pd.DataFrame(extra_data['insights'])
+                # expand the data_point dictionary into separate columns
+                df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+                df = df[df['type'] == 'outlier']
+                min_value = df['value'].min()
 
-            dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
+                dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
+            except KeyError:
+                dispatcher.utter_message(text=f"there aren't any outliers found in data")
+
         return events
 
 
@@ -429,14 +433,17 @@ class ActionDescribeMaxEventDetails(Action):
         if action_performed == 'action_metric_aggregate':
             ex_data: str = bot_prev_statement_ctx.get("extra_data")
             extra_data: dict = json.loads(ex_data)
+            try:
+                df = pd.DataFrame(extra_data['insights'])
+                # expand the data_point dictionary into separate columns
+                df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+                df = df[df['type'] == 'outlier']
+                max_value = df['value'].max()
 
-            df = pd.DataFrame(extra_data['insights'])
-            # expand the data_point dictionary into separate columns
-            df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-            df = df[df['type'] == 'outlier']
-            max_value = df['value'].max()
+                dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
+            except KeyError:
+                dispatcher.utter_message(text=f"there aren't any outliers found in data")
 
-            dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
         return events
 
 
@@ -460,13 +467,17 @@ class ActionDescribeCountEventDetails(Action):
             ex_data: str = bot_prev_statement_ctx.get("extra_data")
             extra_data: dict = json.loads(ex_data)
 
-            df = pd.DataFrame(extra_data['insights'])
-            # expand the data_point dictionary into separate columns
-            df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-            df = df[df['type'] == 'outlier']
-            count_value = df['value'].count()
+            try:
+                df = pd.DataFrame(extra_data['insights'])
+                # expand the data_point dictionary into separate columns
+                df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+                df = df[df['type'] == 'outlier']
+                count_value = df['value'].count()
 
-            dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+                dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+            except KeyError:
+                dispatcher.utter_message(text=f"there aren't any outliers found in data")
+
         return events
 
 
@@ -491,16 +502,19 @@ class ActionDescribeSummaryEventDetails(Action):
             extra_data: dict = json.loads(ex_data)
             dispatcher.utter_message(text="Sure!")
 
-            df = pd.DataFrame(extra_data['insights'])
-            # expand the data_point dictionary into separate columns
-            df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
-            df = df[df['type'] == 'outlier']
-            count_value = df['value'].count()
-            dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
-            min_value = df['value'].min()
-            dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
-            max_value = df['value'].max()
-            dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
+            try:
+                df = pd.DataFrame(extra_data['insights'])
+                # expand the data_point dictionary into separate columns
+                df = pd.concat([df.drop(['data_point'], axis=1), df['data_point'].apply(pd.Series)], axis=1)
+                df = df[df['type'] == 'outlier']
+                count_value = df['value'].count()
+                dispatcher.utter_message(text=f"there where {count_value} No. of extreme cases")
+                min_value = df['value'].min()
+                dispatcher.utter_message(text=f"the minimum value of outlier was found to be {min_value}")
+                max_value = df['value'].max()
+                dispatcher.utter_message(text=f"the maximum value of outlier was found to be {max_value}")
+            except KeyError:
+                dispatcher.utter_message(text=f"there aren't any outliers found in data")
 
         return events
 
