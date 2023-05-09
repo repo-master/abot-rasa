@@ -16,7 +16,7 @@ ACTION_STATEMENT_CONTEXT_SLOT = "statement_context"
 class JSONCustomEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, (pd.DataFrame, pd.Series)):
-            return o.to_dict()
+            return o.to_dict(orient='records')
         if isinstance(o, pd.Timestamp):
             return o.isoformat()
         LOG.warning("Custom JSON encoder couldn't encode %s.", str(type(o)))

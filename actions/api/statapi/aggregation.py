@@ -17,7 +17,7 @@ async def aggregation(data: pd.DataFrame,
         # Send DataFrame and parameters
         response = await client.post("/statistics/aggregation", json={
             #DataIn
-            "data": data.to_dict(orient='records'),
+            "data": data,
 
             #AggregationIn
             "method": method,
