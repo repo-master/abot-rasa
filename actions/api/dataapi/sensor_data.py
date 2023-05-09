@@ -4,8 +4,9 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from .loader import fetch_sensor_data, fetch_sensor_list
-from .schema import AggregationMethod, SensorDataResponse, SensorMetadata
+from .loader import (fetch_sensor_data, fetch_sensor_list, fetch_sensor_report,
+                     find_sensor)
+from .schemas import SensorDataResponse, SensorMetadata
 
 
 async def get_sensor_data(requested_sensor_id: int,
@@ -35,6 +36,16 @@ async def get_sensor_data(requested_sensor_id: int,
 
     return data, metadata
 
+async def query_sensor_list() -> List[SensorMetadata]:
+    return await fetch_sensor_list()
+
+async def determine_user_request_sensor(sensor_type=None, sensor_name=None, location=None) -> Optional[SensorMetadata]:
+    return await find_sensor(sensor_type, sensor_name, location)
+
+async def get_report_generate_preview(requested_sensor_id: int,
+                                      timestamp_from: Optional[datetime] = None,
+                                      timestamp_to: Optional[datetime] = None) -> SensorDataResponse:
+    return await fetch_sensor_report(requested_sensor_id, timestamp_from, timestamp_to)
 
 def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
     name = name.lower() if name is not None else ''
@@ -45,20 +56,10 @@ def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
     elif name == 'em' or name == 'energy' or name == 'power':
         return 'em'
 
-
-def user_to_aggregation_type(name: Optional[str]) -> AggregationMethod:
-    aggregation = AggregationMethod.CURRENT
-    if name is not None:
-        m = name.lower()
-        if m == "minimum":
-            aggregation = AggregationMethod.MINIMUM
-        elif m == "maximum":
-            aggregation = AggregationMethod.MAXIMUM
-        elif m == "average":
-            aggregation = AggregationMethod.AVERAGE
-        elif m == 'summary':
-            aggregation = AggregationMethod.SUMMARY
-    return aggregation
-
-async def query_sensor_list() -> List[SensorMetadata]:
-    return await fetch_sensor_list()
+__all__ = [
+    'get_sensor_data',
+    'query_sensor_list',
+    'determine_user_request_sensor',
+    'get_report_generate_preview',
+    'user_to_sensor_type'
+]

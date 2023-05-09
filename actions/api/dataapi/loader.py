@@ -1,10 +1,11 @@
+'''Fetch data from data source'''
 
 import json
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
 
 from .. import Client
-from .schema import SensorDataResponse, SensorMetadata
+from .schemas import SensorDataResponse, SensorMetadata
 
 
 async def fetch_sensor_data(requested_sensor_id: int,
@@ -19,12 +20,12 @@ async def fetch_sensor_data(requested_sensor_id: int,
             'timestamp_to': timestamp_to.isoformat()
         })
 
-        response = await client.get("/data/sensor", params=params)
+        response = await client.get("/genesis/data/sensor", params=params)
         response.raise_for_status()
         return response.json()
 
 
-async def determine_user_request_sensor(sensor_type=None, sensor_name=None, location=None) -> Optional[SensorMetadata]:
+async def find_sensor(sensor_type=None, sensor_name=None, location=None) -> Optional[SensorMetadata]:
     async with Client() as client:
         params = {}
         params.update({
@@ -33,12 +34,11 @@ async def determine_user_request_sensor(sensor_type=None, sensor_name=None, loca
             'location': location
         })
 
-        response = await client.get("/query/sensor_id", params=params)
+        response = await client.get("/genesis/query/sensor/find", params=params)
         response.raise_for_status()
         try:
             data: dict = response.json()
-            sensor: Optional[SensorMetadata] = data.get('sensor')
-            return sensor
+            return data
         except json.decoder.JSONDecodeError:
             # TODO: Utter something, since the backend HAS to send JSON.
             # We reached here meaning data we got is not JSON
@@ -46,6 +46,24 @@ async def determine_user_request_sensor(sensor_type=None, sensor_name=None, loca
 
 async def fetch_sensor_list() -> List[SensorMetadata]:
     async with Client() as client:
-        response = await client.get("/data/sensor/list")
+        response = await client.get("/genesis/query/sensor/list")
         response.raise_for_status()
+        return response.json()
+
+async def fetch_sensor_report(requested_sensor_id: int,
+                              timestamp_from: Optional[datetime] = None,
+                              timestamp_to: Optional[datetime] = None) -> SensorDataResponse:
+    async with Client() as client:
+        params = {}
+
+        params.update({
+            'sensor_id': requested_sensor_id,
+            'timestamp_from': timestamp_from.isoformat(),
+            'timestamp_to': timestamp_to.isoformat()
+        })
+        # TODO: timestamp error need to fix
+
+        response = await client.get("/genesis/data/report", params=params)
+        response.raise_for_status()
+
         return response.json()
