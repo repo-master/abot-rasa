@@ -1,6 +1,7 @@
 
 import json
 import logging
+from datetime import datetime
 from typing import Any, Callable, Dict, List
 
 import pandas as pd
@@ -17,7 +18,7 @@ class JSONCustomEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, (pd.DataFrame, pd.Series)):
             return o.to_dict(orient='records')
-        if isinstance(o, pd.Timestamp):
+        if isinstance(o, (pd.Timestamp, datetime)):
             return o.isoformat()
         LOG.warning("Custom JSON encoder couldn't encode %s.", str(type(o)))
         return super().default(o)

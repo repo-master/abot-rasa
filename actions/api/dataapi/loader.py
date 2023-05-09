@@ -16,8 +16,8 @@ async def fetch_sensor_data(requested_sensor_id: int,
 
         params.update({
             'sensor_id': requested_sensor_id,
-            'timestamp_from': timestamp_from.isoformat(),
-            'timestamp_to': timestamp_to.isoformat()
+            'timestamp_from': timestamp_from,
+            'timestamp_to': timestamp_to
         })
 
         response = await client.get("/genesis/data/sensor", params=params)
@@ -58,8 +58,8 @@ async def fetch_sensor_report(requested_sensor_id: int,
 
         params.update({
             'sensor_id': requested_sensor_id,
-            'timestamp_from': timestamp_from.isoformat(),
-            'timestamp_to': timestamp_to.isoformat()
+            'timestamp_from': timestamp_from,
+            'timestamp_to': timestamp_to
         })
         # TODO: timestamp error need to fix
 
