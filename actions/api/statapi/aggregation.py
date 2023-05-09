@@ -6,11 +6,11 @@ from .schemas import AggregationMethod, AggregationOut
 
 import pandas as pd
 
-from typing import Union, List
+from typing import Union, Set
 
 
 async def aggregation(data: pd.DataFrame,
-                      method: Union[AggregationMethod, List[AggregationMethod]] = AggregationMethod.RECENT
+                      method: Union[AggregationMethod, Set[AggregationMethod]] = AggregationMethod.RECENT
                       ) -> AggregationOut:
     '''Perform aggregation using given method on the "value" column'''
     async with Client() as client:

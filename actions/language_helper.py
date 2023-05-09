@@ -1,10 +1,10 @@
 
 from .api.statapi.schemas import AggregationOut, AggregationMethod
 
-from typing import Optional, Union, List
+from typing import Optional, Union, Set
 
 
-def user_to_aggregation_type(name: Optional[str]) -> Union[AggregationMethod, List[AggregationMethod]]:
+def user_to_aggregation_type(name: Optional[str]) -> Union[AggregationMethod, Set[AggregationMethod]]:
     #TODO: Implement multiple aggregations (and "all")
     aggregation = AggregationMethod.RECENT
     if name is not None:

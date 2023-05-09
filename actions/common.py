@@ -20,6 +20,8 @@ class JSONCustomEncoder(json.JSONEncoder):
             return o.to_dict(orient='records')
         if isinstance(o, (pd.Timestamp, datetime)):
             return o.isoformat()
+        if isinstance(o, set):
+            return list(o)
         LOG.warning("Custom JSON encoder couldn't encode %s.", str(type(o)))
         return super().default(o)
 

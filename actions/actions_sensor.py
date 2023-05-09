@@ -7,7 +7,7 @@
 import asyncio
 import json
 import logging
-from typing import Any, Callable, Dict, List, Optional, Text, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Text, Union
 
 import humanize
 import pandas as pd
@@ -128,7 +128,7 @@ class ActionMetricAggregate(Action):
         requested_sensor_id: int = requested_sensor['sensor_id']
 
         # Check aggregation method provided by the user
-        aggregation: Union[AggregationMethod, List[AggregationMethod]] = user_input.get('aggregation')
+        aggregation: Union[AggregationMethod, Set[AggregationMethod]] = user_input.get('aggregation')
 
         # Time period of aggregation
         requested_timeperiod: TimeRange = user_input.get('timeperiod')
