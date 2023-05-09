@@ -10,7 +10,7 @@ from rasa_sdk.types import DomainDict
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT,
                      action_exception_handle_graceful)
 from .insights import describe_all_data_insights
-from .schema import StatementContext
+from .schemas import StatementContext
 
 
 class ActionDescribeEventDetails(Action):

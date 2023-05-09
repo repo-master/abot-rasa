@@ -1,39 +1,7 @@
 
-from typing import Optional, Tuple
-
 import pandas as pd
 
-from ..dataapi.schemas import SensorMetadata, UnitMetadata
-
-
-def sensor_name_coalesce(meta: SensorMetadata) -> str:
-    return meta.get('sensor_alias') or \
-        meta.get('sensor_name') or \
-        meta.get('sensor_urn')
-
-def unit_name_coalesce(meta: UnitMetadata) -> str:
-    return meta.get('unit_alias').split(',')[0] or \
-        meta.get('unit_urn')
-
-def get_outliner(df: pd.DataFrame, metadata: SensorMetadata, key_row='timestamp', value_row='value') -> pd.DataFrame:
-    # Calculate the IQR of the value column
-    Q1 = df[value_row].quantile(0.25)
-    Q3 = df[value_row].quantile(0.75)
-    IQR = Q3 - Q1
-
-    # Define the outlier threshold
-    threshold = (Q1 - 1.5*IQR, Q3 + 1.5*IQR)
-
-    # Identify the outliers
-    outliers = df.copy()
-    outliers["display_unit"] = metadata['display_unit']
-    outliers["is_extreme_high"] = (outliers[value_row] > threshold[1])
-    outliers["is_extreme_low"] = (outliers[value_row] < threshold[0])
-    outliers = outliers[outliers["is_extreme_high"] | outliers['is_extreme_low']]
-    # result = {}
-    # for i, row in outliers.iterrows():
-    #     result[row[key_row].strftime('%Y-%m-%d %H:%M:%S.%f')] = row[value_row]
-    return outliers
+from ..dataapi.schemas import SensorMetadata
 
 
 async def perform_aggregation_on_data(

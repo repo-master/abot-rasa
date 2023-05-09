@@ -12,6 +12,9 @@ async def outliers(data: pd.DataFrame):
         response = await client.post("/statistics/outliers", json={
             #DataIn
             "data": data.to_dict(orient='records'),
+            "index_column_names": "timestamp",
+            "datetime_column_names": "timestamp",
+
 
             #OutliersIn
             "outliers_column": "value"

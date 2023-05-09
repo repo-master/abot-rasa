@@ -6,7 +6,17 @@ import pandas as pd
 
 from .loader import (fetch_sensor_data, fetch_sensor_list, fetch_sensor_report,
                      find_sensor)
-from .schemas import SensorDataResponse, SensorMetadata
+from .schemas import SensorDataResponse, SensorMetadata, UnitMetadata
+
+
+def sensor_name_coalesce(meta: SensorMetadata) -> str:
+    return meta.get('sensor_alias') or \
+        meta.get('sensor_name') or \
+        meta.get('sensor_urn')
+
+def unit_name_coalesce(meta: UnitMetadata) -> str:
+    return meta.get('unit_alias').split(',')[0] or \
+        meta.get('unit_urn')
 
 
 async def get_sensor_data(requested_sensor_id: int,
@@ -61,5 +71,7 @@ __all__ = [
     'query_sensor_list',
     'determine_user_request_sensor',
     'get_report_generate_preview',
-    'user_to_sensor_type'
+    'user_to_sensor_type',
+    'sensor_name_coalesce',
+    'unit_name_coalesce'
 ]

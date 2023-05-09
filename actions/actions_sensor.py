@@ -4,6 +4,7 @@
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
 
+import asyncio
 import json
 import logging
 from typing import Any, Callable, Dict, List, Optional, Text, Union
@@ -17,14 +18,13 @@ from rasa_sdk.types import DomainDict
 
 from .api import ConnectError, HTTPStatusError, statapi, dataapi
 from .api.aggregation import (TimeRange, TimeRangeIn,
-                              sensor_name_coalesce, unit_name_coalesce,
                               user_to_timeperiod)
 from .api.statapi.schemas import AggregationMethod
 from .api.dataapi.schemas import SensorMetadata
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
                      ServerException, action_exception_handle_graceful)
 from .language_helper import summary_AggregationOut, user_to_aggregation_type
-from .schema import StatementContext
+from .schemas import StatementContext
 
 LOG = logging.getLogger(__name__)
 
@@ -144,9 +144,13 @@ class ActionMetricAggregate(Action):
         if response_data is not None:
             data, metadata = response_data
             # Run aggregation
-            aggregated_result = await statapi.aggregation(data, aggregation)
+            aggregated_result, outliers_result = await asyncio.gather(
+                statapi.aggregation(data, aggregation),
+                statapi.outliers(data)
+            )
 
-            response_text = summary_AggregationOut(aggregated_result)
+            agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=metadata["display_unit"])
+            dispatcher.utter_message(agg_response_text)
 
             # if aggregated_result:
             #     response_string: str = aggregated_result.pop('result_format', '')
@@ -322,8 +326,8 @@ class ActionShowSensorList(Action):
             dispatcher.utter_message(text="I found %d sensor(s) that I can query:" % len(sensors))
             sensorlist_msg: str = ""
             for sensor in sensors:
-                sensor_name = sensor_name_coalesce(sensor)
-                sensor_location = unit_name_coalesce(sensor["sensor_location"])
+                sensor_name = dataapi.sensor_name_coalesce(sensor)
+                sensor_location = dataapi.unit_name_coalesce(sensor["sensor_location"])
                 sensor_type = sensor["sensor_type"]
                 display_unit = sensor["display_unit"]
                 sensorlist_msg += f"- {sensor_name} [measures {sensor_type} ({display_unit})] at {sensor_location}\n"

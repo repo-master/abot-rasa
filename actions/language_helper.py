@@ -18,6 +18,18 @@ def user_to_aggregation_type(name: Optional[str]) -> Union[AggregationMethod, Li
     return aggregation
 
 
-def summary_AggregationOut(agg: AggregationOut, **kwargs) -> str:
-    pass
+def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs) -> str:
+    def _agg_str(am: AggregationMethod, value: float) -> str:
+        return '{agg_method}: {value:.2f}{unit_symbol}'.format(
+            agg_method=am.value.title(),
+            value=value,
+            unit_symbol=unit_symbol
+        )
+    if len(agg.keys()) == 1:
+        # Directly give that value without a list
+        am, val = next(iter(agg.items()))
+        return _agg_str(AggregationMethod(am), val)
+    elif len(agg.keys()) > 1:
+        # Prepare a markdown list-style output
+        return '\n'.join(["- " + _agg_str(AggregationMethod(am), val) for am, val in agg.items()])
 

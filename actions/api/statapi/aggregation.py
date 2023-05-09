@@ -18,6 +18,8 @@ async def aggregation(data: pd.DataFrame,
         response = await client.post("/statistics/aggregation", json={
             #DataIn
             "data": data,
+            "index_column_names": "timestamp",
+            "datetime_column_names": "timestamp",
 
             #AggregationIn
             "method": method,
