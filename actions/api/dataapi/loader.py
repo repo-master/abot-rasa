@@ -61,7 +61,6 @@ async def fetch_sensor_report(requested_sensor_id: int,
             'timestamp_from': timestamp_from,
             'timestamp_to': timestamp_to
         })
-        # TODO: timestamp error need to fix
 
         response = await client.get("/genesis/data/report", params=params)
         response.raise_for_status()
