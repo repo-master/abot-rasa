@@ -12,17 +12,17 @@ from typing import Any, Callable, Dict, List, Optional, Set, Text, Union
 import humanize
 import pandas as pd
 from rasa_sdk import Action, FormValidationAction, Tracker
-from rasa_sdk.events import (FollowupAction, SlotSet)
+from rasa_sdk.events import FollowupAction, SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
 
-from .api import ConnectError, HTTPStatusError, statapi, dataapi
-from .api.aggregation import (TimeRange, TimeRangeIn,
-                              user_to_timeperiod)
-from .api.statapi.schemas import AggregationMethod
+from .api import ConnectError, HTTPStatusError, dataapi, statapi
+from .api.aggregation import TimeRange, TimeRangeIn, user_to_timeperiod
 from .api.dataapi.schemas import SensorMetadata
+from .api.statapi.schemas import AggregationMethod
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
-                     ServerException, action_exception_handle_graceful)
+                     JSONCustomEncoder, ServerException,
+                     action_exception_handle_graceful)
 from .language_helper import summary_AggregationOut, user_to_aggregation_type
 from .schemas import StatementContext
 
@@ -115,9 +115,6 @@ class ActionMetricAggregate(Action):
         events: List[Dict[str, Any]] = []
         user_input = await parse_input_sensor_operation(dispatcher, tracker, domain, events)
 
-        # Any special things found with the data for further analysis
-        data_insights = []
-
         requested_sensor: SensorMetadata = user_input.get('sensor')
 
         # Could not determine the sensor to get info on (or no info provided at all)
@@ -140,82 +137,77 @@ class ActionMetricAggregate(Action):
 
         # TODO: Run checks on above
         # TODO: Save data into context memory
+        # --- Store dataframe in memory with ID. If user requests different dataset, add new ID.
+        # --- Save ID in context memory, keep using it from there.
+        # TODO: Do analysis (outliers, missing, etc.) when data is loaded ONLY.
 
-        if response_data is not None:
-            data, metadata = response_data
-            # Run aggregation
-            aggregated_result, outliers_result = await asyncio.gather(
-                statapi.aggregation(data, aggregation),
-                statapi.outliers(data)
-            )
-
-            agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=metadata["display_unit"])
-            dispatcher.utter_message(agg_response_text)
-
-            # if aggregated_result:
-            #     response_string: str = aggregated_result.pop('result_format', '')
-            #     # Generate response sentence
-            #     fmt_options = {
-            #         # Add any other options here to pass to the below format string
-            #         **aggregated_result
-            #     }
-
-            #     response_text = response_string.format(**fmt_options)
-
-            #     # Say the sentence
-            #     dispatcher.utter_message(response_text)
-
-            #     aggregation_followup_response_buttons: List[Dict[str, str]] = [
-            #         {"title": "Min", "payload": "minimum"},
-            #         {"title": "Max", "payload": "maximum"},
-            #         {"title": "Average", "payload": "average"},
-            #         {"title": "Current", "payload": "current"}
-            #     ]
-
-            #     outliers = get_outliner(data, metadata)
-            #     if not outliers.empty:
-            #         # df_outlier = pd.DataFrame(list(outliers.items()), columns=['timestamp', 'value'])
-
-            #         dispatcher.utter_message(
-            #             f"Discovered {outliers['value'].count()} outlier value(s) within the data.")
-            #         # dispatcher.utter_message(f"Minimum value of outlier is {outliers['value'].min()} at {outliers.loc[outliers['value'].idxmin(), 'timestamp']}")
-            #         # dispatcher.utter_message(f"Maximum value of outlier is {outliers['value'].max()}")
-
-            #         aggregation_followup_response_buttons.append({
-            #             "title": "Outlier details",
-            #             "payload": "describe the outlier"
-            #         })
-
-            #         for outlier_idx, outlier_ser in outliers.iterrows():
-            #             data_insights.append({
-            #                 "type": "outlier",
-            #                 "data_point": outlier_ser
-            #             })
-
-            #     # TODO: When UI is ready, enable this
-            #     # dispatcher.utter_message(
-            #     #     "Additional actions",
-            #     #     buttons=aggregation_followup_response_buttons
-            #     # )
-
-            #     update_statement_context(tracker, events, {
-            #         "intent_used": tracker.latest_message.get('intent'),
-            #         "action_performed": self.name(),
-            #         "extra_data": json.dumps({
-            #             "insights": data_insights,
-            #             "operation": "aggregation",
-            #             "result": aggregated_result
-            #         }, cls=JSONCustomEncoder)
-            #     })
-            # else:
-            #     dispatcher.utter_message("Sorry, data for {sensor_type} isn't available for the time range.".format(
-            #         sensor_type=metadata['sensor_type']
-            #     ))
-
-        else:
+        if response_data is None:
             dispatcher.utter_message("Sorry, data for {sensor_req} isn't available.".format(
                 sensor_req=user_input.get('user_req_metric')
             ))
+        else:
+            data, metadata = response_data
+
+            if data.empty:
+                dispatcher.utter_message("Sorry, data for {sensor_type} isn't available for the time range.".format(
+                    sensor_type=metadata['sensor_type']
+                ))
+            else:
+                # Any special things found with the data for further analysis
+                data_insights = []
+
+                # Run aggregation
+                aggregated_result, outliers_result = await asyncio.gather(
+                    statapi.aggregation(data, aggregation),
+                    statapi.outliers(data)
+                )
+
+                agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=metadata["display_unit"])
+                dispatcher.utter_message(agg_response_text)
+
+                aggregation_followup_response_buttons: List[Dict[str, str]] = []
+
+                # aggregation_followup_response_buttons.extend([
+                #     {"title": "Min", "payload": "minimum"},
+                #     {"title": "Max", "payload": "maximum"},
+                #     {"title": "Average", "payload": "average"},
+                #     {"title": "Current", "payload": "current"}
+                # ])
+
+                if not outliers_result.empty:
+                    dispatcher.utter_message(
+                        "Discovered {outlier_count} outlier value(s) within the data.".format(
+                            outlier_count=outliers_result['value'].count()
+                        )
+                    )
+
+                    # Button to display outlier's info
+                    # aggregation_followup_response_buttons.append({
+                    #     "title": "Outlier details",
+                    #     "payload": "describe the outlier"
+                    # })
+
+                    for _, outlier_ser in outliers_result.iterrows():
+                        data_insights.append({
+                            "type": "outlier",
+                            "data_point": outlier_ser
+                        })
+
+                # TODO: When UI is ready, enable this
+                # dispatcher.utter_message(
+                #     "Additional actions",
+                #     buttons=aggregation_followup_response_buttons
+                # )
+
+                update_statement_context(tracker, events, {
+                    "intent_used": tracker.latest_message.get('intent'),
+                    "action_performed": self.name(),
+                    "extra_data": json.dumps({
+                        "insights": data_insights,
+                        "operation": "aggregation",
+                        "result": aggregated_result
+                    }, cls=JSONCustomEncoder)
+                })
 
         return events
 

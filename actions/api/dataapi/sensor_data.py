@@ -37,7 +37,7 @@ async def get_sensor_data(requested_sensor_id: int,
     data.dropna(inplace=True, axis=1)
 
     if len(data) > 0:
-        data['timestamp'] = pd.to_datetime(data['timestamp'])
+        data['timestamp'] = pd.to_datetime(data['timestamp'], format='ISO8601')
         data.sort_values('timestamp', ascending=False, inplace=True)
         # We get a dictionary result in the 'value' column. We need to 'explode' it to separate columns.
         data_value_series = data['value'].apply(pd.Series)
