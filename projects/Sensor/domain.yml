@@ -78,9 +78,9 @@ actions:
 responses:
   # Uttered by form_metric_data automatically when an entity is missing.
   utter_ask_metric:
-  - text: Could we please know Sensor are you looking for?
+  - text: Which Sensor are you looking for?
   utter_ask_location:
-  - text: Ok, please provide location where you are looking for this data
+  - text: Ok, which location where you are looking for this data
   utter_ask_timestamp_agg_period :
   - text : Please Specify time period
   utter_ask_aggregation:

@@ -25,7 +25,7 @@ responses:
   utter_goodbye:
   - text: Thank you for using me!
   utter_iamabot:
-  - text: I am Abot, a chat bot powered by Rasa.
+  - text: I am Abot, a chat bot powered by phAIdelta.
   utter_capabilities:
   - text: |
       I am Abot, a chat bot designed for solving statistical or data-related problems.

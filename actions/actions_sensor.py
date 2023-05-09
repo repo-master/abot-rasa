@@ -238,7 +238,7 @@ class ActionFetchReport(Action):
                 dispatcher,
                 events,
                 user_input,
-                message="Sensor information isn't provided. Unable to generate the report."
+                message="Unable to generate the report. Sensor information isn't provided."
             )
 
         # Recover sensor id field
@@ -265,7 +265,7 @@ class ActionFetchReport(Action):
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException(
-                    "Sorry, there isn't any data present for the given sensor at the given time range.")
+                    "Sorry, No data found for sensor at the given time range.")
 
         return events
 
@@ -321,9 +321,9 @@ class ActionShowSensorList(Action):
             raise ServerException("Couldn't connect to Abot backend.", e)
 
         if len(sensors) == 0:
-            dispatcher.utter_message(text="Presently there are no sensors that I can query.")
+            dispatcher.utter_message(text="No sensors available.")
         else:
-            dispatcher.utter_message(text="I found %d sensor(s) that I can query:" % len(sensors))
+            dispatcher.utter_message(text="I found %d sensor(s) :" % len(sensors))
             sensorlist_msg: str = ""
             for sensor in sensors:
                 sensor_name = dataapi.sensor_name_coalesce(sensor)
