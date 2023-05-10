@@ -40,8 +40,12 @@ class ServerException(Exception):
             reason="%s: %s" % (type(self.exc).__name__, str(self.exc))
         )
 
+class ActionFailedException(Exception):
+    def __init__(self, *args, print_traceback=True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tb = print_traceback
 
-class ClientException(Exception):
+class ClientException(ActionFailedException):
     pass
 
 
@@ -49,13 +53,15 @@ def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker
     async def _wrapper_fn(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[str, Any]]:
         try:
             return await fn(self, dispatcher, tracker, domain)
-        except ClientException as exc:
+        except (ClientException, ActionFailedException) as exc:
             dispatcher.utter_message(str(exc))
+            if exc.tb:
+                LOG.exception("%s was generated:", str(type(exc)), exc_info=exc)
             return []
         # Add any specific exceptions here to send response to that need a different response.
         except Exception as exc:
             LOG.exception("Unhandled exception:", exc_info=exc)
-            LOG.info("[for above exception] Current state:\n%s", str(tracker.current_state()))
+            LOG.debug("[for above exception] Current state:\n%s", str(tracker.current_state()))
 
             # Send exception to user. If it is `ServerException` the message will be more user-friendly.
             if not isinstance(exc, ServerException):
