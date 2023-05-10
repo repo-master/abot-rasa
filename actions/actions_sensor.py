@@ -7,23 +7,21 @@
 import asyncio
 import json
 import logging
-from typing import Any, Callable, Dict, List, Optional, Set, Text, Union
+from typing import Any, Dict, List, Optional, Set, Text, Union
 
-import humanize
-import pandas as pd
 from rasa_sdk import Action, FormValidationAction, Tracker
 from rasa_sdk.events import FollowupAction, SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
 
 from .api import ConnectError, HTTPStatusError, dataapi, statapi
-from .api.aggregation import TimeRange, TimeRangeIn, user_to_timeperiod
 from .api.dataapi.schemas import SensorMetadata
 from .api.statapi.schemas import AggregationMethod
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
                      JSONCustomEncoder, ServerException,
                      action_exception_handle_graceful)
-from .language_helper import summary_AggregationOut, user_to_aggregation_type
+from .language_helper import (TimeRange, TimeRangeIn, summary_AggregationOut,
+                              user_to_aggregation_type, user_to_timeperiod)
 from .schemas import StatementContext
 
 LOG = logging.getLogger(__name__)

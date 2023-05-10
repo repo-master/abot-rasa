@@ -41,7 +41,7 @@ slots:
     - type: from_entity
       entity: metric
   aggregation:
-    type: text
+    type: list
     mappings:
     - type: from_entity
       entity: aggregation
