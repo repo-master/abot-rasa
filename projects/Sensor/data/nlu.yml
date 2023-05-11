@@ -55,8 +55,13 @@ nlu:
 
 - intent: query_metric_aggregate
   examples: |
-    - get [standard_dev](aggregation) for [humidity](metric)
+    - get [standard dev](aggregation) for [humidity](metric)
     - get [std_dev](aggregation) for [humidity](metric)
+    - get [SD](aggregation) for [humidity](metric)
+    - get [sigma](aggregation) for [humidity](metric)
+    - get [root mean square error](aggregation) for [humidity](metric)
+    - get [RMSE](aggregation) for [humidity](metric)
+    - get [deviation](aggregation) for [humidity](metric)
     - get [standard deviation](aggregation) for [humidity](metric)
     - What is the [temperature](metric)?
     - What is the [humidity](metric)?

@@ -17,8 +17,4 @@ slots:
 
 actions:
 - action_describe_event_details
-- action_describe_min_event
-- action_describe_max_event
-- action_outlier_mean
 - action_describe_outlier_count
-- action_outlier_summary
