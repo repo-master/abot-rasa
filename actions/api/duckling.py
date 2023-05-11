@@ -51,12 +51,13 @@ def extract_fromto(duckling_input: DucklingExtraction) -> Optional[TimeRange]:
         "user_time_entity": duckling_input.get('body')
     }
 
-async def parse(text: Union[str, List[str]]) -> DucklingExtraction:
+async def parse(text: Union[str, List[str]]) -> List[DucklingExtraction]:
     async with DucklingClient() as client:
         response = await client.post("/parse", data={
             "text": text,
             "dims": ["time", "number"],
-            "locale": "en_IN"
+            "locale": "en_IN",
+            "tz": "Asia/Kolkata"
         })
         response.raise_for_status()
         return response.json()
