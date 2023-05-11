@@ -1,12 +1,18 @@
 
-from .api.statapi.schemas import AggregationOut, AggregationMethod
+from typing import Any, Dict, List, Optional, Set, Union
 
-from typing import Optional, Union, Set
+from rasa_sdk.events import FollowupAction, SlotSet
+from rasa_sdk.interfaces import Tracker
+
+from .api.duckling import DucklingExtraction, TimeRange, extract_fromto, parse as duckling_parse
+from .api.statapi.schemas import AggregationMethod, AggregationOut
+from actions.common import ActionFailedException
 
 
-def user_to_aggregation_type(name: Optional[str]) -> Union[AggregationMethod, Set[AggregationMethod]]:
-    #TODO: Implement multiple aggregations (and "all")
+def user_to_aggregation_type(name: Optional[Union[str, List[str]]]) -> Union[AggregationMethod, Set[AggregationMethod]]:
+    # TODO: Implement multiple aggregations (and "all", "summary")
     aggregation = AggregationMethod.RECENT
+
     if name is not None:
         m = name.lower()
         if m == "minimum":
@@ -17,11 +23,33 @@ def user_to_aggregation_type(name: Optional[str]) -> Union[AggregationMethod, Se
             aggregation = AggregationMethod.AVERAGE
         elif m == "std_dev":
             aggregation = AggregationMethod.STD_DEV
+        if isinstance(name, str):
+            aggregation = AggregationMethod(name.lower())
+        elif isinstance(name, list):
+            aggregation = set(map(lambda n: AggregationMethod(n.lower()), name))
+
     return aggregation
 
+async def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
+    user_req_timeperiod: Optional[Union[DucklingExtraction, List[str], str]] = tracker.get_slot("data_time_range")
+
+    if user_req_timeperiod is None:
+        # No timestamp given. Assume for today.
+        user_req_timeperiod = await duckling_parse("today")
+        events.append(SlotSet("data_time_range", user_req_timeperiod))
+    elif isinstance(user_req_timeperiod, str):
+        # TODO
+        pass
+
+    parsed_timerange = extract_fromto(user_req_timeperiod)
+    if parsed_timerange is None:
+        raise ActionFailedException("Unable to understand timerange given for \"%s\"" % tracker.latest_message["text"])
+
+    return parsed_timerange
 
 def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs) -> str:
     def _agg_str(am: AggregationMethod, value: float) -> str:
+
         return '{agg_method}: {value:.2f}{unit_symbol}'.format(
             agg_method=am.value.title(),
             value=value,
@@ -34,4 +62,3 @@ def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs)
     elif len(agg.keys()) > 1:
         # Prepare a markdown list-style output
         return '\n'.join(["- " + _agg_str(AggregationMethod(am), val) for am, val in agg.items()])
-

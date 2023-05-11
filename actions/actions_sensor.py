@@ -7,23 +7,22 @@
 import asyncio
 import json
 import logging
-from typing import Any, Callable, Dict, List, Optional, Set, Text, Union
+from typing import Any, Dict, List, Optional, Set, Text, Union
 
-import humanize
-import pandas as pd
 from rasa_sdk import Action, FormValidationAction, Tracker
 from rasa_sdk.events import FollowupAction, SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
 
 from .api import ConnectError, HTTPStatusError, dataapi, statapi
-from .api.aggregation import TimeRange, TimeRangeIn, user_to_timeperiod
 from .api.dataapi.schemas import SensorMetadata
 from .api.statapi.schemas import AggregationMethod
+from .api.duckling import TimeRange, DucklingExtraction
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
                      JSONCustomEncoder, ServerException,
                      action_exception_handle_graceful)
-from .language_helper import summary_AggregationOut, user_to_aggregation_type
+from .language_helper import (summary_AggregationOut,
+                              user_to_aggregation_type, user_to_timeperiod)
 from .schemas import StatementContext
 
 LOG = logging.getLogger(__name__)
@@ -46,7 +45,7 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
     user_req_metric: Optional[str] = tracker.get_slot("metric")
     user_req_location: Optional[str] = tracker.get_slot("location")
     user_req_agg_method: Optional[str] = tracker.get_slot("aggregation")
-    user_req_timeperiod: Optional[TimeRangeIn] = tracker.get_slot("timestamp_agg_period")
+    user_req_timeperiod: Optional[DucklingExtraction] = tracker.get_slot("data_time_range")
 
     user_input.update({
         'user_req_metric': user_req_metric,
@@ -56,17 +55,15 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
     })
 
     # Debug output
-    print("Got slots: Metric: %s, Location: %s, Aggregation: %s, timestamp_agg_period: %s" % (
+    print("Got slots: Metric: %s, Location: %s, Aggregation: %s, data_time_range: %s" % (
         user_req_metric, user_req_location, user_req_agg_method, str(user_req_timeperiod)))
 
     # Check aggregation method provided by the user
     user_input['aggregation'] = user_to_aggregation_type(user_req_agg_method)
 
-    user_input['timeperiod'] = user_to_timeperiod(tracker, events)
+    user_input['timeperiod'] = await user_to_timeperiod(tracker, events)
     if user_input['timeperiod'] is None:
         raise ClientException("Need to know for what time period to load the data.")
-
-    print("Aggregation time range:", tracker.slots.get("timestamp_agg_timerange"))
 
     # TODO: More assumption magic needed
 

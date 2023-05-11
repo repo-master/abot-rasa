@@ -23,7 +23,7 @@ nlu:
     - extreme high
 - synonym : std_dev
   examples: |
-    - standard_dev
+    - standard dev
     - std_dev
     - standard deviation
     - SD
@@ -73,6 +73,7 @@ nlu:
     - What is the [humidity](metric) [currently](latest_period)?
     - What is the [average](aggregation) [temperature](metric)?
     - What is the [average](aggregation) [humidity](metric)?
+    - What is the [average](aggregation) and [minimum](aggregation) [humidity](metric)?
     - What is the [temperature](metric) [outside](location)?
     - What is the [humidity](metric) [outside](location)?
     - What is the [temperature](metric) [currently](latest_period) [outside](location)?
@@ -81,12 +82,14 @@ nlu:
     - What is the [average](aggregation) [humidity](metric) [outside](location)?
     - Give me the [temperature](metric)
     - Give me the [humidity](metric)
-    - Give me the [current](aggregation) [energy reading](metric)
+    - Give me the [recent](aggregation) [energy reading](metric)
     - Give me the latest [energy reading](metric)
     - Give me the latest [power reading](metric)
-    - Give me the [current](aggregation) [temperature](metric)
-    - Give me the [current](aggregation) [humidity](metric)
+    - Give me the [recent](aggregation) [temperature](metric)
+    - Give me the [recent](aggregation) and [average](aggregation) [humidity](metric)
+    - Give me the [recent](aggregation), [maximum](aggregation) and [average](aggregation) [humidity](metric)
     - Give me the [average](aggregation) [temperature](metric)
+    - Give me the [maximum](aggregation) and [minimum](aggregation) [temperature](metric)
     - Give me the [average](aggregation) [humidity](metric)
     - What is the [rh](metric) in [room 5](location)?
     - What is the level of [Humidity](metric)?
@@ -178,21 +181,32 @@ nlu:
 
 - intent: change_aggregation
   examples: |
+    - Just [average](aggregation).
+    - Just the [max](aggregation).
+    - [recent](aggregation) one only.
+    - Only [min](aggregation).
+    - Only [max](aggregation).
+    - [min](aggregation) only.
+    - [average](aggregation) only.
     - The [average](aggregation).
     - The [mean](aggregation).
     - Not that, I asked for the [max value](aggregation).
-    - The [the latest value](aggregation).
+    - The [recent](aggregation) value.
     - I wanted to know about the [mean](aggregation)
-    - Actually I asked for [current value](aggregation).
+    - Actually I asked for [recent](aggregation) value.
     - Okay and what is the [maximum](aggregation)?
     - Okay and what about the [average](aggregation)?
-    - Thanks. What is the [current](aggregation) then?
+    - Thanks. What is the [recent](aggregation) then?
     - What is the [temperature](metric) [currently](latest_period)?
     - What is the [average](aggregation)?
     - what is the [maximum](aggregation) value?
     - What is the [max](aggregation)?
     - and [min](aggregation)?
     - give me the [min](aggregation)
+    - The [average](aggregation) and [maximum](aggregation).
+    - The [mean](aggregation) and [minimum](aggregation).
+    - Not that, I asked for the [max](aggregation) and [minimum](aggregation) value.
+    - The [recent](aggregation), [max](aggregation) and [min](aggregation) value.
 
 - intent: change_location
   examples: |

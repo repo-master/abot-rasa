@@ -1,2 +1,2 @@
 
-from ..config import BACKEND_ENDPOINT_BASE
+from ..config import BACKEND_ENDPOINT_BASE, DUCKLING_HTTP_URL

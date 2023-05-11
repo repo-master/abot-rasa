@@ -29,17 +29,22 @@ pipeline:
   - name: LexicalSyntacticFeaturizer
 
   - name: CountVectorsFeaturizer
+
+  - name: CountVectorsFeaturizer
     analyzer: char_wb
     min_ngram: 1
     max_ngram: 4
+
+  # Maybe another time
+  # - name: LanguageModelFeaturizer
+  #   model_name: gpt2
+  #   model_weights: gpt2
 
   - name: DIETClassifier
     epochs: 100
     constrain_similarities: true
 
-  - name: DucklingEntityExtractor
-    # url of the running duckling server
-    url: "http://uat.phaidelta.com:8092"
+  - name: abot.extractor.duckling.DucklingEntityExtractor
     # dimensions to extract
     # comment for all dimensions - ["time", "number", "amount-of-money", "distance"]
     dimensions: ["time", "number"]
@@ -60,7 +65,7 @@ pipeline:
     constrain_similarities: true
 
   - name: FallbackClassifier
-    threshold: 0.3
+    threshold: 0.7
     ambiguity_threshold: 0.1
 
 
