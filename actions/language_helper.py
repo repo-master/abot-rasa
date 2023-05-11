@@ -14,15 +14,6 @@ def user_to_aggregation_type(name: Optional[Union[str, List[str]]]) -> Union[Agg
     aggregation = AggregationMethod.RECENT
 
     if name is not None:
-        m = name.lower()
-        if m == "minimum":
-            aggregation = AggregationMethod.MINIMUM
-        elif m == "maximum":
-            aggregation = AggregationMethod.MAXIMUM
-        elif m == "average":
-            aggregation = AggregationMethod.AVERAGE
-        elif m == "std_dev":
-            aggregation = AggregationMethod.STD_DEV
         if isinstance(name, str):
             aggregation = AggregationMethod(name.lower())
         elif isinstance(name, list):
@@ -35,7 +26,8 @@ async def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
 
     if user_req_timeperiod is None:
         # No timestamp given. Assume for today.
-        user_req_timeperiod = await duckling_parse("today")
+        today_entities = await duckling_parse("today")
+        user_req_timeperiod = today_entities[0]
         events.append(SlotSet("data_time_range", user_req_timeperiod))
     elif isinstance(user_req_timeperiod, str):
         # TODO
