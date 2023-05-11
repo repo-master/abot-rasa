@@ -52,6 +52,17 @@ nlu:
     - avg
     - mean
     - average
+- synonym: median
+  examples: |
+    - middle value
+    - central value
+    - median value
+    - 50th percentile
+    - second quartile
+    - midpoint
+    - center
+    - balance point
+    - median
 
 - intent: query_metric_aggregate
   examples: |
@@ -63,6 +74,14 @@ nlu:
     - get [RMSE](aggregation) for [humidity](metric)
     - get [deviation](aggregation) for [humidity](metric)
     - get [standard deviation](aggregation) for [humidity](metric)
+    - what is [Middle value](aggregation) for [temperature](metric)
+    - what is [Central value](aggregation) for [temperature](metric)
+    - what is [Median value](aggregation) for [temperature](metric) 
+    - what is [50th percentile](aggregation) for [temperature](metric)       
+    - what is [Second quartile](aggregation) for [temperature](metric)
+    - what is [Midpoint](aggregation) for [temperature](metric) 
+    - what is [Center](aggregation) for [temperature](metric)       
+    - what is [Balance point](aggregation) for [temperature](metric)    
     - What is the [temperature](metric)?
     - What is the [humidity](metric)?
     - How [hot](metric) is it?
