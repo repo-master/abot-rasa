@@ -11,7 +11,7 @@ nlu:
   examples: |
     - humid
     - rh
-    - RH    
+    - RH
     - relative humidity
 - synonym: maximum
   examples: |
@@ -86,12 +86,12 @@ nlu:
     - get [standard deviation](aggregation) for [humidity](metric)
     - what is [Middle value](aggregation) for [temperature](metric)
     - what is [Central value](aggregation) for [temperature](metric)
-    - what is [Median value](aggregation) for [temperature](metric) 
-    - what is [50th percentile](aggregation) for [temperature](metric)       
+    - what is [Median value](aggregation) for [temperature](metric)
+    - what is [50th percentile](aggregation) for [temperature](metric)
     - what is [Second quartile](aggregation) for [temperature](metric)
-    - what is [Midpoint](aggregation) for [temperature](metric) 
-    - what is [Center](aggregation) for [temperature](metric)       
-    - what is [Balance point](aggregation) for [temperature](metric)    
+    - what is [Midpoint](aggregation) for [temperature](metric)
+    - what is [Center](aggregation) for [temperature](metric)
+    - what is [Balance point](aggregation) for [temperature](metric)
     - What is the [temperature](metric)?
     - What is the [humidity](metric)?
     - How [hot](metric) is it?
@@ -295,7 +295,7 @@ nlu:
 
 - intent : get_report
   examples: |
-    - Give me Report 
+    - Give me Report
     - can i Have report of this?
     - Generate a Report out of this
     - Give a report on [door](metric) status.
