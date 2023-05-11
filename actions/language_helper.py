@@ -15,6 +15,8 @@ def user_to_aggregation_type(name: Optional[str]) -> Union[AggregationMethod, Se
             aggregation = AggregationMethod.MAXIMUM
         elif m == "average":
             aggregation = AggregationMethod.AVERAGE
+        elif m == "std_dev":
+            aggregation = AggregationMethod.STD_DEV
     return aggregation
 
 

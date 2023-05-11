@@ -21,6 +21,16 @@ nlu:
     - greatest
     - largest
     - extreme high
+- synonym : std_dev
+  examples: |
+    - standard_dev
+    - std_dev
+    - standard deviation
+    - SD
+    - sigma
+    - root mean square error
+    - RMSE
+    - deviation
 - synonym: minimum
   examples: |
     - least
@@ -45,6 +55,9 @@ nlu:
 
 - intent: query_metric_aggregate
   examples: |
+    - get [standard_dev](aggregation) for [humidity](metric)
+    - get [std_dev](aggregation) for [humidity](metric)
+    - get [standard deviation](aggregation) for [humidity](metric)
     - What is the [temperature](metric)?
     - What is the [humidity](metric)?
     - How [hot](metric) is it?
