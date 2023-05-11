@@ -5,3 +5,15 @@ rules:
   steps:
   - intent: query_sensor_list
   - action: action_show_sensor_list
+- rule: User queries for available locations
+  steps:
+  - intent: query_location_list
+  - action: action_show_location_list
+- rule: User queries what is the current value of timerange
+  steps:
+  - intent: query_value_of_data_timerange
+  - action: action_ask_data_value_timerange
+- rule: User queries what is the current value of location
+  steps:
+  - intent: query_value_of_data_location
+  - action: action_ask_data_value_location

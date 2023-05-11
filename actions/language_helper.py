@@ -21,14 +21,18 @@ def user_to_aggregation_type(name: Optional[Union[str, List[str]]]) -> Union[Agg
 
     return aggregation
 
-async def user_to_timeperiod(tracker: Tracker, events: list) -> TimeRange:
+async def user_to_timeperiod(tracker: Tracker, events: Optional[list] = None, autoset_default: Optional[str] = "today") -> Optional[TimeRange]:
     user_req_timeperiod: Optional[Union[DucklingExtraction, List[str], str]] = tracker.get_slot("data_time_range")
 
     if user_req_timeperiod is None:
-        # No timestamp given. Assume for today.
-        today_entities = await duckling_parse("today")
-        user_req_timeperiod = today_entities[0]
-        events.append(SlotSet("data_time_range", user_req_timeperiod))
+        if autoset_default is not None:
+            # No timestamp given. Assume for today (or given value).
+            today_entities = await duckling_parse(autoset_default)
+            user_req_timeperiod = today_entities[0]
+            if events is not None:
+                events.append(SlotSet("data_time_range", user_req_timeperiod))
+        else:
+            return
     elif isinstance(user_req_timeperiod, str):
         # TODO
         pass

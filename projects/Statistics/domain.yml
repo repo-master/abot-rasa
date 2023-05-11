@@ -14,6 +14,11 @@ slots:
     mappings:
     - type: custom
 
+  quantile:
+    type: float
+    mappings:
+    - type: from_entity
+      entity: number
 
 actions:
 - action_describe_event_details

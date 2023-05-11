@@ -11,5 +11,7 @@ class AggregationMethod(str, Enum):
     MAXIMUM = 'maximum'
     STD_DEV = 'std_dev'
     MEDIAN = 'median'
+    COUNT = 'count'
+    COMPLIANCE = 'compliance'
 
 AggregationOut = Dict[AggregationMethod, float]

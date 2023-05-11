@@ -63,6 +63,16 @@ nlu:
     - center
     - balance point
     - median
+    - average value
+    - average score
+- synonym: quantile
+  examples: |
+    - percentile
+    - quartile
+    - proportion
+    - centile
+    - percentile score
+    - quartile score
 
 - intent: query_metric_aggregate
   examples: |
@@ -160,6 +170,16 @@ nlu:
     - What is the [max](aggregation) [temperature](metric) between [31/01/2022](time) and [yesterday](time)?
     - what is the [humidity](metric) in [GF_A](location)?
     - what is the [temperature](metric) in [GF_B](location)?
+    - Give me the [compliance](aggregation) [temperature](metric)
+    - Give me the [compliance](aggregation) and [average](aggregation) [humidity](metric)
+    - Give me the [compliance](aggregation), [maximum](aggregation) and [average](aggregation) [humidity](metric)
+    - Give me the [compliance](aggregation) [temperature](metric)
+    - Give me the [compliance](aggregation) and [minimum](aggregation) [temperature](metric)
+    - Give me the [compliance](aggregation) [humidity](metric)
+    - [Humidity](metric) sensor [compliance](aggregation) for [last week](time)
+    - [Humidity](metric) sensor [compliance](aggregation) for [the past week](time)
+    - [Humidity](metric) sensor [maximum](aggregation) for [the previous week](time)
+    - [Temperature](metric) sensor [min](aggregation) for [the past year](time)
 
 - intent: change_time_period
   examples: |
@@ -223,6 +243,9 @@ nlu:
     - Thanks. What is the [recent](aggregation) then?
     - What is the [temperature](metric) [currently](latest_period)?
     - What is the [average](aggregation)?
+    - What is the [average](aggregation) value?
+    - [average](aggregation)
+    - What is [average](aggregation)?
     - what is the [maximum](aggregation) value?
     - What is the [max](aggregation)?
     - and [min](aggregation)?
@@ -231,6 +254,28 @@ nlu:
     - The [mean](aggregation) and [minimum](aggregation).
     - Not that, I asked for the [max](aggregation) and [minimum](aggregation) value.
     - The [recent](aggregation), [max](aggregation) and [min](aggregation) value.
+    - What is the [50](number) [percentile](aggregation)?
+    - What is the [99](number) [percentile](aggregation)?
+    - What is the [75](number) [percentile](aggregation)?
+    - What is the [10](number) [percentile](aggregation)?
+    - What is the [95](number) [percentile](aggregation)?
+    - What is the [92nd](number) [percentile](aggregation)?
+    - What is the [91st](number) [percentile](aggregation)?
+    - What is the [23rd](number) [percentile](aggregation)?
+    - What is the [43rd](number) [percentile](aggregation)?
+    - What is the [62nd](number) [percentile](aggregation)?
+    - [50th](number) [percentile](aggregation)?
+    - [99th](number) [percentile](aggregation)?
+    - What is the [75th](number) [percentile](aggregation)?
+    - What is the [10th](number) [percentile](aggregation)?
+    - What is the [95th](number) [percentile](aggregation)?
+    - What is the [30](number) [quantile](aggregation)?
+    - What is the [25](number) [quantile](aggregation)?
+    - What is the [45](number) [quantile](aggregation)?
+    - [60th](number) [quantile](aggregation)?
+    - [75th](number) [quantile](aggregation)?
+    - What is the [99](number) [quantile](aggregation)?
+    - What is the [95](number) [quantile](aggregation)?
 
 - intent: change_location
   examples: |
@@ -266,6 +311,9 @@ nlu:
     - Give a list of sensors available
     - Provide a list of sensors
     - Which sensors can I query?
+    - Hey which sensors do you have information for?
+    - Hey which sensors do you have information on?
+    - Hey which sensors you have info for?
     - What data is available?
     - Which sensors can I use?
     - What are the available sensor options?
@@ -288,6 +336,100 @@ nlu:
     - Can you give me an idea of the sensors that I can employ?
     - I'm interested in exploring the sensors that are at my disposal. Can you help me with that?
     - Which sensors are made available for querying purposes?
+
+
+- intent: query_location_list
+  examples: |
+    - Which locations are available?
+    - What are the locations present?
+    - Give a list of locations available
+    - Provide a list of locations
+    - Which locations can I query?
+    - Which locations can I use?
+    - What are the available locations?
+    - Hey which locations are available?
+    - Hey which locations do you have information for?
+    - Hey which locations you have info for?
+    - Can you list the locations that are currently present?
+    - I'm curious about the locations that are available. Could you provide me with that information?
+    - I'd like to know the list of locations that I can access.
+    - Are there any specific locations that I can query?
+    - Can you provide me with a list of the available locations?
+    - I'm interested in knowing which locations are at my disposal.
+    - Could you please give me an overview of the locations that are currently available?
+    - Which locations am I able to utilize?
+    - What locations are accessible for use?
+    - Can you provide details about the available locations?
+    - Which locations are included in the options?
+    - Is there a specific set of locations that I can choose from?
+    - Please provide me with information on the locations that I can use.
+    - I'd like to know which locations I have the ability to interact with.
+    - Are there any locations that I can utilize for gathering data?
+    - What are the options for locations that I can access?
+    - Can you give me an idea of the locations that I can employ?
+    - I'm interested in exploring the locations that are at my disposal. Can you help me with that?
+    - Which locations are made available for querying purposes?
+    - Which units are available?
+    - What are the units present?
+    - Give a list of units available
+    - Provide a list of units
+    - Which units can I query?
+    - Which units can I use?
+    - What are the available units?
+    - Hey which units are available?
+    - Hey which units do you have information for?
+    - Hey which units you have info for?
+    - Can you list the units that are currently present?
+    - I'm curious about the units that are available. Could you provide me with that information?
+    - I'd like to know the list of units that I can access.
+    - Are there any specific units that I can query?
+    - Can you provide me with a list of the available units?
+    - I'm interested in knowing which units are at my disposal.
+    - Could you please give me an overview of the units that are currently available?
+    - Which units am I able to utilize?
+    - What units are accessible for use?
+    - Can you provide details about the available units?
+    - Which units are included in the options?
+    - Is there a specific set of units that I can choose from?
+    - Please provide me with information on the units that I can use.
+    - I'd like to know which units I have the ability to interact with.
+    - Are there any units that I can utilize for gathering data?
+    - What are the options for units that I can access?
+    - Can you give me an idea of the units that I can employ?
+    - I'm interested in exploring the units that are at my disposal. Can you help me with that?
+    - Which units are made available for querying purposes?
+
+- intent: query_value_of_data_timerange
+  examples: |
+    - What is the time range set?
+    - What is the time range set as?
+    - What is the time period?
+    - What time period?
+    - Time period?
+    - Time period
+    - Current time period?
+    - Current time period
+    - What is the current time period?
+    - Time period of sensor data
+    - Time period of data
+    - What is the set time period?
+    - What time period is data loading?
+
+- intent: query_value_of_data_location
+  examples: |
+    - What is the location set?
+    - What is the location set as?
+    - What is the location?
+    - What location?
+    - Location?
+    - Location
+    - Current location?
+    - Current location
+    - What is the current location?
+    - Location of sensor data
+    - Location of data
+    - What is the set location?
+    - What location is data loading?
 
 # TODO: Time period (today's, yesterday's, etc.)
 # - intent: summarize_sensor_data

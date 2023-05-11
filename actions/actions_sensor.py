@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional, Set, Text, Union
 from rasa_sdk import Action, FormValidationAction, Tracker
 from rasa_sdk.events import FollowupAction, SlotSet
 from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.interfaces import Tracker
 from rasa_sdk.types import DomainDict
 
 from .api import ConnectError, HTTPStatusError, dataapi, statapi
@@ -322,4 +323,39 @@ class ActionShowSensorList(Action):
                 sensorlist_msg += f"- {sensor_name} [measures {sensor_type} ({display_unit})] at {sensor_location}\n"
             dispatcher.utter_message(text=sensorlist_msg)
 
+        return []
+
+class ActionShowLocationList(Action):
+    def name(self) -> Text:
+        return "action_show_location_list"
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+        return []
+
+class ActionShowTimerangeValue(Action):
+    def name(self) -> Text:
+        return "action_ask_data_value_timerange"
+
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+        HUMAN_TIME_FORMAT = "%c"
+        time_range = await user_to_timeperiod(tracker, autoset_default=None)
+        if time_range:
+            dispatcher.utter_message(text="Data time range: {t_from} till {t_to}".format(
+                t_from=time_range["from"].strftime(HUMAN_TIME_FORMAT),
+                t_to=time_range["to"].strftime(HUMAN_TIME_FORMAT)
+            ))
+        else:
+            dispatcher.utter_message(text="Time range is not provided for data.")
+        return []
+
+
+class ActionShowLocationValue(Action):
+    def name(self) -> Text:
+        return "action_ask_data_value_location"
+
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+        user_req_location: Optional[str] = tracker.get_slot("location")
+        if user_req_location:
+            dispatcher.utter_message(text="Location: %s" % user_req_location)
+        else:
+            dispatcher.utter_message(text="Location is not provided for data.")
         return []

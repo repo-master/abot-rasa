@@ -26,6 +26,9 @@ intents:
     use_entities:
     - metric
 - query_sensor_list
+- query_location_list
+- query_value_of_data_timerange
+- query_value_of_data_location
 
 entities:
 - metric
@@ -50,7 +53,7 @@ slots:
     mappings:
     - type: from_entity
       entity: location
-  # Timestamp for aggregation. ISO8601 strings of entered time,
+  # Timestamp range for grabbing data. ISO8601 strings of entered time,
   # a dict of {'body': '...', 'from': '...', 'to': '...'} for range.
   # If it fails, you get a list (all entity values)
   data_time_range:
@@ -70,6 +73,9 @@ actions:
 - action_metric_summarize
 - action_fetch_report
 - action_show_sensor_list
+- action_show_location_list
+- action_ask_data_value_timerange
+- action_ask_data_value_location
 
 responses:
   # Uttered by form_metric_data automatically when an entity is missing.
@@ -78,6 +84,6 @@ responses:
   utter_ask_location:
   - text: Ok, which location where you are looking for this data
   utter_ask_data_time_range:
-  - text : Please Specify time period
+  - text: Please Specify time period
   utter_ask_aggregation:
-  - text : What type of aggregation type should be done?
+  - text: What type of aggregation type should be done?
