@@ -1,7 +1,7 @@
 
 from enum import Enum
 
-from typing import Dict
+from typing import Dict, Union
 
 
 class AggregationMethod(str, Enum):
@@ -16,4 +16,4 @@ class AggregationMethod(str, Enum):
     QUANTILE = 'quantile'
     SUMMARY = 'summary'
 
-AggregationOut = Dict[AggregationMethod, float]
+AggregationOut = Dict[AggregationMethod, Union[float, int]]
