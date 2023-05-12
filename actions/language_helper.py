@@ -14,6 +14,8 @@ def user_to_aggregation_type(name: Optional[Union[str, List[str]]]) -> Union[Agg
     aggregation = AggregationMethod.RECENT
 
     if name is not None:
+        if isinstance(name, list) and len(name) == 1:
+            name = name[0]
         if isinstance(name, str):
             aggregation = AggregationMethod(name.lower())
         elif isinstance(name, list):
@@ -46,11 +48,22 @@ async def user_to_timeperiod(tracker: Tracker, events: Optional[list] = None, au
 def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs) -> str:
     def _agg_str(am: AggregationMethod, value: float) -> str:
 
-        return '{agg_method}: {value:.2f}{unit_symbol}'.format(
-            agg_method=am.value.title(),
-            value=value,
-            unit_symbol=unit_symbol
-        )
+        if am == AggregationMethod.COMPLIANCE :
+            return '{agg_method}: {value:.2f} %'.format(
+                agg_method=am.value.title(),
+                value=value*100,
+                unit_symbol=unit_symbol
+            )
+        elif am == AggregationMethod.COUNT:
+            return '{agg_method}: {value:.2f} No.'.format(
+                agg_method=am.value.title(),
+                value=value            )
+        else:
+            return '{agg_method}: {value:.2f}{unit_symbol}'.format(
+                agg_method=am.value.title(),
+                value=value,
+                unit_symbol=unit_symbol
+            )
     if len(agg.keys()) == 1:
         # Directly give that value without a list
         am, val = next(iter(agg.items()))

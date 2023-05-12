@@ -13,5 +13,6 @@ class AggregationMethod(str, Enum):
     MEDIAN = 'median'
     COUNT = 'count'
     COMPLIANCE = 'compliance'
+    SUMMARY = 'summary'
 
 AggregationOut = Dict[AggregationMethod, float]
