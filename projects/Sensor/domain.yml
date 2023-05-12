@@ -1,39 +1,39 @@
 version: '3.1'
 
 intents:
-- change_aggregation:
-    use_entities:
-    - metric
-    - location
-    - aggregation
-- change_location:
-    use_entities:
-    - metric
-    - location
-    - aggregation
-- change_sensor:
-    use_entities:
-    - metric
-    - location
-    - aggregation
-- change_time_period
+# - change_aggregation:
+#     use_entities:
+#     - metric_type
+#     - location
+#     - aggregation
+# - change_location:
+#     use_entities:
+#     - metric_type
+#     - location
+#     - aggregation
+# - change_sensor:
+#     use_entities:
+#     - metric_type
+#     - location
+#     - aggregation
+# - change_time_period
 - query_metric_aggregate:
     use_entities:
-    - metric
+    - metric_type
     - location
     - aggregation
-- summarize_sensor_data:
-    use_entities:
-    - metric
+- change_source
+# - summarize_sensor_data:
+#     use_entities:
+#     - metric_type
 - query_sensor_list
 - query_location_list
 - query_value_of_data_timerange
 - query_value_of_data_location
 
 entities:
-- metric
+- metric_type
 - aggregation
-- latest_period
 - location
 
 
@@ -42,7 +42,7 @@ slots:
     type: text
     mappings:
     - type: from_entity
-      entity: metric
+      entity: metric_type
   aggregation:
     type: list
     mappings:
@@ -61,6 +61,14 @@ slots:
     mappings:
     - type: from_entity
       entity: time
+
+  # When true, if asked to change any aggregation, it will load data again.
+  # If false, will prompt
+  data_auto_load_on_aggregation:
+    type: bool
+    initial_value: true
+    mappings:
+    - type: custom
 
 forms:
   form_metric_data:

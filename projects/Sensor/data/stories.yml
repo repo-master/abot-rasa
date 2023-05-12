@@ -14,11 +14,7 @@ stories:
 
   - story: user wants to change a parameter
     steps:
-    - or:
-      - intent: change_sensor
-      - intent: change_aggregation
-      - intent: change_location
-      - intent: change_time_period
+    - intent: change_source
     - action: action_metric_aggregate
 
     # - slot_was_set:
