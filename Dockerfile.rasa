@@ -10,4 +10,10 @@ WORKDIR /app
 
 COPY . /app
 
+# Install packages
+# TODO: Is there any other way to install without being root?
+USER root
+RUN pip install -r requirements.rasa.txt
+USER 1001
+
 CMD ["run", "--endpoints", "endpoints.test.yml", "--credentials", "credentials.test.yml"]
