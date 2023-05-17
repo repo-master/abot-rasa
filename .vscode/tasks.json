@@ -19,7 +19,21 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": true
+      },
+      "problemMatcher": []
     },
+    {
+      "label": "Generate NLU from Chatette",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "-m",
+        "chatette",
+        "-f",
+        ".\\projects\\Sensor\\sensor_query.chatette",
+        "-o",
+        ".\\projects\\Sensor\\data\\nlu\\chatette"
+      ],
       "problemMatcher": []
     }
   ]
