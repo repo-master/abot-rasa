@@ -27,12 +27,7 @@
       "type": "shell",
       "command": "${command:python.interpreterPath}",
       "args": [
-        "-m",
-        "chatette",
-        "-f",
-        ".\\projects\\Sensor\\sensor_query.chatette",
-        "-o",
-        ".\\projects\\Sensor\\data\\nlu\\chatette"
+        "build_chatette_nlu.py"
       ],
       "problemMatcher": []
     }

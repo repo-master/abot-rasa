@@ -1,0 +1,7 @@
+
+%[&intent_perform_aggregation](1000)
+    and @[aggregation]?
+    [[~[i need]|for]|what [is|about]?] [the?] @[aggregation][[, @[aggregation]?] and @[aggregation]?][\??]
+
+|aggregation_slots.chatette
+|../../../Common/general.chatette

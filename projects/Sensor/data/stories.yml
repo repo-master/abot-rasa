@@ -1,47 +1,42 @@
 version: "3.1"
 
 stories:
-  - story: User asks or queries sensor data with optional aggregate and location
-    steps:
-    - intent: query_metric_aggregate
-    # - action : form_metric_data
-    # - active_loop: form_metric_data
-    # - active_loop : null
-    - action: action_metric_aggregate
+# - story: User asks or queries sensor data with optional aggregate and location
+#   steps:
+#   - intent: query_metric_aggregate
+#   # - action : form_metric_data
+#   # - active_loop: form_metric_data
+#   # - active_loop : null
+#   - action: action_metric_aggregate
 
-    # - slot_was_set:
-    #   - previous_action: "action_metric_aggregate"
+  # - slot_was_set:
+  #   - previous_action: "action_metric_aggregate"
 
-  - story: user wants to change a parameter
-    steps:
-    - intent: change_source
-    - action: action_metric_aggregate
+  # - slot_was_set:
+  #     - previous_action
+  #   - action: "{previous_action}"
 
-    # - slot_was_set:
-    #     - previous_action
-    #   - action: "{previous_action}"
+- story : report fetching story
+  steps:
+  - intent : get_report
+  - action : action_fetch_report
 
-  - story : report fetching story
-    steps:
-    - intent : get_report
-    - action : action_fetch_report
+# - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
+#   steps:
+#   - intent: summarize_sensor_data
+#   - slot_was_set:
+#     - metric
+#   - action: utter_summarize_affirm
+#   - action: action_metric_summarize
 
-  # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
-  #   steps:
-  #   - intent: summarize_sensor_data
-  #   - slot_was_set:
-  #     - metric
-  #   - action: utter_summarize_affirm
-  #   - action: action_metric_summarize
-
-  # - story: User did not want the response that they received
-  #   steps:
-  #   #TODO: Use action_two_stage_fallback and action_default_ask_rephrase default actions
-  #   - intent: out_of_scope
-  #   - action: utter_mistake
-  #   - or:
-  #     - intent: change_sensor
-  #     - intent: change_aggregation
-  #     - intent: change_location
-  #   - action: action_metric_aggregate
-  #   - action: utter_corrected
+# - story: User did not want the response that they received
+#   steps:
+#   #TODO: Use action_two_stage_fallback and action_default_ask_rephrase default actions
+#   - intent: out_of_scope
+#   - action: utter_mistake
+#   - or:
+#     - intent: change_sensor
+#     - intent: change_aggregation
+#     - intent: change_location
+#   - action: action_metric_aggregate
+#   - action: utter_corrected

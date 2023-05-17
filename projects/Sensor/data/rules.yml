@@ -17,3 +17,15 @@ rules:
   steps:
   - intent: query_value_of_data_location
   - action: action_ask_data_value_location
+
+- rule: User asks to load sensor data and to perform aggregation on it
+  steps:
+  - intent: query_metric_aggregate
+  - action: action_sensor_data_load
+  - action: action_aggregation
+
+- rule: User wants to change a parameter, reload data and perform aggregation again
+  steps:
+  - intent: change_source
+  - action: action_sensor_data_load
+  - action: action_aggregation

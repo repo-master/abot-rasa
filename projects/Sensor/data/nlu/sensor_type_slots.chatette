@@ -1,0 +1,6 @@
+
+@[metric_type]
+    ~[temperature]
+    ~[humidity]
+
+|sensor_type_aliases.chatette

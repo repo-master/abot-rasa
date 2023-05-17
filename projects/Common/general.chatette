@@ -1,0 +1,21 @@
+
+~[i need]
+    [&i]['d| would?] [need|want]
+    [&i]['d| would] like
+    give [me?]
+
+~[num]
+    [~[nb$1]|~[nb$one]]
+    [~[nb$2]|~[nb$two]]
+    [~[nb$3]|~[nb$three]]
+    [~[nb$4]|~[nb$four]]
+    [~[nb$5]|~[nb$five]]
+    [~[nb$6]|~[nb$six]]
+    [~[nb$12]|~[nb$twelve]]
+    [~[nb$50]|~[nb$fifty]]
+    [~[nb$100]|~[nb$hundred]]
+
+~[nb$NB]
+    exactly $NB
+    precisely $NB
+    $NB

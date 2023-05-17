@@ -1,12 +1,7 @@
 version: "3.1"
 
 stories:
-  - story: Some value that the user needs more details on.
-    steps:
-    - intent: ask_followup_summary_details
-    - action : action_describe_event_details
-
-  - story: Some value that the user needs count value of.
+  - story: Some value that the user needs more details of.
     steps:
     - intent: ask_followup_summary_details
     - action : action_describe_event_details

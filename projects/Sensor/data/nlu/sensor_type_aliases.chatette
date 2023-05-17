@@ -1,0 +1,13 @@
+
+// Sensor types that can be recognized
+
+~[temperature]
+    temperature
+    temp
+    heat sensor
+
+~[humidity]
+    humidity
+    humid
+    rh
+    relative humidity

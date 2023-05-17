@@ -1,3 +1,7 @@
 version: "3.1"
 
-rules: []
+rules:
+- rule: User wants to perform aggregation on loaded data or change aggregation method
+  steps:
+  - intent: intent_perform_aggregation
+  - action: action_aggregation
