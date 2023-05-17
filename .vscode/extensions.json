@@ -4,11 +4,12 @@
 
 	// List of extensions which should be recommended for users of this workspace.
 	"recommendations": [
-		"EditorConfig.EditorConfig",
-		"Gruntfuggly.todo-tree",
+		"editorconfig.editorconfig",
+		"gruntfuggly.todo-tree",
 		"ms-python.python",
 		"ms-python.isort",
-		"ms-python.vscode-pylance"
+		"ms-python.vscode-pylance",
+		"cendekia.chatette-vscode"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": [
