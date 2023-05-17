@@ -1,4 +1,5 @@
 
+import asyncio
 import json
 from typing import Any, Dict, List, Optional
 
@@ -7,11 +8,43 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
 
-from .common import (ACTION_STATEMENT_CONTEXT_SLOT,
+from .api import statapi
+from .api.dataapi import get_loaded_data
+from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
                      action_exception_handle_graceful)
 from .insights import describe_all_data_insights
+from .language_helper import user_to_aggregation_type
 from .schemas import StatementContext
+from .language_helper import summary_AggregationOut
 
+
+class ActionAggregation(Action):
+    def name(self):
+        return 'action_aggregation'
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[str, Any]]:
+        events = []
+        user_req_agg_method: Optional[str] = tracker.get_slot("aggregation")
+        # Check aggregation method provided by the user
+        aggregation = user_to_aggregation_type(user_req_agg_method)
+
+        data_raw = await get_loaded_data(tracker)
+        if data_raw is None:
+            raise ClientException("No data is loaded to perform %s aggregation." % aggregation.value)
+
+        if data_raw['content'] is None:
+            dispatcher.utter_message("Sorry, data isn't available.")
+        else:
+            data_df, data_meta = data_raw['content']
+            if data_df.empty:
+                dispatcher.utter_message("Sorry, data isn't available for the time range.")
+            else:
+                aggregated_result = await statapi.aggregation(data_df, aggregation)
+                agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=data_meta["display_unit"])
+                dispatcher.utter_message(agg_response_text)
+
+        return events
 
 class ActionDescribeEventDetails(Action):
     def name(self):
@@ -73,5 +106,3 @@ class ActionDescribeCountEventDetails(Action):
                 dispatcher.utter_message(text=f"No Outlier found")
 
         return events
-
-

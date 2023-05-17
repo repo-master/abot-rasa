@@ -1,25 +1,29 @@
 
-from typing import Dict, List, Optional
+from typing import Dict, Any, Optional
 
-from typing_extensions import NotRequired, TypedDict
-
-
-class UnitMetadata(TypedDict):
-    unit_urn: str
-    unit_id: int
-    unit_alias: Optional[str]
+from httpx._types import (AuthTypes, CookieTypes, HeaderTypes, QueryParamTypes,
+                          RequestContent, RequestData, RequestExtensions,
+                          RequestFiles, TimeoutTypes, URLTypes)
+from typing_extensions import TypedDict
 
 
-class SensorMetadata(TypedDict):
-    sensor_urn: str
-    sensor_id: NotRequired[int]
-    sensor_name: NotRequired[str]
-    sensor_alias: NotRequired[str]
-    sensor_type: str
-    display_unit: str
-    sensor_location: NotRequired[UnitMetadata]
+DataLoaderOptions = Dict[str, Any]
 
+class DataLoaderRequest(TypedDict):
+    method: str
+    url: URLTypes
+    content: Optional[RequestContent]
+    data: Optional[RequestData]
+    files: Optional[RequestFiles]
+    json: Optional[Any]
+    params: Optional[QueryParamTypes]
+    headers: Optional[HeaderTypes]
+    cookies: Optional[CookieTypes]
+    auth: Optional[AuthTypes]
+    follow_redirects: Optional[bool]
+    timeout: Optional[TimeoutTypes]
+    extensions: Optional[RequestExtensions]
 
-class SensorDataResponse(TypedDict):
-    metadata: SensorMetadata
-    data: List[Dict]
+__all__ = [
+    'DataLoaderRequest'
+]
