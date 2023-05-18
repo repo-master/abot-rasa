@@ -9,4 +9,8 @@
     Block B Ground Floor Temperature
     Block A Ground Floor Humidity
 
+@[location]
+    [[A|B|C][1|2|3|4]]_[GF|FF|SF]_[A|B|C]
+    Block [A|B|C] [Ground|First|Second] Floor
+
 |sensor_type_aliases.chatette
