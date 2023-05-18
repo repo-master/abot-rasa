@@ -71,6 +71,7 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text,
 
 async def reset_slot(slot_name, value, events: list ):
     events.append(SlotSet(slot_name, value))
+    return events
 
 async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
     try:
@@ -125,9 +126,9 @@ class ActionSensorDataLoad(Action):
 
         print(requested_sensor)
 
-        reset_slot(slot_name="metric",value=requested_sensor["sensor_type"])        
-        reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'])        
-        reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'])        
+        events = await reset_slot(slot_name="metric",value=requested_sensor["sensor_type"], events=events)        
+        events = await reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)        
+        events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
 
 
 
@@ -229,11 +230,10 @@ class ActionFetchReport(Action):
         parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
         requested_sensor = await search_best_matching_sensor(parsed_input)
 
-        print(requested_sensor)
-        
-        reset_slot(slot_name="metric",value=requested_sensor["sensor_type"])        
-        reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'])        
-        reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'])        
+
+        events = await reset_slot(slot_name="metric",value=requested_sensor["sensor_type"] , events=events)        
+        events = await reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)        
+        events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
 
         # Recover sensor id field
         requested_sensor_id: int = requested_sensor['sensor_id']
@@ -333,6 +333,7 @@ class ActionGetSensor(Action):
 
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
         print("Runing action_search_sensor_by_name")
         sensor_name: Optional[str] = tracker.get_slot("sensor_name")
         print("slot sensor_name filled with ", sensor_name)
@@ -340,8 +341,8 @@ class ActionGetSensor(Action):
             sensor = await integration_genesis.determine_user_request_sensor(
                 sensor_name=sensor_name,  # TODO: Get from slot
             )
-            reset_slot(slot_name="metric",value=sensor["sensor_type"])
-            reset_slot(slot_name="location",value=sensor["sensor_location"]['unit_alias'])
+            events = await reset_slot(slot_name="metric",value=sensor["sensor_type"], events=events)
+            events = await reset_slot(slot_name="location",value=sensor["sensor_location"]['unit_alias'], events=events)
             dispatcher.utter_message(text=f"found sensor as to be : {sensor}")
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
@@ -350,7 +351,7 @@ class ActionGetSensor(Action):
             raise ServerException("Couldn't connect to Abot backend.", e)
         except Exception as e:  # TODO: Capture specific exceptions
             raise ServerException("Something went wrong while looking up sensor data.", e)
-        return []
+        return events 
 
 
 class ActionShowLocationList(Action):
