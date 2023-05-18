@@ -30,11 +30,13 @@ intents:
 - query_location_list
 - query_value_of_data_timerange
 - query_value_of_data_location
+- activate_sensor_name_form
 
 entities:
 - metric_type
 - aggregation
 - location
+- sensor_name
 
 
 slots:
@@ -53,6 +55,16 @@ slots:
     mappings:
     - type: from_entity
       entity: location
+  sensor_name:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: sensor_name
+  slot_json:
+    type: any
+    mappings:
+    - type: custom
+
   # Timestamp range for grabbing data. ISO8601 strings of entered time,
   # a dict of {'body': '...', 'from': '...', 'to': '...'} for range.
   # If it fails, you get a list (all entity values)
@@ -75,6 +87,10 @@ forms:
     required_slots:
     - metric
     - location
+    
+  form_sensor_name:
+    required_slots:
+    - sensor_name
 
 actions:
 - action_metric_aggregate
@@ -84,6 +100,7 @@ actions:
 - action_show_location_list
 - action_ask_data_value_timerange
 - action_ask_data_value_location
+- action_search_sensor_by_name
 
 responses:
   # Uttered by form_metric_data automatically when an entity is missing.
@@ -95,3 +112,5 @@ responses:
   - text: Please Specify time period
   utter_ask_aggregation:
   - text: What type of aggregation type should be done?
+  utter_ask_sensor_name:
+  - text: Which sensor are your looking this data for?

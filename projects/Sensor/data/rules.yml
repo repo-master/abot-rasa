@@ -17,3 +17,11 @@ rules:
   steps:
   - intent: query_value_of_data_location
   - action: action_ask_data_value_location
+
+- rule: sensor_name_fetching_story
+  steps:
+  - intent : activate_sensor_name_form
+  - action : form_sensor_name
+  - active_loop : form_sensor_name
+  - active_loop : null
+  - action : action_search_sensor_by_name

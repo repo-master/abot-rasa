@@ -26,6 +26,7 @@ stories:
     - intent : get_report
     - action : action_fetch_report
 
+
   # - story: User wants a summary or briefing of a sensor (optionally at a time period like yesterday)
   #   steps:
   #   - intent: summarize_sensor_data

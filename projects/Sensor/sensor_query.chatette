@@ -12,10 +12,35 @@
     [~[i need]|for] @[time][\??]
     [what [is|about]] [for?] @[time][\??]
 
+%[&activate_sensor_name_form](1000)
+    ~[i request?] ~[information] [for|of|using|from] ~[sensor] [name?] [please?] [\??]
+    [~[i request?] | interested] ~[sensor]
+    ~[i need] ~[information] ~[sensor]
+
+~[i request]
+    [&i] request
+    [&i]['d| would?] [need|want]
+    [&i]['d| would] like
+    [can you?] [give|provide|Tell] [me?]
+    can [&i] get
+
+
+
+~[information]
+  information
+  info
+  details
+  know
+
 ~[i need]
     [&i]['d| would?] [need|want]
     [&i]['d| would] like
     give [me?]
+    looking
+
+~[sensor]
+  sensor [name?]
+  metric
 
 // From AggregationMethod enum
 @[aggregation]
@@ -29,6 +54,12 @@
     compliance [score|value?]
     ~[quantile] [score|value?]
     ~[summary]
+
+@[sensor_name]
+    VER_W1_B1_GF_B_1_temp
+    VER_W1_B1_GF_A_1_rh
+    Block B Ground Floor Temperature
+    Block A Ground Floor Humidity
 
 ~[summary]
     summary

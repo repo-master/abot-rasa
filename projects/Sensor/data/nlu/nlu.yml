@@ -431,6 +431,30 @@ nlu:
     - What is the set location?
     - What location is data loading?
 
+- intent : get_sensor_name
+  examples: |
+   - [VER_W1_B1_GF_B_1_temp](sensor_name)
+   - [VER_W1_B1_GF_A_1_rh](sensor_name)
+   - [Block B Ground Floor Temperature](sensor_name)
+   - [Block A Ground Floor Humidity](sensor_name)
+
+# - intent : activate_sensor_name_form
+#   examples: |
+#   - Can i get info for sensor
+#   - i need info for sensor
+#   - i need info for sensor name
+#   - Can you provide details about a sensor?
+#   - I'm looking for information about a specific sensor.
+#   - Tell me about the sensor.
+#   - What can you tell me about the sensor?
+#   - Give me details on the sensor, please.
+#   - I want to know more about the sensor.
+#   - I'm interested in learning about a sensor.
+#   - Provide me with information regarding the sensor.
+#   - I need details about a sensor's functionality.
+
+
+
 # TODO: Time period (today's, yesterday's, etc.)
 # - intent: summarize_sensor_data
 #   examples: |

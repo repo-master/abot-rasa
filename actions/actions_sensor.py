@@ -82,6 +82,8 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
         raise ServerException("Couldn't connect to Abot backend.", e)
     except Exception as e:  # TODO: Capture specific exceptions
         raise ServerException("Something went wrong while looking up sensor data.", e)
+    
+    print(user_input)
 
     return user_input
 
@@ -324,6 +326,29 @@ class ActionShowSensorList(Action):
             dispatcher.utter_message(text=sensorlist_msg)
 
         return []
+
+class ActionGetSensor(Action):
+    def name(self):
+        return "action_search_sensor_by_name"
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        print("Runing action_search_sensor_by_name")
+        sensor_name: Optional[str] = tracker.get_slot("sensor_name")
+        print("slot sensor_name filled with ", sensor_name)
+        try:
+            sensor = await dataapi.determine_user_request_sensor(
+                sensor_name=None,  # TODO: Get from slot
+            )
+        except HTTPStatusError as exc:
+            if exc.response.is_client_error:
+                raise ClientException("Requested data does not exist.")
+        except ConnectError as e:
+            raise ServerException("Couldn't connect to Abot backend.", e)
+        except Exception as e:  # TODO: Capture specific exceptions
+            raise ServerException("Something went wrong while looking up sensor data.", e)
+        return []
+
 
 class ActionShowLocationList(Action):
     def name(self) -> Text:
