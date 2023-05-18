@@ -7,7 +7,7 @@
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Optional, Set, Text, Union
+from typing import Any, Dict, List, Optional, Set, Text, Tuple, Union
 
 from rasa_sdk import Action, FormValidationAction, Tracker
 from rasa_sdk.events import FollowupAction, SlotSet
@@ -15,15 +15,15 @@ from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.interfaces import Tracker
 from rasa_sdk.types import DomainDict
 
-from .api import ConnectError, HTTPStatusError, dataapi, statapi
-from .api.dataapi.schemas import SensorMetadata
+from .api import (ConnectError, HTTPStatusError, dataapi, integration_genesis,
+                  statapi)
+from .api.duckling import DucklingExtraction, TimeRange
+from .api.integration_genesis.schemas import SensorMetadata
 from .api.statapi.schemas import AggregationMethod
-from .api.duckling import TimeRange, DucklingExtraction
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
                      JSONCustomEncoder, ServerException,
                      action_exception_handle_graceful)
-from .language_helper import (summary_AggregationOut,
-                              user_to_aggregation_type, user_to_timeperiod)
+from .language_helper import summary_AggregationOut, user_to_timeperiod
 from .schemas import StatementContext
 
 LOG = logging.getLogger(__name__)
@@ -39,8 +39,9 @@ def update_statement_context(tracker: Tracker, events: list, data: StatementCont
     events.extend(ev)
 
 
-async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict, events: List[Dict[Text, Any]]) -> Dict:
+async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text, Any]]) -> Tuple[Dict, Dict]:
     user_input = {}
+    parsed_input = {}
 
     # We need these slots
     user_req_metric: Optional[str] = tracker.get_slot("metric")
@@ -59,34 +60,36 @@ async def parse_input_sensor_operation(dispatcher: CollectingDispatcher, tracker
     print("Got slots: Metric: %s, Location: %s, Aggregation: %s, data_time_range: %s" % (
         user_req_metric, user_req_location, user_req_agg_method, str(user_req_timeperiod)))
 
-    # Check aggregation method provided by the user
-    user_input['aggregation'] = user_to_aggregation_type(user_req_agg_method)
+    parsed_input['sensor_type'] = user_req_metric
+    parsed_input['sensor_location'] = user_req_location
 
-    user_input['timeperiod'] = await user_to_timeperiod(tracker, events)
-    if user_input['timeperiod'] is None:
+    parsed_input['timeperiod'] = await user_to_timeperiod(tracker, events)
+    if parsed_input['timeperiod'] is None:
         raise ClientException("Need to know for what time period to load the data.")
 
-    # TODO: More assumption magic needed
+    return parsed_input, user_input
 
-    # Either one can be set
+
+async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
     try:
-        user_input['sensor'] = await dataapi.determine_user_request_sensor(
-            sensor_type=user_req_metric,
+        # TODO: If sensor id is given, fetch metadata of it directly
+        # Either one can be set
+        return await integration_genesis.determine_user_request_sensor(
+            sensor_type=parsed_input['sensor_type'],
             sensor_name=None,  # TODO: Get from slot
-            location=user_req_location
+            location=parsed_input['sensor_location']
         )
     except HTTPStatusError as exc:
         if exc.response.is_client_error:
-            raise ClientException("Requested data does not exist.")
+            raise ClientException("No sensors of type {sensor_type} present.".format(
+                sensor_type=parsed_input['sensor_type']
+            ))
     except ConnectError as e:
         raise ServerException("Couldn't connect to Abot backend.", e)
     except Exception as e:  # TODO: Capture specific exceptions
         raise ServerException("Something went wrong while looking up sensor data.", e)
     
     print(user_input)
-
-    return user_input
-
 
 def exit_reject_sensor_data_incorrect(
         action_name: str,
@@ -96,7 +99,9 @@ def exit_reject_sensor_data_incorrect(
         message: str = None):
 
     if message is None:
-        message = "The sensor {user_req_metric} does not exist at location \"{user_req_location}\". Please enter proper data for the same"
+        message = "No sensors of type {user_req_metric} present%s." % (
+            ' at location \"{user_req_location}\"' if ('user_req_location' in data.keys() and data['user_req_location']) else ''
+        )
 
     dispatcher.utter_message(text=message.format(**data))
 
@@ -106,34 +111,29 @@ def exit_reject_sensor_data_incorrect(
     return events
 
 
-class ActionMetricAggregate(Action):
+class ActionSensorDataLoad(Action):
+    '''Loads sensor data with requested parameters'''
+
     def name(self):
-        return "action_metric_aggregate"
+        return "action_sensor_data_load"
 
     @action_exception_handle_graceful
     async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
-        user_input = await parse_input_sensor_operation(dispatcher, tracker, domain, events)
+        parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
 
-        requested_sensor: SensorMetadata = user_input.get('sensor')
+        requested_sensor = await search_best_matching_sensor(parsed_input)
 
-        # Could not determine the sensor to get info on (or no info provided at all)
-        if requested_sensor is None:
-            return exit_reject_sensor_data_incorrect(self.name(), dispatcher, events, user_input)
+        await dataapi.cached_loader(
+            loader = integration_genesis.get_sensor_data,
+            metadata = requested_sensor,
+            fetch_range = parsed_input['timeperiod']
+        )
+        events.append(SlotSet("data_source", "test"))
 
-        # Recover sensor id field
-        requested_sensor_id: int = requested_sensor['sensor_id']
+        return events
 
-        # Check aggregation method provided by the user
-        aggregation: Union[AggregationMethod, Set[AggregationMethod]] = user_input.get('aggregation')
-
-        # Time period of aggregation
-        requested_timeperiod: TimeRange = user_input.get('timeperiod')
-
-        # TODO: Aggregation must be done on backend. Move all this to backend with API
-
-        # Load data
-        response_data = await dataapi.get_sensor_data(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
+        # TODO: More assumption magic needed
 
         # TODO: Run checks on above
         # TODO: Save data into context memory
@@ -219,19 +219,8 @@ class ActionFetchReport(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
-        user_input = await parse_input_sensor_operation(dispatcher, tracker, domain, events)
-
-        requested_sensor: SensorMetadata = user_input.get('sensor')
-
-        # Could not determine the sensor to get info on (or no info provided at all)
-        if requested_sensor is None:
-            return exit_reject_sensor_data_incorrect(
-                self.name(),
-                dispatcher,
-                events,
-                user_input,
-                message="Unable to generate the report. Sensor information isn't provided."
-            )
+        parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
+        requested_sensor = await search_best_matching_sensor(parsed_input)
 
         # Recover sensor id field
         requested_sensor_id: int = requested_sensor['sensor_id']
@@ -241,16 +230,14 @@ class ActionFetchReport(Action):
 
         # URI or Data URI of preview image
         try:
-            report_data: dict = await dataapi.get_report_generate_preview(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
+            report_data: dict = await integration_genesis.get_report_generate_preview(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
 
             report_url: str = report_data['interactive_report_route']
             preview_image_url: str = report_data['preview_image']
 
             # "Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report."
             dispatcher.utter_message(
-                text="Okay, here is the report plot.".format(
-                    report_url=report_url
-                ),
+                text="Okay, here is the report plot.",
                 image=preview_image_url
             )
             events.append(FollowupAction("utter_did_that_help"))
@@ -308,7 +295,7 @@ class ActionShowSensorList(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         try:
-            sensors = await dataapi.query_sensor_list()
+            sensors = await integration_genesis.query_sensor_list()
         except ConnectError as e:
             raise ServerException("Couldn't connect to Abot backend.", e)
 
@@ -318,8 +305,8 @@ class ActionShowSensorList(Action):
             dispatcher.utter_message(text="I found %d sensor(s) :" % len(sensors))
             sensorlist_msg: str = ""
             for sensor in sensors:
-                sensor_name = dataapi.sensor_name_coalesce(sensor)
-                sensor_location = dataapi.unit_name_coalesce(sensor["sensor_location"])
+                sensor_name = integration_genesis.sensor_name_coalesce(sensor)
+                sensor_location = integration_genesis.unit_name_coalesce(sensor["sensor_location"])
                 sensor_type = sensor["sensor_type"]
                 display_unit = sensor["display_unit"]
                 sensorlist_msg += f"- {sensor_name} [measures {sensor_type} ({display_unit})] at {sensor_location}\n"

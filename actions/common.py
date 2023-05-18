@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, List
 import pandas as pd
 from rasa_sdk import Tracker
 from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.events import ActionExecutionRejected
 from rasa_sdk.types import DomainDict
 
 LOG = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker
             dispatcher.utter_message(str(exc))
             if exc.tb:
                 LOG.exception("%s was generated:", str(type(exc)), exc_info=exc)
-            return []
+            return [ActionExecutionRejected(tracker.latest_action_name)]
         # Add any specific exceptions here to send response to that need a different response.
         except Exception as exc:
             LOG.exception("Unhandled exception:", exc_info=exc)
