@@ -69,6 +69,8 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text,
 
     return parsed_input, user_input
 
+async def reset_slot(slot_name, value, events: list ):
+    events.append(SlotSet(slot_name, value))
 
 async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
     try:
@@ -76,7 +78,6 @@ async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
         # Either one can be set
         return await integration_genesis.determine_user_request_sensor(
             sensor_type=parsed_input['sensor_type'],
-            sensor_name=None,  # TODO: Get from slot
             location=parsed_input['sensor_location']
         )
     except HTTPStatusError as exc:
@@ -121,6 +122,14 @@ class ActionSensorDataLoad(Action):
         parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
 
         requested_sensor = await search_best_matching_sensor(parsed_input)
+
+        print(requested_sensor)
+
+        reset_slot(slot_name="metric",value=requested_sensor["sensor_type"])        
+        reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'])        
+        reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'])        
+
+
 
         await dataapi.cached_loader(
             loader = integration_genesis.get_sensor_data,
@@ -219,6 +228,12 @@ class ActionFetchReport(Action):
         events: List[Dict[str, Any]] = []
         parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
         requested_sensor = await search_best_matching_sensor(parsed_input)
+
+        print(requested_sensor)
+        
+        reset_slot(slot_name="metric",value=requested_sensor["sensor_type"])        
+        reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'])        
+        reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'])        
 
         # Recover sensor id field
         requested_sensor_id: int = requested_sensor['sensor_id']
@@ -322,9 +337,12 @@ class ActionGetSensor(Action):
         sensor_name: Optional[str] = tracker.get_slot("sensor_name")
         print("slot sensor_name filled with ", sensor_name)
         try:
-            sensor = await dataapi.determine_user_request_sensor(
-                sensor_name=None,  # TODO: Get from slot
+            sensor = await integration_genesis.determine_user_request_sensor(
+                sensor_name=sensor_name,  # TODO: Get from slot
             )
+            reset_slot(slot_name="metric",value=sensor["sensor_type"])
+            reset_slot(slot_name="location",value=sensor["sensor_location"]['unit_alias'])
+            dispatcher.utter_message(text=f"found sensor as to be : {sensor}")
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException("Requested data does not exist.")
