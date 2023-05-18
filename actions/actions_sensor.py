@@ -88,8 +88,6 @@ async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
         raise ServerException("Couldn't connect to Abot backend.", e)
     except Exception as e:  # TODO: Capture specific exceptions
         raise ServerException("Something went wrong while looking up sensor data.", e)
-    
-    print(user_input)
 
 def exit_reject_sensor_data_incorrect(
         action_name: str,
