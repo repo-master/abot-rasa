@@ -10,6 +10,11 @@
     [~[i need]|for] @[time][\??]
     [what [is|about]] [for?] @[time][\??]
 
+%[&activate_sensor_name_form](1000)
+    ~[i request?] ~[information] [for|of|using|from] ~[sensor] [name?] [please?] [\??]
+    [~[i request?] | interested] ~[sensor]
+    ~[i need] ~[information] ~[sensor]
+
 
 |sensor_type_slots.chatette
 |../../../Common/general.chatette

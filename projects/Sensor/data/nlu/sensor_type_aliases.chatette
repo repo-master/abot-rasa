@@ -11,3 +11,7 @@
     humid
     rh
     relative humidity
+
+~[sensor]
+  sensor [name?]
+  metric

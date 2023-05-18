@@ -3,4 +3,10 @@
     ~[temperature]
     ~[humidity]
 
+@[sensor_name]
+    VER_W1_B1_GF_B_1_temp
+    VER_W1_B1_GF_A_1_rh
+    Block B Ground Floor Temperature
+    Block A Ground Floor Humidity
+
 |sensor_type_aliases.chatette

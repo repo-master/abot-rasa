@@ -3,6 +3,20 @@
     [&i]['d| would?] [need|want]
     [&i]['d| would] like
     give [me?]
+    looking
+
+~[i request]
+    [&i] request
+    [&i]['d| would?] [need|want]
+    [&i]['d| would] like
+    [can you?] [give|provide|Tell] [me?]
+    can [&i] get
+
+~[information]
+  information
+  info
+  details
+  know
 
 ~[num]
     [~[nb$1]|~[nb$one]]
