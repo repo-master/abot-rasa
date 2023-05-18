@@ -1,0 +1,75 @@
+version: "3.1"
+
+nlu:
+- synonym: temperature
+  examples: |
+    - temp
+    - temps
+    - cold
+    - hot
+- synonym: humidity
+  examples: |
+    - humid
+    - rh
+    - RH
+    - relative humidity
+- synonym: maximum
+  examples: |
+    - max
+    - maximum
+    - highest
+    - greatest
+    - largest
+    - extreme high
+- synonym : std_dev
+  examples: |
+    - standard dev
+    - std_dev
+    - standard deviation
+    - SD
+    - sigma
+    - root mean square error
+    - RMSE
+    - deviation
+- synonym: minimum
+  examples: |
+    - least
+    - lowest
+    - min
+    - minimum
+    - extreme low
+- synonym: summary
+  examples: |
+    - sum
+    - summary
+    - summarize
+    - stats
+    - statistic
+    - faring
+    - brief me about
+- synonym: average
+  examples: |
+    - avg
+    - mean
+    - average
+- synonym: median
+  examples: |
+    - middle value
+    - central value
+    - median value
+    - 50th percentile
+    - second quartile
+    - midpoint
+    - center
+    - balance point
+    - median
+    - average value
+    - average score
+- synonym: quantile
+  examples: |
+    - percentile
+    - quartile
+    - proportion
+    - centile
+    - percentile score
+    - quartile score
