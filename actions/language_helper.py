@@ -10,7 +10,6 @@ from actions.common import ActionFailedException
 
 
 def user_to_aggregation_type(name: Optional[Union[str, List[str]]]) -> Union[AggregationMethod, Set[AggregationMethod]]:
-    # TODO: Implement multiple aggregations (and "all", "summary")
     aggregation = AggregationMethod.RECENT
 
     if name is not None:

@@ -148,3 +148,4 @@ models/
 .rasa/
 *.dot
 results/
+projects/Sensor/data/nlu/output/train

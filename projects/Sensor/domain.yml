@@ -93,7 +93,7 @@ forms:
     - sensor_name
 
 actions:
-- action_metric_aggregate
+- action_sensor_data_load
 - action_metric_summarize
 - action_fetch_report
 - action_show_sensor_list

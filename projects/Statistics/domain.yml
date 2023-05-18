@@ -1,6 +1,7 @@
 version: '3.1'
 
 intents:
+- intent_perform_aggregation
 - ask_followup_summary_details
 - ask_for_max_outlier
 - ask_for_min_outlier
@@ -20,6 +21,18 @@ slots:
     - type: from_entity
       entity: number
 
+  data_loader:
+    type: any
+    mappings:
+    - type: custom
+
+  # Current data source to use
+  data_source:
+    type: text
+    mappings:
+    - type: custom
+
 actions:
+- action_aggregation
 - action_describe_event_details
 - action_describe_outlier_count

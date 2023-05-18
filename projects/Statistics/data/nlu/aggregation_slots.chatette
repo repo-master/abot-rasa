@@ -1,0 +1,15 @@
+
+// From AggregationMethod enum
+@[aggregation]
+    ~[recent] [value?]
+    ~[average] [score|value?]
+    median [score|value?]
+    ~[minimum] [score|value?]
+    ~[maximum] [score|value?]
+    ~[std_dev] [score|value?]
+    ~[count]
+    compliance [score|value?]
+    ~[quantile] [score|value?]
+    ~[summary]
+
+|aggregation_aliases.chatette

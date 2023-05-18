@@ -1,0 +1,52 @@
+
+~[summary]
+    summary
+    summarize[d?]
+    stat[s?]
+    statistic[s?]
+    faring
+    brief [info|stats?]
+    [all?] info[rmation?]
+
+~[recent]
+    [most?] recent
+    current
+    recent
+    latest
+    last
+    up to date
+    up-to-date
+    right now
+
+~[minimum]
+    minimum
+    min
+    lowest
+
+~[maximum]
+    maximum
+    max
+    highest
+    greatest
+
+~[std_dev]
+    stdev
+    standard deviation
+    sd
+    sdev
+    deviation
+
+~[count]
+    count
+    [count?] [the?] number of
+
+~[average]
+    average
+    mean
+    avg
+
+~[quantile]
+    quantile
+    [per?]centile
+    quartile
+    proportion[al?]
