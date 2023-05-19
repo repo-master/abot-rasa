@@ -257,8 +257,8 @@ class ActionFetchReport(Action):
                 message['custom'] = interactive_plot
 
             dispatcher.utter_message(**message)
-
-            events.append(FollowupAction("utter_did_that_help"))
+            dispatcher.utter_message(response="utter_did_that_help")
+            #events.append(FollowupAction("utter_did_that_help"))
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException(
