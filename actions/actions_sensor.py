@@ -251,10 +251,11 @@ class ActionFetchReport(Action):
             # "Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report."
             message = dict()
             message['text'] = "Okay, here is the report plot."
+            message['custom'] = {}
             if preview_image_url:
                 message['image'] = preview_image_url
             if interactive_plot:
-                message['custom'] = interactive_plot
+                message['custom']['chart'] = interactive_plot
 
             dispatcher.utter_message(**message)
             dispatcher.utter_message(response="utter_did_that_help")
