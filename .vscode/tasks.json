@@ -4,13 +4,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Train Rasa model",
+      "label": "Train Rasa model (Dev)",
       "type": "shell",
       "command": "${command:python.interpreterPath}",
       "args": [
         "-m",
         "rasa",
-        "train"
+        "train",
+        "--fixed-model-name",
+        "dev-model.tar.gz"
       ],
       "presentation": {
         "echo": true,
