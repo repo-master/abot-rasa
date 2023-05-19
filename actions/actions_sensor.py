@@ -254,7 +254,7 @@ class ActionFetchReport(Action):
             if preview_image_url:
                 message['image'] = preview_image_url
             if interactive_plot:
-                message['chart'] = interactive_plot
+                message['custom'] = interactive_plot
 
             dispatcher.utter_message(**message)
 
