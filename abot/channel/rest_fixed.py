@@ -8,11 +8,6 @@ from rasa.core.channels.rest import QueueOutputChannel, RestInput
 
 class RestInputFixed(RestInput):
     # Override
-    @classmethod
-    def name(cls) -> str:
-        return "rest_fixed"
-
-    # Override
     @staticmethod
     async def on_message_wrapper(
         on_new_message: Callable[[UserMessage], Awaitable[Any]],
