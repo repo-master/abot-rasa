@@ -1,20 +1,30 @@
-%[&query_metric_aggregate](1000)
+%[&query_metric_aggregate](300)
+    @[metric_type][\??]
     [~[i need?]|what [is|about]?] [the?] @[metric_type] [[at|in] [location?] @[location]?][\??]
     [~[i need?]|what [is|about]?] [the?] @[location?] @[metric_type][\??]
     [~[i need?]|what [is|about]?] [the?] @[metric_type] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|at] ~[pre_time?] @[time?] [[at|in] [location?] @[location]?][\??] 
     [~[i need?]|what [is|about|are]?] [the?] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|of] @[metric_type] [[at|in] [location?] @[location]?] [for|at] ~[pre_time?] @[time?][\??]
     [~[i need?]|what [is|about|are]?] [@[time]['s?]?] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|of] @[metric_type] [[at|in] [location?] @[location]?][\??]
 
-%[&change_source](1000)
+%[&change_source](300)
     [[~[i need]|for]|what [is|about]?] [the?] @[metric_type][\??]
     [~[i need]|for] @[time][\??]
     [what [is|about]] [for?] @[time][\??]
 
-%[&activate_sensor_name_form](1000)
+%[&activate_sensor_name_form](200)
     ~[i request?] ~[information] [for|of|using|from] ~[sensor] [name?] [please?] [\??]
     [~[i request?] | interested] ~[sensor]
     ~[i need] ~[information] ~[sensor]
 
+%[&sensor_generate_report](500)
+    [~[i need]|~[i request]?] [[a|the]?] [report|chart|plot] [graph?] [[on|for?] ~[sensor]?][\??]
+    [~[i need]|~[i request]?] [[a|the]?] [report|chart|plot] [[on|for?] @[metric_type]?][\??]
+    [~[i need]|~[i request]?] [[a|the]?] @[metric_type] [report|chart|plot][\??]
+    [~[i need]|~[i request]?] [[a|the]?] ~[sensor] [report|chart|plot][\??]
+    ~[sensor] [report|chart|plot]
+    @[metric_type] [report|chart|plot]
+    [report|chart|plot] [on|for] [this|that][\??]
+    [report|chart|plot|graph]
 
 |sensor_type_slots.chatette
 |../../../Common/general.chatette

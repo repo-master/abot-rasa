@@ -1,33 +1,6 @@
 version: "3.1"
 
 nlu:
-# - intent: change_location
-#   examples: |
-#     - The [outside](location) value.
-#     - The [unit 1](location).
-#     - [my](location) location.
-#     - [my](location) present location.
-#     - The [indoor](location).
-#     - I wanted to know about the [unit 9](location)
-#     - Actually I asked for [basement](location).
-#     - [Outdoor](location) reading?
-#     - How about in the [basement](location)?
-#     - What about [outside](location)?
-#     - And the [unit 1](location)?
-#     - also at [unit 2](location)?
-
-
-- intent : get_report
-  examples: |
-    - Give me Report
-    - can i Have report of this?
-    - Generate a Report out of this
-    - Give a report on [door](metric_type) status.
-    - [temperature](metric_type) metric's report
-    - [humidity](metric_type) metric's report
-    - Plot graph of [temperature](metric_type) metric
-    - Plot graph of [humidity](metric_type) metric
-
 - intent: query_sensor_list
   examples: |
     - Which sensors are available?
@@ -154,30 +127,6 @@ nlu:
     - Location of data
     - What is the set location?
     - What location is data loading?
-
-- intent : get_sensor_name
-  examples: |
-   - [VER_W1_B1_GF_B_1_temp](sensor_name)
-   - [VER_W1_B1_GF_A_1_rh](sensor_name)
-   - [Block B Ground Floor Temperature](sensor_name)
-   - [Block A Ground Floor Humidity](sensor_name)
-
-# - intent : activate_sensor_name_form
-#   examples: |
-#   - Can i get info for sensor
-#   - i need info for sensor
-#   - i need info for sensor name
-#   - Can you provide details about a sensor?
-#   - I'm looking for information about a specific sensor.
-#   - Tell me about the sensor.
-#   - What can you tell me about the sensor?
-#   - Give me details on the sensor, please.
-#   - I want to know more about the sensor.
-#   - I'm interested in learning about a sensor.
-#   - Provide me with information regarding the sensor.
-#   - I need details about a sensor's functionality.
-
-
 
 # TODO: Time period (today's, yesterday's, etc.)
 # - intent: summarize_sensor_data

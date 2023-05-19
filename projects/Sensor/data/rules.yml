@@ -36,3 +36,8 @@ rules:
   - intent: change_source
   - action: action_sensor_data_load
   - action: action_aggregation
+
+- rule : report fetching
+  steps:
+  - intent : sensor_generate_report
+  - action : action_fetch_report
