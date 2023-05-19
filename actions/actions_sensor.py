@@ -131,13 +131,13 @@ class ActionSensorDataLoad(Action):
         events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
 
 
-
         await dataapi.cached_loader(
+            'sensor',
             loader = integration_genesis.get_sensor_data,
             metadata = requested_sensor,
             fetch_range = parsed_input['timeperiod']
         )
-        events.append(SlotSet("data_source", "test"))
+        events.append(SlotSet("data_source", 'sensor'))
 
         return events
 
@@ -239,20 +239,25 @@ class ActionFetchReport(Action):
         requested_sensor_id: int = requested_sensor['sensor_id']
 
         # Time period of aggregation
-        requested_timeperiod: TimeRange = user_input.get('timeperiod')
+        requested_timeperiod: TimeRange = parsed_input.get('timeperiod')
 
         # URI or Data URI of preview image
         try:
             report_data: dict = await integration_genesis.get_report_generate_preview(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
 
-            report_url: str = report_data['interactive_report_route']
-            preview_image_url: str = report_data['preview_image']
+            preview_image_url: Optional[str] = report_data.get('preview_image')
+            interactive_plot: Optional[dict] = report_data.get('plot_interactive')
 
             # "Okay, here is the report plot. You can click [here]({report_url}) to view the interactive report."
-            dispatcher.utter_message(
-                text="Okay, here is the report plot.",
-                image=preview_image_url
-            )
+            message = dict()
+            message['text'] = "Okay, here is the report plot."
+            if preview_image_url:
+                message['image'] = preview_image_url
+            if interactive_plot:
+                message['chart'] = interactive_plot
+
+            dispatcher.utter_message(**message)
+
             events.append(FollowupAction("utter_did_that_help"))
         except HTTPStatusError as exc:
             if exc.response.is_client_error:

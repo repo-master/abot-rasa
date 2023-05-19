@@ -11,7 +11,6 @@ from .sensor_data import mkrequest_fetch_sensor_data
 async def get_sensor_data(
         metadata,
         fetch_range) -> Optional[Tuple[pd.DataFrame, SensorMetadata]]:
-    # await mkrequest_fetch_sensor_data(requested_sensor_id, timestamp_from, timestamp_to)
     sensor_data: SensorDataResponse = await request_json(mkrequest_fetch_sensor_data(metadata, fetch_range))
 
     if not ('data' in sensor_data and 'metadata' in sensor_data):
