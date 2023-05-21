@@ -36,9 +36,9 @@ pipeline:
     max_ngram: 4
 
   # Maybe another time
-  # - name: LanguageModelFeaturizer
-  #   model_name: gpt2
-  #   model_weights: gpt2
+  - name: LanguageModelFeaturizer
+    model_name: gpt2
+    model_weights: gpt2
 
   - name: DIETClassifier
     epochs: 100

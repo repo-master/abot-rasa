@@ -37,7 +37,12 @@ rules:
   - action: action_sensor_data_load
   - action: action_aggregation
 
-- rule : report fetching
+- rule: report fetching
   steps:
   - intent : sensor_generate_report
   - action : action_fetch_report
+
+- rule: Sensor status enquiry
+  steps:
+  - intent: sensor_status
+  - action: utter_unable

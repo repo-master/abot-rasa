@@ -7,6 +7,7 @@ intents:
 #     use_entities:
 #     - metric_type
 - sensor_generate_report
+- sensor_status
 - query_sensor_list
 - query_location_list
 - query_value_of_data_timerange

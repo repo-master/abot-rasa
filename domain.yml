@@ -20,6 +20,8 @@ responses:
   - text: I am sorry about the previous response. Can you please clarify what was required?
   - text: I am very sorry about the response
   - text: I apologise for the previous response. Please let me know what you wanted?
+  utter_unable:
+  - text: Sorry, I am unable to complete this request.
 
 session_config:
   session_expiration_time: 60
