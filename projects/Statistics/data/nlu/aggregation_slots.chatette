@@ -9,7 +9,16 @@
     ~[std_dev] [score|value?]
     ~[count]
     compliance [score|value?]
+    compliance [score|value?] ~[versus] @[number]
     ~[quantile] [score|value?]
     ~[summary]
+
+@[number]
+    25
+    22.5
+    99.4
+    50
+    32
+    28
 
 |aggregation_aliases.chatette

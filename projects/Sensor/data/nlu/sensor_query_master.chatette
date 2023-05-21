@@ -1,4 +1,4 @@
-%[&query_metric_aggregate](300)
+%[&query_metric_aggregate](200)
     @[metric_type][\??]
     [~[i need?]|what [is|about]?] [the?] @[metric_type] [[at|in] [location?] @[location]?][\??]
     [~[i need?]|what [is|about]?] [the?] @[location?] @[metric_type][\??]
@@ -6,17 +6,22 @@
     [~[i need?]|what [is|about|are]?] [the?] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|of?] @[metric_type] [[at|in] [location?] @[location]?] [for|at?] ~[pre_time?] @[time?][\??]
     [~[i need?]|what [is|about|are]?] [@[time]['s?]?] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|of?] @[metric_type] [[at|in] [location?] @[location]?][\??]
 
-%[&change_source](300)
+%[&change_source](200)
     [[~[i need]|for]|what [is|about]?] [the?] @[metric_type][\??]
     [~[i need]|for] @[time][\??]
     [what [is|about]] [for?] @[time][\??]
+
+%[&sensor_status](200)
+    [[~[i need]|for]|what [is|about]?] [the?] @[metric_type] [status|~[information]][\??]
+    how is the @[metric_type?] ~[sensor] [faring|performing|doing]?
+    [status|~[information]]
 
 %[&activate_sensor_name_form](200)
     ~[i request?] ~[information] [for|of|using|from] ~[sensor] [name?] [please?] [\??]
     [~[i request?] | interested] ~[sensor]
     ~[i need] ~[information] ~[sensor]
 
-%[&sensor_generate_report](500)
+%[&sensor_generate_report](200)
     [~[i need]|~[i request]?] [[a|the]?] [report|chart|plot] [graph?] [[on|for?] ~[sensor]?][\??]
     [~[i need]|~[i request]?] [[a|the]?] [report|chart|plot] [[on|for?] @[metric_type]?][\??]
     [~[i need]|~[i request]?] [[a|the]?] @[metric_type] [report|chart|plot][\??]
