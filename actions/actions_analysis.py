@@ -10,6 +10,7 @@ from rasa_sdk.types import DomainDict
 
 from .api import statapi
 from .api.dataapi import get_loaded_data
+from .api.cache import PandasDataCache
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
                      action_exception_handle_graceful)
 from .insights import describe_all_data_insights
@@ -30,22 +31,18 @@ class ActionAggregation(Action):
         aggregation = user_to_aggregation_type(user_req_agg_method)
 
         # TODO: Needs overhaul, this was done in a rush
-        data_raw = await get_loaded_data(tracker)
+        data_raw: PandasDataCache = await get_loaded_data(tracker)
         if data_raw is None:
             raise ClientException("No data is loaded to perform %s aggregation.\nTry loading sensor data." %
                                   aggregation.value, print_traceback=False)
-
-        if data_raw['content'] is None:
-            dispatcher.utter_message("Sorry, data isn't available.")
+        data_df: pd.DataFrame = data_raw.df
+        data_meta: dict = data_raw.metadata
+        if data_df.empty:
+            dispatcher.utter_message("Sorry, data isn't available for the time range.")
         else:
-            data_df: pd.DataFrame = data_raw['content']['data']
-            data_meta = data_raw['content']['metadata']
-            if data_df.empty:
-                dispatcher.utter_message("Sorry, data isn't available for the time range.")
-            else:
-                aggregated_result = await statapi.aggregation(data_df, aggregation)
-                agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=data_meta["display_unit"])
-                dispatcher.utter_message(agg_response_text)
+            aggregated_result = await statapi.aggregation(data_df, aggregation)
+            agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=data_meta.get("display_unit", ''))
+            dispatcher.utter_message(agg_response_text)
 
         return events
 

@@ -133,6 +133,7 @@ class ActionSensorDataLoad(Action):
         reset_slot(slot_name="sensor_name", value=requested_sensor['sensor_name'], events=events)
 
         await dataapi.cached_loader(
+            tracker,
             'sensor',
             loader=integration_genesis.get_sensor_data,
             metadata=requested_sensor,
@@ -248,8 +249,8 @@ class ActionFetchReport(Action):
                 raise ClientException(
                     "Sorry, sensor data not selected. Try specifying sensor and time range.",
                     print_traceback=False)
-            sensor_metadata: SensorMetadata = sensor_selected['input']['metadata']
-            sensor_data_select_range: TimeRange = sensor_selected['input']['fetch_range']
+            sensor_metadata: SensorMetadata = sensor_selected._loader_params['metadata']
+            sensor_data_select_range: TimeRange = sensor_selected._loader_params['fetch_range']
             report_data: dict = await integration_genesis.get_report_generate_preview(sensor_metadata, sensor_data_select_range)
 
             preview_image_url: Optional[str] = report_data.get('preview_image')

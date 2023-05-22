@@ -8,7 +8,7 @@
     ~[maximum] = maximum
     ~[std_dev] = std_dev
     ~[count] = count
-    compliance
+    ~[compliance] = compliance
     ~[quantile] = quantile
     ~[summary] = summary
 
