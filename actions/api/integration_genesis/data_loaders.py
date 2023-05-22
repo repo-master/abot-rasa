@@ -1,5 +1,5 @@
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Any, Optional
 
 import pandas as pd
 
@@ -10,7 +10,7 @@ from .sensor_data import mkrequest_fetch_sensor_data
 
 async def get_sensor_data(
         metadata,
-        fetch_range) -> Optional[Tuple[pd.DataFrame, SensorMetadata]]:
+        fetch_range) -> Optional[Dict[str, Any]]:
     sensor_data: SensorDataResponse = await request_json(mkrequest_fetch_sensor_data(metadata, fetch_range))
 
     if not ('data' in sensor_data and 'metadata' in sensor_data):
@@ -33,7 +33,10 @@ async def get_sensor_data(
         # Concatenate the data value columns to original df, remove the 'value' column from original
         data = pd.concat([data.drop(['value'], axis=1), data_value_series], axis=1)
 
-    return data, sensor_metadata
+    return {
+        'data': data,
+        'metadata': sensor_metadata
+    }
 
 __all__ = [
     'get_sensor_data'

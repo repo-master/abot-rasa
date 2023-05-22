@@ -10,7 +10,7 @@ import logging
 from typing import Any, Dict, List, Optional, Set, Text, Tuple, Union
 
 from rasa_sdk import Action, FormValidationAction, Tracker
-from rasa_sdk.events import FollowupAction, SlotSet
+from rasa_sdk.events import SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.interfaces import Tracker
 from rasa_sdk.types import DomainDict
@@ -19,7 +19,6 @@ from .api import (ConnectError, HTTPStatusError, dataapi, integration_genesis,
                   statapi)
 from .api.duckling import DucklingExtraction, TimeRange
 from .api.integration_genesis.schemas import SensorMetadata
-from .api.statapi.schemas import AggregationMethod
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
                      JSONCustomEncoder, ServerException,
                      action_exception_handle_graceful)
@@ -72,6 +71,9 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text,
 async def reset_slot(slot_name, value, events: list ):
     events.append(SlotSet(slot_name, value))
     return events
+
+def reset_slot(slot_name, value, events: list):
+    events.append(SlotSet(slot_name, value))
 
 async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
     try:
@@ -126,9 +128,9 @@ class ActionSensorDataLoad(Action):
 
         print(requested_sensor)
 
-        events = await reset_slot(slot_name="metric",value=requested_sensor["sensor_type"], events=events)        
-        events = await reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)        
-        events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
+        reset_slot(slot_name="metric",value=requested_sensor["sensor_type"], events=events)        
+        reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)        
+        reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
 
 
         await dataapi.cached_loader(
@@ -227,23 +229,28 @@ class ActionFetchReport(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
-        parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
-        requested_sensor = await search_best_matching_sensor(parsed_input)
+        #parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
+        #requested_sensor = await search_best_matching_sensor(parsed_input)
 
-
-        events = await reset_slot(slot_name="metric",value=requested_sensor["sensor_type"] , events=events)        
-        events = await reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)        
-        events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
+        #events = await reset_slot(slot_name="metric",value=requested_sensor["sensor_type"] , events=events)        
+        #events = await reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)        
+        #events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
 
         # Recover sensor id field
-        requested_sensor_id: int = requested_sensor['sensor_id']
+        #requested_sensor_id: int = requested_sensor['sensor_id']
 
         # Time period of aggregation
-        requested_timeperiod: TimeRange = parsed_input.get('timeperiod')
+        #requested_timeperiod: TimeRange = parsed_input.get('timeperiod')
 
         # URI or Data URI of preview image
         try:
-            report_data: dict = await integration_genesis.get_report_generate_preview(requested_sensor_id, requested_timeperiod["from"], requested_timeperiod["to"])
+            sensor_selected = dataapi.get_cache("sensor")
+            if sensor_selected is None:
+                raise ClientException(
+                    "Sorry, sensor data not selected. Try specifying sensor and time range.")
+            sensor_metadata: SensorMetadata = sensor_selected['metadata']
+            sensor_data_select_range: TimeRange = sensor_selected['fetch_range']
+            report_data: dict = await integration_genesis.get_report_generate_preview(sensor_metadata, sensor_data_select_range)
 
             preview_image_url: Optional[str] = report_data.get('preview_image')
             interactive_plot: Optional[dict] = report_data.get('plot_interactive')
@@ -259,7 +266,6 @@ class ActionFetchReport(Action):
 
             dispatcher.utter_message(**message)
             dispatcher.utter_message(response="utter_did_that_help")
-            #events.append(FollowupAction("utter_did_that_help"))
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException(

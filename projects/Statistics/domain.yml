@@ -21,6 +21,23 @@ slots:
     - type: from_entity
       entity: number
 
+  compliance_bound_lower:
+    type: float
+    mappings:
+    - type: from_entity
+      entity: number
+      role: lower
+    - type: from_entity
+      entity: number
+  compliance_bound_upper:
+    type: float
+    mappings:
+    - type: from_entity
+      entity: number
+      role: upper
+    - type: from_entity
+      entity: number
+
   data_loader:
     type: any
     mappings:

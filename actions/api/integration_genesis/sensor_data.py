@@ -1,7 +1,8 @@
 
 import json
-from datetime import datetime
 from typing import List, Optional
+
+from ..duckling import TimeRange
 
 from ..client import Client
 from .schemas import SensorMetadata, UnitMetadata
@@ -40,16 +41,14 @@ async def determine_user_request_sensor(sensor_type=None, sensor_name=None, loca
             pass
 
 
-async def get_report_generate_preview(requested_sensor_id: int,
-                                      timestamp_from: Optional[datetime] = None,
-                                      timestamp_to: Optional[datetime] = None):
+async def get_report_generate_preview(metadata: SensorMetadata, fetch_range: TimeRange):
     async with Client() as client:
         params = {}
 
         params.update({
-            'sensor_id': requested_sensor_id,
-            'timestamp_from': timestamp_from,
-            'timestamp_to': timestamp_to,
+            'sensor_id': metadata['sensor_id'],
+            'timestamp_from': fetch_range["from"],
+            'timestamp_to': fetch_range["to"],
             'preview_image': True,
             'plot_interactive': True
         })
@@ -69,7 +68,7 @@ def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
         return 'em'
 
 
-def mkrequest_fetch_sensor_data(metadata, fetch_range) -> DataLoaderRequest:
+def mkrequest_fetch_sensor_data(metadata: SensorMetadata, fetch_range: TimeRange) -> DataLoaderRequest:
     params = {
         'sensor_id': metadata["sensor_id"],
         'timestamp_from': fetch_range["from"],

@@ -21,12 +21,12 @@
     [~[i request?] | interested] ~[sensor]
     ~[i need] ~[information] ~[sensor]
 
-%[&sensor_generate_report](200)
+%[&sensor_generate_report](300)
     [~[i need]|~[i request]?] [[a|the]?] [report|chart|plot] [graph?] [[on|for?] ~[sensor]?][\??]
     [~[i need]|~[i request]?] [[a|the]?] [report|chart|plot] [[on|for?] @[metric_type]?][\??]
     [~[i need]|~[i request]?] [[a|the]?] @[metric_type] [report|chart|plot][\??]
     [~[i need]|~[i request]?] [[a|the]?] ~[sensor] [report|chart|plot][\??]
-    ~[sensor] [report|chart|plot]
+    ~[sensor] [report|chart|plot] [for|at?] ~[pre_time?] @[time?]
     @[metric_type] [report|chart|plot]
     [report|chart|plot] [on|for] [this|that][\??]
     [report|chart|plot|graph]

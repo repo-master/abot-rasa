@@ -29,6 +29,7 @@ class ActionAggregation(Action):
         # Check aggregation method provided by the user
         aggregation = user_to_aggregation_type(user_req_agg_method)
 
+        # TODO: Needs overhaul, this was done in a rush
         data_raw = await get_loaded_data(tracker)
         if data_raw is None:
             raise ClientException("No data is loaded to perform %s aggregation.\nTry loading sensor data." % aggregation.value, print_traceback=False)
@@ -36,7 +37,8 @@ class ActionAggregation(Action):
         if data_raw['content'] is None:
             dispatcher.utter_message("Sorry, data isn't available.")
         else:
-            data_df, data_meta = data_raw['content']
+            data_df: pd.DataFrame = data_raw['content']['data']
+            data_meta = data_raw['content']['metadata']
             if data_df.empty:
                 dispatcher.utter_message("Sorry, data isn't available for the time range.")
             else:
