@@ -68,12 +68,10 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text,
 
     return parsed_input, user_input
 
-async def reset_slot(slot_name, value, events: list ):
-    events.append(SlotSet(slot_name, value))
-    return events
 
 def reset_slot(slot_name, value, events: list):
     events.append(SlotSet(slot_name, value))
+
 
 async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
     try:
@@ -87,11 +85,12 @@ async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
         if exc.response.is_client_error:
             raise ClientException("No sensors of type {sensor_type} present.".format(
                 sensor_type=parsed_input['sensor_type']
-            ))
+            ), print_traceback=False)
     except ConnectError as e:
         raise ServerException("Couldn't connect to Abot backend.", e)
     except Exception as e:  # TODO: Capture specific exceptions
         raise ServerException("Something went wrong while looking up sensor data.", e)
+
 
 def exit_reject_sensor_data_incorrect(
         action_name: str,
@@ -102,7 +101,8 @@ def exit_reject_sensor_data_incorrect(
 
     if message is None:
         message = "No sensors of type {user_req_metric} present%s." % (
-            ' at location \"{user_req_location}\"' if ('user_req_location' in data.keys() and data['user_req_location']) else ''
+            ' at location \"{user_req_location}\"' if (
+                'user_req_location' in data.keys() and data['user_req_location']) else ''
         )
 
     dispatcher.utter_message(text=message.format(**data))
@@ -128,16 +128,15 @@ class ActionSensorDataLoad(Action):
 
         print(requested_sensor)
 
-        reset_slot(slot_name="metric",value=requested_sensor["sensor_type"], events=events)        
-        reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)        
-        reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
-
+        reset_slot(slot_name="metric", value=requested_sensor["sensor_type"], events=events)
+        reset_slot(slot_name="location", value=requested_sensor["sensor_location"]['unit_alias'], events=events)
+        reset_slot(slot_name="sensor_name", value=requested_sensor['sensor_name'], events=events)
 
         await dataapi.cached_loader(
             'sensor',
-            loader = integration_genesis.get_sensor_data,
-            metadata = requested_sensor,
-            fetch_range = parsed_input['timeperiod']
+            loader=integration_genesis.get_sensor_data,
+            metadata=requested_sensor,
+            fetch_range=parsed_input['timeperiod']
         )
         events.append(SlotSet("data_source", 'sensor'))
 
@@ -229,18 +228,18 @@ class ActionFetchReport(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
-        #parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
-        #requested_sensor = await search_best_matching_sensor(parsed_input)
+        # parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
+        # requested_sensor = await search_best_matching_sensor(parsed_input)
 
-        #events = await reset_slot(slot_name="metric",value=requested_sensor["sensor_type"] , events=events)        
-        #events = await reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)        
-        #events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)        
+        # events = await reset_slot(slot_name="metric",value=requested_sensor["sensor_type"] , events=events)
+        # events = await reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)
+        # events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)
 
         # Recover sensor id field
-        #requested_sensor_id: int = requested_sensor['sensor_id']
+        # requested_sensor_id: int = requested_sensor['sensor_id']
 
         # Time period of aggregation
-        #requested_timeperiod: TimeRange = parsed_input.get('timeperiod')
+        # requested_timeperiod: TimeRange = parsed_input.get('timeperiod')
 
         # URI or Data URI of preview image
         try:
@@ -340,6 +339,7 @@ class ActionShowSensorList(Action):
 
         return []
 
+
 class ActionGetSensor(Action):
     def name(self):
         return "action_search_sensor_by_name"
@@ -354,8 +354,8 @@ class ActionGetSensor(Action):
             sensor = await integration_genesis.determine_user_request_sensor(
                 sensor_name=sensor_name,  # TODO: Get from slot
             )
-            events = await reset_slot(slot_name="metric",value=sensor["sensor_type"], events=events)
-            events = await reset_slot(slot_name="location",value=sensor["sensor_location"]['unit_alias'], events=events)
+            reset_slot(slot_name="metric", value=sensor["sensor_type"], events=events)
+            reset_slot(slot_name="location", value=sensor["sensor_location"]['unit_alias'], events=events)
             dispatcher.utter_message(text=f"found sensor as to be : {sensor}")
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
@@ -364,14 +364,16 @@ class ActionGetSensor(Action):
             raise ServerException("Couldn't connect to Abot backend.", e)
         except Exception as e:  # TODO: Capture specific exceptions
             raise ServerException("Something went wrong while looking up sensor data.", e)
-        return events 
+        return events
 
 
 class ActionShowLocationList(Action):
     def name(self) -> Text:
         return "action_show_location_list"
+
     async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
         return []
+
 
 class ActionShowTimerangeValue(Action):
     def name(self) -> Text:

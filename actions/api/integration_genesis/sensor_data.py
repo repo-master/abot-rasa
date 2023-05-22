@@ -14,6 +14,7 @@ def sensor_name_coalesce(meta: SensorMetadata) -> str:
         meta.get('sensor_name') or \
         meta.get('sensor_urn')
 
+
 def unit_name_coalesce(meta: UnitMetadata) -> str:
     return meta.get('unit_alias').split(',')[0] or \
         meta.get('unit_urn')
@@ -24,6 +25,7 @@ async def query_sensor_list() -> List[SensorMetadata]:
         response = await client.get("/genesis/query/sensor/list")
         response.raise_for_status()
         return response.json()
+
 
 async def determine_user_request_sensor(sensor_type=None, sensor_name=None, location=None) -> Optional[SensorMetadata]:
     async with Client() as client:
@@ -58,6 +60,7 @@ async def get_report_generate_preview(metadata: SensorMetadata, fetch_range: Tim
 
         return response.json()
 
+
 def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
     name = name.lower() if name is not None else ''
     if name == 'temp' or name == 'temperature':
@@ -80,6 +83,7 @@ def mkrequest_fetch_sensor_data(metadata: SensorMetadata, fetch_range: TimeRange
         url='/genesis/data/sensor',
         params=params
     )
+
 
 __all__ = [
     'query_sensor_list',

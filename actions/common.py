@@ -41,10 +41,12 @@ class ServerException(Exception):
             reason="%s: %s" % (type(self.exc).__name__, str(self.exc))
         )
 
+
 class ActionFailedException(Exception):
     def __init__(self, *args, print_traceback=True, **kwargs):
         super().__init__(*args, **kwargs)
         self.tb = print_traceback
+
 
 class ClientException(ActionFailedException):
     pass
@@ -73,4 +75,3 @@ def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker
             # No events are sent since it failed
             return []
     return _wrapper_fn
-

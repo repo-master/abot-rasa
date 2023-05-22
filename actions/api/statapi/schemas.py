@@ -16,4 +16,5 @@ class AggregationMethod(str, Enum):
     QUANTILE = 'quantile'
     SUMMARY = 'summary'
 
+
 AggregationOut = Dict[AggregationMethod, Union[float, int]]

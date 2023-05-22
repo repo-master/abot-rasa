@@ -32,7 +32,8 @@ class ActionAggregation(Action):
         # TODO: Needs overhaul, this was done in a rush
         data_raw = await get_loaded_data(tracker)
         if data_raw is None:
-            raise ClientException("No data is loaded to perform %s aggregation.\nTry loading sensor data." % aggregation.value, print_traceback=False)
+            raise ClientException("No data is loaded to perform %s aggregation.\nTry loading sensor data." %
+                                  aggregation.value, print_traceback=False)
 
         if data_raw['content'] is None:
             dispatcher.utter_message("Sorry, data isn't available.")
@@ -47,6 +48,7 @@ class ActionAggregation(Action):
                 dispatcher.utter_message(agg_response_text)
 
         return events
+
 
 class ActionDescribeEventDetails(Action):
     def name(self):

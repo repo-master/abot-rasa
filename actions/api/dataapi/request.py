@@ -14,6 +14,7 @@ def update_loader_config(tracker: Tracker, options: DataLoaderRequest) -> List[D
         SlotSet("data_loader", options)
     ]
 
+
 async def request_data(tracker: Optional[Tracker] = None, options: Optional[DataLoaderRequest] = None) -> Any:
     if options is None and tracker is not None:
         options = tracker.slots.get("data_loader")

@@ -7,7 +7,8 @@ from dateutil.relativedelta import relativedelta
 from .client import DucklingClient
 
 DucklingExtraction = TypedDict("DucklingExtraction", {"body": str})
-TimeRange = TypedDict("TimeRange", {"from": pd.Timestamp, "to": pd.Timestamp, "user_time_entity": str, "user_time_grain": str})
+TimeRange = TypedDict("TimeRange", {"from": pd.Timestamp, "to": pd.Timestamp,
+                      "user_time_entity": str, "user_time_grain": str})
 
 
 GRAINS = {
@@ -21,8 +22,10 @@ GRAINS = {
     'year': relativedelta(years=1)
 }
 
+
 def extract_fromto(duckling_input: DucklingExtraction) -> Optional[TimeRange]:
-    if duckling_input.get('dim') != "time": return
+    if duckling_input.get('dim') != "time":
+        return
     is_interval = duckling_input['value'].get('type') == 'interval'
 
     val_obj = duckling_input.get('value', {})
@@ -50,6 +53,7 @@ def extract_fromto(duckling_input: DucklingExtraction) -> Optional[TimeRange]:
         "user_time_grain": grain_size,
         "user_time_entity": duckling_input.get('body')
     }
+
 
 async def parse(text: Union[str, List[str]]) -> List[DucklingExtraction]:
     async with DucklingClient() as client:

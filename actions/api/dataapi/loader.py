@@ -11,6 +11,7 @@ from typing import Type
 
 DatasetCache = CacheHolder()
 
+
 async def request_json(req: DataLoaderRequest):
     async with Client() as client:
         response = await client.request(**req)
@@ -18,6 +19,8 @@ async def request_json(req: DataLoaderRequest):
         return response.json()
 
 # TODO: User ID segregation
+
+
 async def cached_loader(dataset_name: str, cache: CacheHolder = DatasetCache, loader=None, **params) -> Cache:
     cache[dataset_name] = {
         'input': params,
@@ -25,8 +28,10 @@ async def cached_loader(dataset_name: str, cache: CacheHolder = DatasetCache, lo
         'content': await loader(**params)
     }
 
+
 def get_cache(dataset_name: str, cache: CacheHolder = DatasetCache):
     return cache.get(dataset_name)
+
 
 async def get_loaded_data(tracker: Tracker, cache: CacheHolder = DatasetCache):
     data_source: str = tracker.get_slot("data_source")
