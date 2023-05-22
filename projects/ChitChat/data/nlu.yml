@@ -39,6 +39,9 @@ nlu:
     - of course
     - that sounds good
     - correct
+    - yeah
+    - it did
+    - nice
 
 - intent: deny
   examples: |

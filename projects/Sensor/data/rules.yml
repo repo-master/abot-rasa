@@ -28,6 +28,11 @@ rules:
 - rule: User asks to load sensor data and to perform aggregation on it
   steps:
   - intent: query_metric_aggregate
+  # - slot_is_set:
+  #   - or:
+  #     - sensor_type
+  #     - location
+  #   - sensor_name
   - action: action_sensor_data_load
   - action: action_aggregation
 
