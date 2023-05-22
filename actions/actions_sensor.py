@@ -247,9 +247,10 @@ class ActionFetchReport(Action):
             sensor_selected = dataapi.get_cache("sensor")
             if sensor_selected is None:
                 raise ClientException(
-                    "Sorry, sensor data not selected. Try specifying sensor and time range.")
-            sensor_metadata: SensorMetadata = sensor_selected['metadata']
-            sensor_data_select_range: TimeRange = sensor_selected['fetch_range']
+                    "Sorry, sensor data not selected. Try specifying sensor and time range.",
+                    print_traceback=False)
+            sensor_metadata: SensorMetadata = sensor_selected['input']['metadata']
+            sensor_data_select_range: TimeRange = sensor_selected['input']['fetch_range']
             report_data: dict = await integration_genesis.get_report_generate_preview(sensor_metadata, sensor_data_select_range)
 
             preview_image_url: Optional[str] = report_data.get('preview_image')
