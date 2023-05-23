@@ -357,6 +357,7 @@ class ActionGetSensor(Action):
             )
             reset_slot(slot_name="metric", value=sensor["sensor_type"], events=events)
             reset_slot(slot_name="location", value=sensor["sensor_location"]['unit_alias'], events=events)
+            # TODO: [NARAYAN] Improve grammar, make it shorter, show only sensor name and not dict.
             dispatcher.utter_message(text=f"found sensor as to be : {sensor}")
         except HTTPStatusError as exc:
             if exc.response.is_client_error:

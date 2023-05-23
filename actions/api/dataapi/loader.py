@@ -31,8 +31,8 @@ async def cached_loader(tracker: Tracker, datasource_name: str, cache: CacheHold
 def get_cache(dataset_name: str, cache: CacheHolder = DatasetCache) -> Optional[Cache]:
     return cache.get(dataset_name)
 
-async def get_loaded_data(tracker: Tracker, cache: CacheHolder = DatasetCache) -> Optional[Cache]:
+async def get_loaded_data(tracker: Tracker, events: list, cache: CacheHolder = DatasetCache) -> Optional[Cache]:
     data_source: str = tracker.get_slot("data_source")
     c = cache.get(data_source)
     if isinstance(c, Cache):
-        return await c.invalidate()
+        return await c.invalidate(events)

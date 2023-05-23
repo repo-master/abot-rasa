@@ -2,7 +2,7 @@
 import json
 import logging
 from datetime import datetime
-from typing import Any, Callable, Dict, List
+from typing import Any, Optional, Callable, Dict, List
 
 import pandas as pd
 from rasa_sdk import Tracker
@@ -75,3 +75,6 @@ def action_exception_handle_graceful(fn: Callable[[CollectingDispatcher, Tracker
             # No events are sent since it failed
             return []
     return _wrapper_fn
+
+def find_event_first(event_name: str, events: list) -> Optional[dict]:
+    return next((item for item in events if item["event"] == event_name), None)

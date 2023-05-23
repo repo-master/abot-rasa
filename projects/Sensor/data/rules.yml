@@ -22,6 +22,8 @@ rules:
   steps:
   - intent : activate_sensor_name_form
   - action : form_sensor_name
+  # TODO [NARAYAN]: This is wrong. You are activating, then immediately deactivating the form
+  # Look at https://github.com/RasaHQ/rasa-3.x-form-examples/blob/main/04-from-text/data/rules.yml
   - active_loop : form_sensor_name
   - active_loop : null
   - action : action_search_sensor_by_name

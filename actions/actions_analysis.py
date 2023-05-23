@@ -12,7 +12,7 @@ from .api import statapi
 from .api.dataapi import get_loaded_data
 from .api.cache import PandasDataCache
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
-                     action_exception_handle_graceful)
+                     action_exception_handle_graceful, find_event_first)
 from .insights import describe_all_data_insights
 from .language_helper import user_to_aggregation_type
 from .schemas import StatementContext
@@ -25,13 +25,13 @@ class ActionAggregation(Action):
 
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[str, Any]]:
-        events = []
+        analysis_events = []
         user_req_agg_method: Optional[str] = tracker.get_slot("aggregation")
         # Check aggregation method provided by the user
         aggregation = user_to_aggregation_type(user_req_agg_method)
 
         # TODO: Needs overhaul, this was done in a rush
-        data_raw: PandasDataCache = await get_loaded_data(tracker)
+        data_raw: PandasDataCache = await get_loaded_data(tracker, analysis_events)
         if data_raw is None:
             raise ClientException("No data is loaded to perform %s aggregation.\nTry loading sensor data." %
                                   aggregation.value, print_traceback=False)
@@ -40,11 +40,21 @@ class ActionAggregation(Action):
         if data_df.empty:
             dispatcher.utter_message("Sorry, data isn't available for the time range.")
         else:
+            analysis_result = find_event_first("data_analysis_done", analysis_events)
+            if analysis_result:
+                insight_type_counts: dict = analysis_result['counts']
+                if len(insight_type_counts) > 0:
+                    counts = '\n'.join([
+                        "- %d %s(s)" % (v, k) for k, v in insight_type_counts.items()
+                    ])
+                    dispatcher.utter_message(text="In the selected data, I've found:\n%s" % counts)
+
+
             aggregated_result = await statapi.aggregation(data_df, aggregation)
             agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=data_meta.get("display_unit", ''))
             dispatcher.utter_message(agg_response_text)
 
-        return events
+        return []
 
 
 class ActionDescribeEventDetails(Action):
