@@ -6,7 +6,7 @@
     median
     ~[minimum] = minimum
     ~[maximum] = maximum
-    ~[std_dev] = std_dev
+    ~[stddev] = stddev
     ~[count] = count
     ~[compliance] = compliance
     ~[quantile] = quantile
