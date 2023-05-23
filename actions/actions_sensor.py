@@ -28,16 +28,6 @@ from .schemas import StatementContext
 LOG = logging.getLogger(__name__)
 
 
-def update_statement_context(tracker: Tracker, events: list, data: StatementContext):
-    curr_val = tracker.slots.get(ACTION_STATEMENT_CONTEXT_SLOT, {})
-    if curr_val is None:
-        curr_val = {}
-    curr_val.update(data)
-    ev = [SlotSet(ACTION_STATEMENT_CONTEXT_SLOT, curr_val)]
-    tracker.add_slots(ev)
-    events.extend(ev)
-
-
 async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text, Any]]) -> Tuple[Dict, Dict]:
     user_input = {}
     parsed_input = {}
@@ -229,20 +219,7 @@ class ActionFetchReport(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
-        # parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
-        # requested_sensor = await search_best_matching_sensor(parsed_input)
 
-        # events = await reset_slot(slot_name="metric",value=requested_sensor["sensor_type"] , events=events)
-        # events = await reset_slot(slot_name="location",value=requested_sensor["sensor_location"]['unit_alias'], events=events)
-        # events = await reset_slot(slot_name="sensor_name",value=requested_sensor['sensor_name'], events=events)
-
-        # Recover sensor id field
-        # requested_sensor_id: int = requested_sensor['sensor_id']
-
-        # Time period of aggregation
-        # requested_timeperiod: TimeRange = parsed_input.get('timeperiod')
-
-        # URI or Data URI of preview image
         try:
             sensor_selected = dataapi.get_cache("sensor")
             if sensor_selected is None:

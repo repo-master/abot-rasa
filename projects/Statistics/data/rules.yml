@@ -12,5 +12,6 @@ rules:
   - action: action_describe_event_details
 
 - rule: Even more specific details about outliers
+  steps:
   - intent: ask_count_of_outlier
   - action: action_describe_outlier_count
