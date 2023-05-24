@@ -36,7 +36,7 @@ class TelegramOutput(OutputChannel):
     def catch_exceptions(fn):
         async def wrapper(self, recipient_id: str, *args, **kwargs):
             try:
-                return await fn(*args, **kwargs)
+                return await fn(self, recipient_id, *args, **kwargs)
             except TelegramAPIError:
                 self.dp.bot.send_message(recipient_id, "Woops! There was an issue encountered in the Telegram Bot.\nPlease report this issue.")
                 logger.exception("TelegramAPIError exception in Telegram Bot:")
