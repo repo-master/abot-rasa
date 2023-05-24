@@ -21,6 +21,7 @@ rules:
 - rule: sensor_name_fetching_story
   steps:
   - intent : activate_sensor_name_form
+  - action : action_reset_slot
   - action : form_sensor_name
   - active_loop : form_sensor_name
   - active_loop : null
