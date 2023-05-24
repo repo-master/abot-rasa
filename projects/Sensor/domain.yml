@@ -13,6 +13,7 @@ intents:
 - query_value_of_data_timerange
 - query_value_of_data_location
 - activate_sensor_name_form
+- sensor_name_input
 
 entities:
 - metric_type
@@ -83,6 +84,7 @@ actions:
 - action_ask_data_value_timerange
 - action_ask_data_value_location
 - action_search_sensor_by_name
+- action_reset_slot
 
 responses:
   # Uttered by form_metric_data automatically when an entity is missing.

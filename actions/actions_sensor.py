@@ -222,6 +222,7 @@ class ActionFetchReport(Action):
 
         try:
             sensor_selected = dataapi.get_cache("sensor")
+            print(sensor_selected, " : recived this from sensor ")
             if sensor_selected is None:
                 raise ClientException(
                     "Sorry, sensor data not selected. Try specifying sensor and time range.",
@@ -345,6 +346,28 @@ class ActionGetSensor(Action):
             raise ServerException("Something went wrong while looking up sensor data.", e)
         return events
 
+
+class ActionResetSlot(Action):
+    def name(self):
+        return "action_reset_slot"
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        events: List[Dict[str, Any]] = []
+        print("Runing action_reset_slot")
+        try:
+            reset_slot(slot_name="sensor_name",value=None, events=events)
+            reset_slot(slot_name="metric",value=None, events=events)
+            reset_slot(slot_name="location",value=None, events=events)
+            print("Reseting all slots")
+        except HTTPStatusError as exc:
+            if exc.response.is_client_error:
+                raise ClientException("Requested data does not exist.")
+        except ConnectError as e:
+            raise ServerException("Couldn't connect to Abot backend.", e)
+        except Exception as e:  # TODO: Capture specific exceptions
+            raise ServerException("Something went wrong while looking up sensor data.", e)
+        return events 
 
 class ActionShowLocationList(Action):
     def name(self) -> Text:

@@ -21,6 +21,7 @@ rules:
 - rule: sensor_name_fetching_story
   steps:
   - intent : activate_sensor_name_form
+  - action : action_reset_slot
   - action : form_sensor_name
   # TODO [NARAYAN]: This is wrong. You are activating, then immediately deactivating the form
   # Look at https://github.com/RasaHQ/rasa-3.x-form-examples/blob/main/04-from-text/data/rules.yml
