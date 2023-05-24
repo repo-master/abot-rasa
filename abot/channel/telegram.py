@@ -63,7 +63,7 @@ class TelegramOutput(OutputChannel):
                 await self.dp.bot.send_photo(recipient_id, img_f, caption=caption)
         elif all([parsed_url.scheme, parsed_url.netloc]):
             # FIXME: Potential SSRF
-            await self.dp.bot.send_photo(recipient_id, img_f, caption=caption)
+            await self.dp.bot.send_photo(recipient_id, image, caption=caption)
         else:
             logger.warning("Invalid image uri received: %s...", image[:50])
 
