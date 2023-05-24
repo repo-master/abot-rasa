@@ -1,7 +1,7 @@
 
 @[metric_type]
-    ~[temperature]
-    ~[humidity]
+    ~[temperature] = temperature
+    ~[humidity] = humidity
 
 @[sensor_name]
     VER_W1_B1_GF_B_1_temp

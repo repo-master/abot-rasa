@@ -29,7 +29,7 @@
     highest
     greatest
 
-~[std_dev]
+~[stddev]
     stdev
     standard deviation
     sd
@@ -50,3 +50,6 @@
     [per?]centile
     quartile
     proportion[al?]
+
+~[compliance]
+    compliance

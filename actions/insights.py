@@ -33,13 +33,13 @@ def describe_all_data_insights(insights: list) -> List[Dict[str, str]]:
             display_unit = dp.get('display_unit', '')
 
             if dp['is_extreme_high']:
-                dp_type = "much higher compared to"
+                dp_type = "high value"
             elif dp['is_extreme_low']:
-                dp_type = "much lower compared to"
+                dp_type = "low value"
             else:
-                dp_type = "comparable to"
+                dp_type = "value"
 
-            outlier_format = "There is a data point on {timestamp} with the value {value:.2f}{unit}. This seems to be an extreme value which is *{high_or_low}* the rest of the points in the timerange."
+            outlier_format = "{timestamp}: {value:.2f}{unit}\nExtreme *{high_or_low}*"
             messages.append(dict(text=outlier_format.format(
                 timestamp=occurrence_time_formatted,
                 value=outlier_value,
@@ -48,11 +48,12 @@ def describe_all_data_insights(insights: list) -> List[Dict[str, str]]:
             )))
         # HACK: Exhaust list for now
         if i > 2 and i < len(insights):
-            messages.append(dict(text="I've discovered more outliers, but can't display all of them."))
+            messages.append(dict(text="More outliers present, but can't display all of them."))
             break
     else:
         messages.append(dict(text="There aren't any other significant issues present in the data."))
         if insight_type_counts.get('outlier', 0) == 0:
-            messages.append(dict(text="I've found that there are no outliers present in the data, all values are within normal range."))
+            messages.append(
+                dict(text="There are no outliers present in the data, all values are within normal range."))
 
     return messages

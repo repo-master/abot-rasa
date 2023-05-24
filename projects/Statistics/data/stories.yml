@@ -1,10 +1,3 @@
 version: "3.1"
 
-stories:
-  - story: Some value that the user needs more details of.
-    steps:
-    - intent: ask_followup_summary_details
-    - action : action_describe_event_details
-    - intent : ask_count_of_outlier
-    - action : action_describe_outlier_count
-
+stories: []

@@ -10,6 +10,7 @@
     [[~[i need]|for]|what [is|about]?] [the?] @[metric_type][\??]
     [~[i need]|for] @[time][\??]
     [what [is|about]] [for?] @[time][\??]
+    @[time]
 
 %[&sensor_status](200)
     [[~[i need]|for]|what [is|about]?] [the?] @[metric_type] [status|~[information]][\??]

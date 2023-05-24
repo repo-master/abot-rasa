@@ -10,12 +10,12 @@ async def outliers(data: pd.DataFrame) -> pd.DataFrame:
     async with Client() as client:
         # Send DataFrame and parameters
         response = await client.post("/statistics/outliers", json={
-            #DataIn
+            # DataIn
             "data": data,
             "index_column_names": "timestamp",
             "datetime_column_names": "timestamp",
 
-            #OutliersIn
+            # OutliersIn
             "outliers_column": "value"
         })
         response.raise_for_status()

@@ -37,7 +37,7 @@ async def user_to_timeperiod(tracker: Tracker, events: Optional[list] = None, au
             return
     elif isinstance(user_req_timeperiod, str):
         # TODO
-        pass
+        return
 
     parsed_timerange = extract_fromto(user_req_timeperiod)
     if parsed_timerange is None:

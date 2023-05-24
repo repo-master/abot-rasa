@@ -1,17 +1,16 @@
 
 // From AggregationMethod enum
 @[aggregation]
-    ~[recent] [value?]
-    ~[average] [score|value?]
-    median [score|value?]
-    ~[minimum] [score|value?]
-    ~[maximum] [score|value?]
-    ~[std_dev] [score|value?]
-    ~[count]
-    compliance [score|value?]
-    compliance [score|value?] ~[versus] @[number]
-    ~[quantile] [score|value?]
-    ~[summary]
+    ~[recent] = recent
+    ~[average] = average
+    median
+    ~[minimum] = minimum
+    ~[maximum] = maximum
+    ~[stddev] = stddev
+    ~[count] = count
+    ~[compliance] = compliance
+    ~[quantile] = quantile
+    ~[summary] = summary
 
 @[number]
     25

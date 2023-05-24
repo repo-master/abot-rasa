@@ -2,3 +2,6 @@ rasa~=3.4.5
 websockets~=10.4
 aiogram~=2.23.1
 python-decouple~=3.8
+
+# Huggingface transformers (for GPT2 LLM)
+transformers

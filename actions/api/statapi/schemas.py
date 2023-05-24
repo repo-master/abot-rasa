@@ -9,11 +9,12 @@ class AggregationMethod(str, Enum):
     AVERAGE = 'average'
     MINIMUM = 'minimum'
     MAXIMUM = 'maximum'
-    STD_DEV = 'std_dev'
+    STDDEV = 'stddev'
     MEDIAN = 'median'
     COUNT = 'count'
     COMPLIANCE = 'compliance'
     QUANTILE = 'quantile'
     SUMMARY = 'summary'
+
 
 AggregationOut = Dict[AggregationMethod, Union[float, int]]

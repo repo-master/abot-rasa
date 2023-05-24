@@ -9,6 +9,7 @@ from typing_extensions import TypedDict
 
 DataLoaderOptions = Dict[str, Any]
 
+
 class DataLoaderRequest(TypedDict):
     method: str
     url: URLTypes
@@ -23,6 +24,7 @@ class DataLoaderRequest(TypedDict):
     follow_redirects: Optional[bool]
     timeout: Optional[TimeoutTypes]
     extensions: Optional[RequestExtensions]
+
 
 __all__ = [
     'DataLoaderRequest'
