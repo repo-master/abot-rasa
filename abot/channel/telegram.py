@@ -33,8 +33,8 @@ class TelegramOutput(OutputChannel):
         else:
             await self.send_text_message(recipient_id, **message)
 
-    def catch_exceptions(self, fn):
-        async def wrapper(recipient_id: str, *args, **kwargs):
+    def catch_exceptions(fn):
+        async def wrapper(self, recipient_id: str, *args, **kwargs):
             try:
                 return await fn(*args, **kwargs)
             except TelegramAPIError:
