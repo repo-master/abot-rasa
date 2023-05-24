@@ -13,6 +13,7 @@ intents:
 - query_value_of_data_timerange
 - query_value_of_data_location
 - activate_sensor_name_form
+- sensor_name_input
 
 entities:
 - metric_type

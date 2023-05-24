@@ -356,9 +356,9 @@ class ActionResetSlot(Action):
         events: List[Dict[str, Any]] = []
         print("Runing action_reset_slot")
         try:
-            events = await reset_slot(slot_name="sensor_name",value=None, events=events)
-            events = await reset_slot(slot_name="metric",value=None, events=events)
-            events = await reset_slot(slot_name="location",value=None, events=events)
+            reset_slot(slot_name="sensor_name",value=None, events=events)
+            reset_slot(slot_name="metric",value=None, events=events)
+            reset_slot(slot_name="location",value=None, events=events)
             print("Reseting all slots")
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
