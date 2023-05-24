@@ -8,19 +8,32 @@ from sanic import Sanic, Blueprint
 
 from typing import Callable, Coroutine, Awaitable, Dict, Any
 
-
 class TelegramOutput(OutputChannel):
     def __init__(self, dp: Dispatcher):
         self.dp = dp
+
+    # Override
+    async def send_response(self, recipient_id: str, message: Dict[str, Any]) -> None:
+        if message.get("quick_replies"):
+            await self.send_quick_replies(
+                recipient_id,
+                message.pop("text"),
+                message.pop("quick_replies"),
+                **message,
+            )
+        elif message.get("image"):
+            await self.send_image_url(recipient_id, message.pop("image"), caption=message.pop("text"), **message)
+        else:
+            await self.send_text_message(recipient_id, **message)
 
     async def send_text_message(self, recipient_id: str, text: str, **kwargs) -> None:
         """Sends text message."""
         for message_part in text.strip().split("\n\n"):
             await self.dp.bot.send_message(recipient_id, message_part)
 
-    async def send_image_url(self, recipient_id: str, image: str, **kwargs) -> None:
+    async def send_image_url(self, recipient_id: str, image: str, caption: str = None, **kwargs) -> None:
         """Sends an image."""
-        await self.dp.bot.send_photo(recipient_id, image)
+        await self.dp.bot.send_photo(recipient_id, image, caption=caption)
 
 
 class TelegramInput(InputChannel):
