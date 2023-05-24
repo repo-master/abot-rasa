@@ -1,12 +1,19 @@
 
-from aiogram import Bot, Dispatcher, types as aiogtypes
-
-from rasa.core.channels import InputChannel, OutputChannel, UserMessage
-
+import base64
+import io
+import urllib.parse
+import logging
 from asyncio import AbstractEventLoop, Task
-from sanic import Sanic, Blueprint
+from typing import Any, Awaitable, Callable, Coroutine, Dict
 
-from typing import Callable, Coroutine, Awaitable, Dict, Any
+from aiogram import Bot, Dispatcher
+from aiogram import types as aiogtypes
+from aiogram.utils.exceptions import TelegramAPIError
+from rasa.core.channels import InputChannel, OutputChannel, UserMessage
+from sanic import Blueprint, Sanic
+
+logger = logging.getLogger(__name__)
+
 
 class TelegramOutput(OutputChannel):
     def __init__(self, dp: Dispatcher):
@@ -19,22 +26,46 @@ class TelegramOutput(OutputChannel):
                 recipient_id,
                 message.pop("text"),
                 message.pop("quick_replies"),
-                **message,
+                **message
             )
         elif message.get("image"):
             await self.send_image_url(recipient_id, message.pop("image"), caption=message.pop("text"), **message)
         else:
             await self.send_text_message(recipient_id, **message)
 
+    def catch_exceptions(self, fn):
+        async def wrapper(recipient_id: str, *args, **kwargs):
+            try:
+                return await fn(*args, **kwargs)
+            except TelegramAPIError:
+                self.dp.bot.send_message(recipient_id, "Woops! There was an issue encountered in the Telegram Bot.\nPlease report this issue.")
+                logger.exception("TelegramAPIError exception in Telegram Bot:")
+        return wrapper
+
+    @catch_exceptions
     async def send_text_message(self, recipient_id: str, text: str, **kwargs) -> None:
         """Sends text message."""
         for message_part in text.strip().split("\n\n"):
             await self.dp.bot.send_message(recipient_id, message_part)
 
+    @catch_exceptions
     async def send_image_url(self, recipient_id: str, image: str, caption: str = None, **kwargs) -> None:
         """Sends an image."""
-        await self.dp.bot.send_photo(recipient_id, image, caption=caption)
+        parsed_url = urllib.parse.urlparse(image)
+        if parsed_url.scheme == 'data':
+            img_buffer: bytes = b''
+            mime_type, img_data = parsed_url.path.split(";", 1)
+            encoding_type, img_encoded = img_data.split(',', 1)
+            if encoding_type == 'base64':
+                img_buffer = base64.b64decode(img_encoded)
 
+            with io.BytesIO(img_buffer) as img_f:
+                await self.dp.bot.send_photo(recipient_id, img_f, caption=caption)
+        elif all([parsed_url.scheme, parsed_url.netloc]):
+            # FIXME: Potential SSRF
+            await self.dp.bot.send_photo(recipient_id, img_f, caption=caption)
+        else:
+            logger.warning("Invalid image uri received: %s...", image[:50])
 
 class TelegramInput(InputChannel):
     @classmethod
