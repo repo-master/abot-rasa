@@ -36,18 +36,20 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text,
     user_req_metric: Optional[str] = tracker.get_slot("metric")
     user_req_location: Optional[str] = tracker.get_slot("location")
     user_req_agg_method: Optional[str] = tracker.get_slot("aggregation")
+    user_req_sensor_name: Optional[str] = tracker.get_slot("sensor_name")    
     user_req_timeperiod: Optional[DucklingExtraction] = tracker.get_slot("data_time_range")
 
     user_input.update({
         'user_req_metric': user_req_metric,
         'user_req_location': user_req_location,
         'user_req_agg_method': user_req_agg_method,
+        'user_req_sensor_name' : user_req_sensor_name,
         'user_req_timeperiod': user_req_timeperiod
     })
 
     # Debug output
-    print("Got slots: Metric: %s, Location: %s, Aggregation: %s, data_time_range: %s" % (
-        user_req_metric, user_req_location, user_req_agg_method, str(user_req_timeperiod)))
+    print("Got slots: Metric: %s, Location: %s, Aggregation: %s, data_time_range: %s, sensor_name: %s" % (
+        user_req_metric, user_req_location, user_req_agg_method, str(user_req_timeperiod), user_req_sensor_name))
 
     parsed_input['sensor_type'] = user_req_metric
     parsed_input['sensor_location'] = user_req_location
@@ -336,7 +338,7 @@ class ActionGetSensor(Action):
             reset_slot(slot_name="metric", value=sensor["sensor_type"], events=events)
             reset_slot(slot_name="location", value=sensor["sensor_location"]['unit_alias'], events=events)
             # TODO: [NARAYAN] Improve grammar, make it shorter, show only sensor name and not dict.
-            dispatcher.utter_message(text=f"found sensor as to be : {sensor}")
+            dispatcher.utter_message(text=f"found sensor as to be : {sensor['sensor_name']} with alias {sensor['sensor_alias']}")
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException("Requested data does not exist.")
@@ -354,12 +356,14 @@ class ActionResetSlot(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
+
         print("Runing action_reset_slot")
         try:
             reset_slot(slot_name="sensor_name",value=None, events=events)
             reset_slot(slot_name="metric",value=None, events=events)
             reset_slot(slot_name="location",value=None, events=events)
             print("Reseting all slots")
+
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException("Requested data does not exist.")

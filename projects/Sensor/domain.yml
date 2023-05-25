@@ -98,3 +98,6 @@ responses:
   - text: What type of aggregation type should be done?
   utter_ask_sensor_name:
   - text: Which sensor are your looking this data for?
+  utter_ask_query:
+  - text: What would you like to know about sensor?
+  
