@@ -35,10 +35,9 @@ pipeline:
     min_ngram: 1
     max_ngram: 4
 
-  # Maybe another time
-  # - name: LanguageModelFeaturizer
-  #   model_name: gpt2
-  #   model_weights: gpt2
+  - name: LanguageModelFeaturizer
+    model_name: roberta
+    model_weights: roberta-base
 
   - name: DIETClassifier
     epochs: 100
@@ -65,7 +64,8 @@ pipeline:
     constrain_similarities: true
 
   - name: FallbackClassifier
-    threshold: 0.65
+    # Highest confidence acceptable. If no intent has higher confidence, fallback intent is called
+    threshold: 0.55
     ambiguity_threshold: 0.1
 
 

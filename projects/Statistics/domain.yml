@@ -9,7 +9,16 @@ intents:
 - ask_outlier_summary
 - ask_outlier_average
 
+entities:
+- aggregation
+
 slots:
+  aggregation:
+    type: list
+    mappings:
+    - type: from_entity
+      entity: aggregation
+  
   statement_context:
     type: any
     mappings:

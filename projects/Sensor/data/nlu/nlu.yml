@@ -3,6 +3,8 @@ version: "3.1"
 nlu:
 - intent: query_sensor_list
   examples: |
+    - Sensor list
+    - List of sensors
     - Which sensors are available?
     - What are the sensors present?
     - Give a list of sensors available

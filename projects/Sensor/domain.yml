@@ -16,7 +16,6 @@ intents:
 
 entities:
 - metric_type
-- aggregation
 - location
 - sensor_name_input
 
@@ -27,16 +26,13 @@ slots:
     mappings:
     - type: from_entity
       entity: metric_type
-  aggregation:
-    type: list
-    mappings:
-    - type: from_entity
-      entity: aggregation
+      intent: query_metric_aggregate
   location:
     type: text
     mappings:
     - type: from_entity
       entity: location
+      intent: query_metric_aggregate
   sensor_name:
     type: text
     mappings:

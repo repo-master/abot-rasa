@@ -7,7 +7,4 @@
     [[A|B|C][1|2|3|4]]_[GF|FF|SF]_[A|B|C]
     Block [A|B|C] [Ground|First|Second] Floor
 
-@[sensor_name_input]
-    [VER|MAR|VAS]_W[1|2|3]_[[A|B|C][1|2|3|4]]_[GF|FF|SF]_[A|B|C]_[1|2|3|4]_[temp|rh|energy|dg]
-
 |sensor_type_aliases.chatette

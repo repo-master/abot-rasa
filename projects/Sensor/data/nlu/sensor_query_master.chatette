@@ -19,8 +19,8 @@
 
 %[&activate_sensor_name_form](300)
     ~[i request?] ~[information] [for|of|using|from] ~[sensor] [name?] [please?] [\??]
-    [~[i request?] | interested] ~[sensor] [named?] @[sensor_name_input]
-    ~[i need] ~[information] ~[sensor?] @[sensor_name_input]
+    [~[i request?] | interested] ~[sensor] [named?]
+    ~[i need] ~[information] ~[sensor?]
 
 %[&sensor_generate_report](300)
     [~[i need]|~[i request]?] [[a|the]?] [report|chart|plot] [graph?] [[on|for?] ~[sensor]?][\??]
