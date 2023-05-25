@@ -1,8 +1,12 @@
 
+import logging
+from typing import Any, Awaitable, Callable, Dict
+
 import pandas as pd
 
-from typing import Any, Dict, Callable, Awaitable
 from .. import statapi
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Cache:
@@ -31,7 +35,7 @@ class Cache:
 
     async def _load(self, events: list, **params):
         if self._loader:
-            print("Updating cache %s" % str(self))
+            LOGGER.debug("Updating cache %s" % str(self))
             self._content = await self._loader(**params)
             events.append({
                 "event": "cache_update",
@@ -39,12 +43,14 @@ class Cache:
                 "cache": str(self)
             })
 
+
 class PandasDataCache(Cache):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.df: pd.DataFrame = None
         self.metadata: dict = None
         self.insights: list = []
+
     async def _load(self, events: list, **params):
         await super()._load(events, **params)
         if self._content != self.NOT_SET:

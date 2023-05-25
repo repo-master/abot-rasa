@@ -128,13 +128,6 @@ nlu:
     - What is the set location?
     - What location is data loading?
 
-- intent: sensor_name_input
-  examples: |
-    - [VER_W1_B1_GF_B_1_temp](sensor_name)
-    - [Block B Ground Floor Temperature](sensor_name)
-    - [VER_W1_B1_GF_A_1_rh](sensor_name)
-    - [Block A Ground Floor Humidity](sensor_name)
-
 # TODO: Time period (today's, yesterday's, etc.)
 # - intent: summarize_sensor_data
 #   examples: |
