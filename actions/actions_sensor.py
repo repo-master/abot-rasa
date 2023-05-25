@@ -43,7 +43,7 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text,
 
     # Debug output
     LOGGER.info("Got slots: Sensor-Type: %s, Location: %s, Sensor-Name: %s",
-        user_req_metric, user_req_location, user_req_sensor_name)
+                user_req_metric, user_req_location, user_req_sensor_name)
 
     parsed_input['sensor_type'] = user_req_metric
     parsed_input['sensor_location'] = user_req_location
@@ -75,11 +75,11 @@ async def search_best_matching_sensors(parsed_input: dict) -> List[SensorMetadat
             if parsed_input['sensor_type']:
                 raise ClientException("No sensors of type {sensor_type} present{loc_opt}.".format(
                     sensor_type=parsed_input['sensor_type'],
-                    loc_opt='' if parsed_input['sensor_location'] is None else 'at %s' % parsed_input['sensor_location']
+                    loc_opt='' if parsed_input['sensor_location'] is None else ' at %s' % parsed_input['sensor_location']
                 ), print_traceback=False)
             elif parsed_input['sensor_name']:
                 raise ClientException("Sensor named {sensor_name} not found.".format(
-                    sensor_name = parsed_input['sensor_name']
+                    sensor_name=parsed_input['sensor_name']
                 ), print_traceback=False)
             elif 'detail' in resp.keys():
                 raise ClientException(resp['detail'], print_traceback=False)
@@ -387,10 +387,11 @@ class ActionResetSlot(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
-        reset_slot(slot_name="sensor_name",value=None, events=events)
-        reset_slot(slot_name="metric",value=None, events=events)
-        reset_slot(slot_name="location",value=None, events=events)
-        return events 
+        reset_slot(slot_name="sensor_name", value=None, events=events)
+        reset_slot(slot_name="metric", value=None, events=events)
+        reset_slot(slot_name="location", value=None, events=events)
+        return events
+
 
 class ActionShowLocationList(Action):
     def name(self) -> Text:
