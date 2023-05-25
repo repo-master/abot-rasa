@@ -13,13 +13,12 @@ intents:
 - query_value_of_data_timerange
 - query_value_of_data_location
 - activate_sensor_name_form
-- sensor_name_input
 
 entities:
 - metric_type
 - aggregation
 - location
-- sensor_name
+- sensor_name_input
 
 
 slots:
@@ -41,8 +40,13 @@ slots:
   sensor_name:
     type: text
     mappings:
+    - type: from_text
+      conditions:
+      - active_loop: form_sensor_name
+        requested_slot: sensor_name
     - type: from_entity
-      entity: sensor_name
+      entity: sensor_name_input
+      intent: activate_sensor_name_form
   slot_json:
     type: any
     mappings:
@@ -97,4 +101,4 @@ responses:
   utter_ask_aggregation:
   - text: What type of aggregation type should be done?
   utter_ask_sensor_name:
-  - text: Which sensor are your looking this data for?
+  - text: "Give me the sensor name:"

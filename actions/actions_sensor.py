@@ -7,7 +7,7 @@
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Optional, Set, Text, Tuple, Union
+from typing import Any, Dict, List, Optional, Text, Tuple, Union
 
 from rasa_sdk import Action, FormValidationAction, Tracker
 from rasa_sdk.events import SlotSet
@@ -17,15 +17,13 @@ from rasa_sdk.types import DomainDict
 
 from .api import (ConnectError, HTTPStatusError, dataapi, integration_genesis,
                   statapi)
-from .api.duckling import DucklingExtraction, TimeRange
+from .api.duckling import TimeRange
 from .api.integration_genesis.schemas import SensorMetadata
-from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException,
-                     JSONCustomEncoder, ServerException,
+from .common import (ClientException, JSONCustomEncoder, ServerException,
                      action_exception_handle_graceful)
 from .language_helper import summary_AggregationOut, user_to_timeperiod
-from .schemas import StatementContext
 
-LOG = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text, Any]]) -> Tuple[Dict, Dict]:
@@ -35,22 +33,21 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text,
     # We need these slots
     user_req_metric: Optional[str] = tracker.get_slot("metric")
     user_req_location: Optional[str] = tracker.get_slot("location")
-    user_req_agg_method: Optional[str] = tracker.get_slot("aggregation")
-    user_req_timeperiod: Optional[DucklingExtraction] = tracker.get_slot("data_time_range")
+    user_req_sensor_name: Optional[str] = tracker.get_slot("sensor_name")
 
     user_input.update({
         'user_req_metric': user_req_metric,
         'user_req_location': user_req_location,
-        'user_req_agg_method': user_req_agg_method,
-        'user_req_timeperiod': user_req_timeperiod
+        'user_req_sensor_name': user_req_sensor_name
     })
 
     # Debug output
-    print("Got slots: Metric: %s, Location: %s, Aggregation: %s, data_time_range: %s" % (
-        user_req_metric, user_req_location, user_req_agg_method, str(user_req_timeperiod)))
+    LOGGER.info("Got slots: Sensor-Type: %s, Location: %s, Sensor-Name: %s",
+        user_req_metric, user_req_location, user_req_sensor_name)
 
     parsed_input['sensor_type'] = user_req_metric
     parsed_input['sensor_location'] = user_req_location
+    parsed_input['sensor_name'] = user_req_sensor_name
 
     parsed_input['timeperiod'] = await user_to_timeperiod(tracker, events)
     if parsed_input['timeperiod'] is None:
@@ -63,19 +60,29 @@ def reset_slot(slot_name, value, events: list):
     events.append(SlotSet(slot_name, value))
 
 
-async def search_best_matching_sensor(parsed_input: dict) -> SensorMetadata:
+async def search_best_matching_sensors(parsed_input: dict) -> List[SensorMetadata]:
     try:
         # TODO: If sensor id is given, fetch metadata of it directly
         # Either one can be set
         return await integration_genesis.determine_user_request_sensor(
             sensor_type=parsed_input['sensor_type'],
-            location=parsed_input['sensor_location']
+            location=parsed_input['sensor_location'],
+            sensor_name=parsed_input['sensor_name']
         )
     except HTTPStatusError as exc:
         if exc.response.is_client_error:
-            raise ClientException("No sensors of type {sensor_type} present.".format(
-                sensor_type=parsed_input['sensor_type']
-            ), print_traceback=False)
+            resp = exc.response.json()
+            if parsed_input['sensor_type']:
+                raise ClientException("No sensors of type {sensor_type} present{loc_opt}.".format(
+                    sensor_type=parsed_input['sensor_type'],
+                    loc_opt='' if parsed_input['sensor_location'] is None else 'at %s' % parsed_input['sensor_location']
+                ), print_traceback=False)
+            elif parsed_input['sensor_name']:
+                raise ClientException("Sensor named {sensor_name} not found.".format(
+                    sensor_name = parsed_input['sensor_name']
+                ), print_traceback=False)
+            elif 'detail' in resp.keys():
+                raise ClientException(resp['detail'], print_traceback=False)
     except ConnectError as e:
         raise ServerException("Couldn't connect to Abot backend.", e)
     except Exception as e:  # TODO: Capture specific exceptions
@@ -114,9 +121,36 @@ class ActionSensorDataLoad(Action):
         events: List[Dict[str, Any]] = []
         parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
 
-        requested_sensor = await search_best_matching_sensor(parsed_input)
+        requested_sensors = await search_best_matching_sensors(parsed_input)
 
-        print(requested_sensor)
+        requested_sensor: SensorMetadata = None
+
+        if len(requested_sensors) == 1:
+            requested_sensor = requested_sensors[0]
+        elif len(requested_sensors) > 1:
+            def loc_at_str(s):
+                if s:
+                    return ' at ' + s
+                return ''
+            dispatcher.utter_button_message("Which sensor?", buttons=[
+                {
+                    "title": "%s%s" % (
+                        integration_genesis.sensor_name_coalesce(sensor_obj),
+                        loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
+                    ),
+                    "payload": "/activate_sensor_name_form{%s}" % (
+                        json.dumps({"sensor_name": sensor_obj["sensor_name"]})
+                    )
+                }
+                for sensor_obj in requested_sensors
+            ])
+            return events
+
+        dispatcher.utter_message(text="Loading sensor %s at time range %s to %s..." % (
+            integration_genesis.sensor_name_coalesce(requested_sensor),
+            parsed_input['timeperiod']['from'].strftime('%c'),
+            parsed_input['timeperiod']['to'].strftime('%c')
+        ))
 
         reset_slot(slot_name="metric", value=requested_sensor["sensor_type"], events=events)
         reset_slot(slot_name="location", value=requested_sensor["sensor_location"]['unit_alias'], events=events)
@@ -222,7 +256,6 @@ class ActionFetchReport(Action):
 
         try:
             sensor_selected = dataapi.get_cache("sensor")
-            print(sensor_selected, " : recived this from sensor ")
             if sensor_selected is None:
                 raise ClientException(
                     "Sorry, sensor data not selected. Try specifying sensor and time range.",
@@ -306,11 +339,11 @@ class ActionShowSensorList(Action):
         if len(sensors) == 0:
             dispatcher.utter_message(text="No sensors available.")
         else:
-            dispatcher.utter_message(text="I found %d sensor(s) :" % len(sensors))
+            dispatcher.utter_message(text="Found %d sensor(s):" % len(sensors))
             sensorlist_msg: str = ""
             for sensor in sensors:
                 sensor_name = integration_genesis.sensor_name_coalesce(sensor)
-                sensor_location = integration_genesis.unit_name_coalesce(sensor["sensor_location"])
+                sensor_location = integration_genesis.location_name_coalesce(sensor["sensor_location"])
                 sensor_type = sensor["sensor_type"]
                 display_unit = sensor["display_unit"]
                 sensorlist_msg += f"- {sensor_name} [measures {sensor_type} ({display_unit})] at {sensor_location}\n"
@@ -326,9 +359,9 @@ class ActionGetSensor(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
-        print("Runing action_search_sensor_by_name")
+        LOGGER.info("Running action_search_sensor_by_name")
         sensor_name: Optional[str] = tracker.get_slot("sensor_name")
-        print("slot sensor_name filled with ", sensor_name)
+        LOGGER.info("slot sensor_name filled with %s", sensor_name)
         try:
             sensor = await integration_genesis.determine_user_request_sensor(
                 sensor_name=sensor_name,  # TODO: Get from slot
@@ -354,19 +387,9 @@ class ActionResetSlot(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
         events: List[Dict[str, Any]] = []
-        print("Runing action_reset_slot")
-        try:
-            reset_slot(slot_name="sensor_name",value=None, events=events)
-            reset_slot(slot_name="metric",value=None, events=events)
-            reset_slot(slot_name="location",value=None, events=events)
-            print("Reseting all slots")
-        except HTTPStatusError as exc:
-            if exc.response.is_client_error:
-                raise ClientException("Requested data does not exist.")
-        except ConnectError as e:
-            raise ServerException("Couldn't connect to Abot backend.", e)
-        except Exception as e:  # TODO: Capture specific exceptions
-            raise ServerException("Something went wrong while looking up sensor data.", e)
+        reset_slot(slot_name="sensor_name",value=None, events=events)
+        reset_slot(slot_name="metric",value=None, events=events)
+        reset_slot(slot_name="location",value=None, events=events)
         return events 
 
 class ActionShowLocationList(Action):

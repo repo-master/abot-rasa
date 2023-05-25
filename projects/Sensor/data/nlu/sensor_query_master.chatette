@@ -17,10 +17,10 @@
     how is the @[metric_type?] ~[sensor] [faring|performing|doing]?
     [status|~[information]]
 
-%[&activate_sensor_name_form](200)
+%[&activate_sensor_name_form](300)
     ~[i request?] ~[information] [for|of|using|from] ~[sensor] [name?] [please?] [\??]
-    [~[i request?] | interested] ~[sensor]
-    ~[i need] ~[information] ~[sensor]
+    [~[i request?] | interested] ~[sensor] [named?] @[sensor_name_input]
+    ~[i need] ~[information] ~[sensor?] @[sensor_name_input]
 
 %[&sensor_generate_report](300)
     [~[i need]|~[i request]?] [[a|the]?] [report|chart|plot] [graph?] [[on|for?] ~[sensor]?][\??]

@@ -5,7 +5,7 @@ from typing import List, Optional
 from ..duckling import TimeRange
 
 from ..client import Client
-from .schemas import SensorMetadata, UnitMetadata
+from .schemas import SensorMetadata, LocationMetadata
 from ..dataapi.schemas import DataLoaderRequest
 
 
@@ -15,7 +15,7 @@ def sensor_name_coalesce(meta: SensorMetadata) -> str:
         meta.get('sensor_urn')
 
 
-def unit_name_coalesce(meta: UnitMetadata) -> str:
+def location_name_coalesce(meta: LocationMetadata) -> str:
     return meta.get('unit_alias').split(',')[0] or \
         meta.get('unit_urn')
 
@@ -27,16 +27,17 @@ async def query_sensor_list() -> List[SensorMetadata]:
         return response.json()
 
 
-async def determine_user_request_sensor(sensor_type=None, sensor_name=None, location=None) -> Optional[SensorMetadata]:
+async def determine_user_request_sensor(sensor_type=None, sensor_name=None, location=None) -> Optional[List[SensorMetadata]]:
     async with Client() as client:
         params = {
             'sensor_type': sensor_type,
-            'sensor_name': sensor_name,
-            'location': location
+            'location': location,
+            'sensor_name': sensor_name
         }
 
         response = await client.get("/genesis/query/sensor/find", params=params)
         response.raise_for_status()
+
         try:
             return response.json()
         except json.decoder.JSONDecodeError:
@@ -91,5 +92,5 @@ __all__ = [
     'get_report_generate_preview',
     'user_to_sensor_type',
     'sensor_name_coalesce',
-    'unit_name_coalesce'
+    'location_name_coalesce'
 ]
