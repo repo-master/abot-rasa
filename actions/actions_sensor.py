@@ -132,7 +132,7 @@ class ActionSensorDataLoad(Action):
                 if s:
                     return ' at ' + s
                 return ''
-            dispatcher.utter_button_message("Which sensor?", buttons=[
+            dispatcher.utter_button_message("Which sensor? Select one:", buttons=[
                 {
                     "title": "%s%s" % (
                         integration_genesis.sensor_name_coalesce(sensor_obj),
