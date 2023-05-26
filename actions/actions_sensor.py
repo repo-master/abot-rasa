@@ -64,11 +64,15 @@ async def search_best_matching_sensors(parsed_input: dict) -> List[SensorMetadat
     try:
         # TODO: If sensor id is given, fetch metadata of it directly
         # Either one can be set
-        return await integration_genesis.determine_user_request_sensor(
-            sensor_type=parsed_input['sensor_type'],
-            location=parsed_input['sensor_location'],
-            sensor_name=parsed_input['sensor_name']
-        )
+        if parsed_input['sensor_name'] is not None:
+            return await integration_genesis.determine_user_request_sensor(
+                sensor_name=parsed_input['sensor_name']
+            )
+        else:
+            return await integration_genesis.determine_user_request_sensor(
+                sensor_type=parsed_input['sensor_type'],
+                location=parsed_input['sensor_location']
+            )
     except HTTPStatusError as exc:
         if exc.response.is_client_error:
             resp = exc.response.json()

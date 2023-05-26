@@ -35,9 +35,9 @@ pipeline:
     min_ngram: 1
     max_ngram: 4
 
-  - name: LanguageModelFeaturizer
-    model_name: roberta
-    model_weights: roberta-base
+  # - name: LanguageModelFeaturizer
+  #   model_name: roberta
+  #   model_weights: roberta-base
 
   - name: DIETClassifier
     epochs: 100
