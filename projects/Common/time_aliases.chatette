@@ -7,9 +7,9 @@
     ~[time_words]
     8 [o'clock?] ~[time_words]
     5:30[[P|A]M?]
-    [the?] [last|past|this|previous] [week|month|year]
-    [last|past|previous] ~[num] [weeks|months|years]
-    [whole|entire|full] [week|month|year]
+    [the?] [last|past|this|previous] ~[time_period#singular]
+    [last|past|previous] ~[num] ~[time_period#plural]
+    [whole|entire|full] ~[time_period#singular]
     01/01/2022 [[at?] 9:30?]
     31/01/2021 [[at?] 8:00?]
     12/03/2022 [[at?] 6:00?]
@@ -22,6 +22,22 @@
     22nd March 2022 [[at?] 9:00?]
     19 February 2023 [[at?] 9:15?]
     31/01/2022 [[at?] 9:45?]
+
+~[time_period#singular]
+    minute
+    hour
+    day
+    week
+    month
+    year
+
+~[time_period#plural]
+    minutes
+    hours
+    days
+    weeks
+    months
+    years
 
 ~[time_words]
     today

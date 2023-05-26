@@ -105,6 +105,6 @@ responses:
   utter_ask_sensor_name:
   - text: "Give me the sensor name:"
   utter_ask_query:
-  - text: What would you like to know about sensor?
+  - text: What would you like to know about the sensor?
   
 
