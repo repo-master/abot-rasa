@@ -21,7 +21,7 @@ from .api.duckling import TimeRange
 from .api.integration_genesis.schemas import SensorMetadata
 from .common import (ClientException, JSONCustomEncoder, ServerException,
                      action_exception_handle_graceful)
-from .language_helper import summary_AggregationOut, user_to_timeperiod
+from .language_helper import summary_AggregationOut, user_to_timeperiod, string_timestamp_to_human
 
 LOGGER = logging.getLogger(__name__)
 
@@ -142,8 +142,8 @@ class ActionSensorDataLoad(Action):
                         integration_genesis.sensor_name_coalesce(sensor_obj),
                         loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
                     ),
-                    "payload": "/activate_sensor_name_form{%s}" % (
-                        json.dumps({"sensor_name": sensor_obj["sensor_name"]})
+                    "payload": "/activate_sensor_name_form%s" % (
+                        json.dumps({"sensor_name_input": sensor_obj["sensor_name"]})
                     )
                 }
                 for sensor_obj in requested_sensors
@@ -373,7 +373,8 @@ class ActionGetSensor(Action):
             reset_slot(slot_name="metric", value=sensor["sensor_type"], events=events)
             reset_slot(slot_name="location", value=sensor["sensor_location"]['unit_alias'], events=events)
             # TODO: [NARAYAN] Improve grammar, make it shorter, show only sensor name and not dict.
-            dispatcher.utter_message(text=f"found sensor as to be : {sensor['sensor_name']} with alias {sensor['sensor_alias']}")
+            dispatcher.utter_message(
+                text=f"found sensor as to be : {sensor['sensor_name']} with alias {sensor['sensor_alias']}")
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException("Requested data does not exist.")
@@ -397,11 +398,86 @@ class ActionResetSlot(Action):
         return events
 
 
+class ActionResetSensorNameSlot(Action):
+    def name(self):
+        return "action_reset_sensor_name"
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        return [SlotSet("sensor_name", None)]
+
+
 class ActionShowLocationList(Action):
     def name(self) -> Text:
         return "action_show_location_list"
 
     async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+        try:
+            locations = await integration_genesis.query_location_list()
+        except ConnectError as e:
+            raise ServerException("Couldn't connect to Abot backend.", e)
+
+        if len(locations) == 0:
+            dispatcher.utter_message(text="No locations available.")
+        else:
+            dispatcher.utter_message(text="Found %d locations(s):" % len(locations))
+            loclist_msg: str = ""
+            for loc in locations:
+                location_name = integration_genesis.location_name_coalesce(loc)
+                loclist_msg += f"- {location_name}\n"
+            dispatcher.utter_message(text=loclist_msg)
+
+        return []
+
+
+class ActionQuerySensorStatus(Action):
+    def name(self) -> Text:
+        return "action_query_sensor_status"
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+        try:
+            sensor_selected = dataapi.get_cache("sensor")
+            if sensor_selected is None:
+                raise ClientException(
+                    "Sorry, sensor data not selected. Try specifying a sensor.",
+                    print_traceback=False)
+            sensor_metadata_old: SensorMetadata = sensor_selected._loader_params['metadata']
+            sensor_metadata_updated = await integration_genesis.sensor_query_metadata(sensor_metadata_old["sensor_id"])
+            if not sensor_metadata_updated:
+                raise ClientException("Couldn't get information on sensor %s." %
+                                      integration_genesis.sensor_name_coalesce(sensor_metadata_old))
+
+            status_msg = "Information for {sensor_name}:"
+            status_msg += "\n- Sensor type: {sensor_type}"
+            status_msg += "\n- Health: {sensor_health}"
+            status_msg += "\n- Last reading: {sensor_reading}"
+
+            sensor_status_health = "UNKNOWN"
+            sensor_last_reading = "UNKNOWN"
+            if sensor_metadata_updated['sensor_status']:
+                if sensor_metadata_updated['sensor_status']['sensor_health'] and sensor_metadata_updated['sensor_status']['sensor_health']['code_name']:
+                    sensor_status_health = sensor_metadata_updated['sensor_status']['sensor_health']['code_name']
+
+                if sensor_metadata_updated['sensor_status']['last_value']:
+                    # TODO: ['value'] part depends on sensor type (it can be 'state')
+                    sensor_last_reading = "%s%s" % (
+                        sensor_metadata_updated['sensor_status']['last_value']['value'],
+                        sensor_metadata_updated['display_unit']
+                    )
+                    if sensor_metadata_updated['sensor_status']['last_timestamp']:
+                        ts_human = string_timestamp_to_human(sensor_metadata_updated['sensor_status']['last_timestamp'])
+                        sensor_last_reading += " (at %s)" % ts_human
+
+            dispatcher.utter_message(text=status_msg.format(
+                sensor_name=integration_genesis.sensor_name_coalesce(sensor_metadata_updated),
+                sensor_type=sensor_metadata_updated['sensor_type'],
+                sensor_health=sensor_status_health,
+                sensor_reading=sensor_last_reading
+            ))
+        except ConnectError as e:
+            raise ServerException("Couldn't connect to Abot backend.", e)
+
         return []
 
 

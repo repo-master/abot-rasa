@@ -30,12 +30,14 @@ rules:
 - rule: User asks to load sensor data and to perform aggregation on it
   steps:
   - intent: query_metric_aggregate
+  - action: action_reset_sensor_name
   - action: action_sensor_data_load
   - action: action_aggregation
 
 - rule: User wants to change a parameter, reload data and perform aggregation again
   steps:
   - intent: change_source
+  - action: action_reset_sensor_name
   - action: action_sensor_data_load
   - action: action_aggregation
 
@@ -47,4 +49,4 @@ rules:
 - rule: Sensor status enquiry
   steps:
   - intent: sensor_status
-  - action: utter_unable
+  - action: action_query_sensor_status

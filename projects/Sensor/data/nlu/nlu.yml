@@ -39,6 +39,8 @@ nlu:
 
 - intent: query_location_list
   examples: |
+    - Location list
+    - List of locations
     - Which locations are available?
     - What are the locations present?
     - Give a list of locations available

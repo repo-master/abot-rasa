@@ -26,13 +26,17 @@ slots:
     mappings:
     - type: from_entity
       entity: metric_type
-      intent: query_metric_aggregate
+      intent:
+      - query_metric_aggregate
+      - change_source
   location:
     type: text
     mappings:
     - type: from_entity
       entity: location
-      intent: query_metric_aggregate
+      intent:
+      - query_metric_aggregate
+      - change_source
   sensor_name:
     type: text
     mappings:
@@ -85,6 +89,8 @@ actions:
 - action_ask_data_value_location
 - action_search_sensor_by_name
 - action_reset_slot
+- action_reset_sensor_name
+- action_query_sensor_status
 
 responses:
   # Uttered by form_metric_data automatically when an entity is missing.

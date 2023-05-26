@@ -9,6 +9,16 @@ class LocationMetadata(TypedDict):
     unit_alias: Optional[str]
 
 
+class SensorHealth(TypedDict):
+    code_name: str
+
+
+class SensorState(TypedDict):
+    last_value: Optional[Dict]
+    last_timestamp: Optional[str]
+    sensor_health: Optional[SensorHealth]
+
+
 class SensorMetadata(TypedDict):
     sensor_urn: str
     sensor_id: NotRequired[int]
@@ -17,6 +27,7 @@ class SensorMetadata(TypedDict):
     sensor_type: str
     display_unit: str
     sensor_location: NotRequired[LocationMetadata]
+    sensor_status: Optional[SensorState]
 
 
 class SensorDataResponse(TypedDict):

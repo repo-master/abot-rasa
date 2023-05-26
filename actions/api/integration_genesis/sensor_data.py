@@ -2,11 +2,10 @@
 import json
 from typing import List, Optional
 
-from ..duckling import TimeRange
-
 from ..client import Client
-from .schemas import SensorMetadata, LocationMetadata
 from ..dataapi.schemas import DataLoaderRequest
+from ..duckling import TimeRange
+from .schemas import LocationMetadata, SensorMetadata
 
 
 def sensor_name_coalesce(meta: SensorMetadata) -> str:
@@ -26,6 +25,11 @@ async def query_sensor_list() -> List[SensorMetadata]:
         response.raise_for_status()
         return response.json()
 
+async def query_location_list() -> List[LocationMetadata]:
+    async with Client() as client:
+        response = await client.get("/genesis/query/unit/list")
+        response.raise_for_status()
+        return response.json()
 
 async def determine_user_request_sensor(sensor_type=None, sensor_name=None, location=None) -> Optional[List[SensorMetadata]]:
     async with Client() as client:
@@ -39,6 +43,18 @@ async def determine_user_request_sensor(sensor_type=None, sensor_name=None, loca
         response.raise_for_status()
 
         try:
+            return response.json()
+        except json.decoder.JSONDecodeError:
+            pass
+
+
+async def sensor_query_metadata(sensor_id: int) -> Optional[SensorMetadata]:
+    async with Client() as client:
+        response = await client.get("/genesis/query/sensor", params={
+            'sensor_id': sensor_id
+        })
+        try:
+            response.raise_for_status()
             return response.json()
         except json.decoder.JSONDecodeError:
             pass
@@ -88,7 +104,9 @@ def mkrequest_fetch_sensor_data(metadata: SensorMetadata, fetch_range: TimeRange
 
 __all__ = [
     'query_sensor_list',
+    'query_location_list',
     'determine_user_request_sensor',
+    'sensor_query_metadata',
     'get_report_generate_preview',
     'user_to_sensor_type',
     'sensor_name_coalesce',

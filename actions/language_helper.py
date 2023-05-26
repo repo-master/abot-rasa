@@ -1,6 +1,7 @@
 
 from typing import Any, Dict, List, Optional, Set, Union
 
+import pandas as pd
 from rasa_sdk.events import FollowupAction, SlotSet
 from rasa_sdk.interfaces import Tracker
 
@@ -45,6 +46,9 @@ async def user_to_timeperiod(tracker: Tracker, events: Optional[list] = None, au
 
     return parsed_timerange
 
+def string_timestamp_to_human(ts_raw: str) -> str:
+    ts = pd.to_datetime(ts_raw)
+    return ts.strftime("%c")
 
 def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs) -> str:
     def _agg_str(am: AggregationMethod, value: Union[float, int]) -> str:

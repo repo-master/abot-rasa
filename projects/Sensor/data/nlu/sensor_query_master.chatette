@@ -12,9 +12,10 @@
     [what [is|about]] [for?] @[time][\??]
     @[time]
 
-%[&sensor_status](200)
+%[&sensor_status](300)
+    [what|which|current] ~[sensor]?
     [[~[i need]|for]|what [is|about]?] [the?] @[metric_type] [status|~[information]][\??]
-    how is the @[metric_type?] ~[sensor] [faring|performing|doing]?
+    how is [the @[metric_type?] ~[sensor]|it] [faring|performing|doing]?
     [status|~[information]]
 
 %[&activate_sensor_name_form](300)
