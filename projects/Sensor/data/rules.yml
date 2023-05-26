@@ -25,6 +25,7 @@ rules:
   - action: form_sensor_name
   - active_loop: form_sensor_name
   - active_loop: null
+  - action: action_sensor_data_load
   - action: utter_ask_query
 
 
