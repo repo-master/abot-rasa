@@ -18,6 +18,11 @@
   details
   know
 
+~[limit]
+  limit
+  bound
+  level
+
 ~[num]
     [~[nb$1]|~[nb$one]]
     [~[nb$2]|~[nb$two]]
