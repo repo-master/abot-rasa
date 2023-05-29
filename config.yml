@@ -60,12 +60,12 @@ pipeline:
   - name: EntitySynonymMapper
 
   - name: ResponseSelector
-    epochs: 100
+    epochs: 300
     constrain_similarities: true
 
   - name: FallbackClassifier
     # Highest confidence acceptable. If no intent has higher confidence, fallback intent is called
-    threshold: 0.55
+    threshold: 0.6
     ambiguity_threshold: 0.1
 
 
