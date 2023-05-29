@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 def compile_chatette(args: Tuple[Path, Path]):
     chatette_master_file, output_dir = args
-    facade = Facade.reset_system(chatette_master_file, output_dir, adapter_str='rasa', force_overwriting=True)
+    facade = Facade.reset_system(chatette_master_file, output_dir, adapter_str='rasayml', force_overwriting=True)
     facade.run()
 
 
