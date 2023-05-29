@@ -40,7 +40,7 @@ pipeline:
   #   model_weights: roberta-base
 
   - name: DIETClassifier
-    epochs: 800
+    epochs: 300
     constrain_similarities: true
 
   - name: abot.extractor.duckling.DucklingEntityExtractor

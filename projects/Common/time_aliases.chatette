@@ -1,5 +1,5 @@
 
-@[time]
+~[time]
     ~[datetime_input]
     [between?] [range?] ~[datetime_input] [till|and|-] ~[datetime_input]
 

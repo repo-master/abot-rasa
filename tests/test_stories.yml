@@ -1,6 +1,8 @@
 #### This file contains tests to evaluate that your bot behaves as expected.
 #### If you want to learn more, please see the docs: https://rasa.com/docs/rasa/testing-your-assistant
 
+version: '3.1'
+
 stories:
 - story: Greet
   steps:
@@ -8,3 +10,9 @@ stories:
       hello there!
     intent: greet
   - action: utter_greet
+
+- story: Changing sensor source inputs
+  steps:
+  - user: |
+      what about may 28, 8 pm to 10 pm
+    intent: change_source
