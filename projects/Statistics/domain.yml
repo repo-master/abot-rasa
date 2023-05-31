@@ -2,6 +2,7 @@ version: '3.1'
 
 intents:
 - intent_perform_aggregation
+- change_aggregation_param
 - ask_followup_summary_details
 - ask_for_max_outlier
 - ask_for_min_outlier
@@ -26,9 +27,15 @@ slots:
 
   quantile:
     type: float
+    min_value: 0.0
+    max_value: 100.0
     mappings:
     - type: from_entity
       entity: number
+    - type: from_text
+      conditions:
+      - active_loop: form_aggregation_percentile
+        requested_slot: quantile
 
   compliance_bound_lower:
     type: float
@@ -36,16 +43,20 @@ slots:
     - type: from_entity
       entity: number
       role: lower
-    - type: from_entity
-      entity: number
+    - type: from_text
+      conditions:
+      - active_loop: form_aggregation_compliance
+        requested_slot: compliance_bound_lower
   compliance_bound_upper:
     type: float
     mappings:
     - type: from_entity
       entity: number
       role: upper
-    - type: from_entity
-      entity: number
+    - type: from_text
+      conditions:
+      - active_loop: form_aggregation_compliance
+        requested_slot: compliance_bound_upper
 
   data_loader:
     type: any
@@ -62,3 +73,20 @@ actions:
 - action_aggregation
 - action_describe_event_details
 - action_describe_outlier_count
+
+forms:
+  form_aggregation_percentile:
+    required_slots:
+    - quantile
+  form_aggregation_compliance:
+    required_slots:
+    - compliance_bound_lower
+    - compliance_bound_upper
+
+responses:
+  utter_ask_quantile:
+  - text: What percentile?
+  utter_ask_compliance_bound_lower:
+  - text: "Lower limit (or none):"
+  utter_ask_compliance_bound_upper:
+  - text: "Upper limit (or none):"

@@ -70,11 +70,6 @@ slots:
     - type: custom
 
 forms:
-  form_metric_data:
-    required_slots:
-    - metric
-    - location
-    
   form_sensor_name:
     required_slots:
     - sensor_name
@@ -87,17 +82,11 @@ actions:
 - action_show_location_list
 - action_ask_data_value_timerange
 - action_ask_data_value_location
-- action_search_sensor_by_name
 - action_reset_slot
 - action_reset_sensor_name
 - action_query_sensor_status
 
 responses:
-  # Uttered by form_metric_data automatically when an entity is missing.
-  utter_ask_metric:
-  - text: Which Sensor are you looking for?
-  utter_ask_location:
-  - text: Ok, which location where you are looking for this data
   utter_ask_data_time_range:
   - text: Please Specify time period
   utter_ask_aggregation:

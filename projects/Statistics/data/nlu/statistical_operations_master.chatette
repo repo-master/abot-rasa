@@ -1,8 +1,14 @@
 
-%[&intent_perform_aggregation](800)
+%[&intent_perform_aggregation](600)
     [and?] @[aggregation]?
     [[~[i need]|for]|what [is|about]?] [the?] @[aggregation][[, @[aggregation]?] and @[aggregation]?][\??]
-    @[aggregation] [with?] [lower ~[limit] @[number]("role": "lower")?] [and?] [upper ~[limit] @[number]("role": "upper")?]
+    @[aggregation] [with?] [lower ~[limit?] @[number]("role": "lower")?] [and?] [upper ~[limit?] @[number]("role": "upper")?]
+    @[aggregation] [with?] @[number]
+
+%[&change_aggregation_param](300)
+    @[number]
+    [[~[i need]|for]|what [is|about]?] lower ~[limit?] @[number]("role": "lower")
+    [[~[i need]|for]|what [is|about]?] upper ~[limit?] @[number]("role": "upper")
 
 |aggregation_slots.chatette
 |../../../Common/general.chatette

@@ -35,18 +35,18 @@ pipeline:
     min_ngram: 1
     max_ngram: 4
 
-  # - name: LanguageModelFeaturizer
-  #   model_name: roberta
-  #   model_weights: roberta-base
+  - name: LanguageModelFeaturizer
+    model_name: gpt2
+    model_weights: gpt2
 
   - name: DIETClassifier
-    epochs: 300
+    epochs: 200
     constrain_similarities: true
 
   - name: abot.extractor.duckling.DucklingEntityExtractor
     # dimensions to extract
     # comment for all dimensions - ["time", "number", "amount-of-money", "distance"]
-    dimensions: ["time", "number"]
+    dimensions: ["time"]
     # allows you to configure the locale, by default the language is
     # used
     locale: "en_IN"
@@ -83,9 +83,9 @@ policies:
   core_fallback_action_name: action_default_fallback
   enable_fallback_prediction: true
 
-# - name: UnexpecTEDIntentPolicy
-#   max_history: 5
-#   epochs: 100
+- name: UnexpecTEDIntentPolicy
+  max_history: 5
+  epochs: 400
 
 - name: TEDPolicy
   max_history: 5

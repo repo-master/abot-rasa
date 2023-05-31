@@ -7,7 +7,7 @@ USER root
 
 WORKDIR /app
 COPY ./requirements.actions.txt /app/requirements.actions.txt
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.actions.txt
+RUN pip install -q --no-cache-dir --upgrade -r /app/requirements.actions.txt
 
 COPY . /app
 
