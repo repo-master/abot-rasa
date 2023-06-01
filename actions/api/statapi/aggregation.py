@@ -10,7 +10,8 @@ from typing import Union, Set
 
 
 async def aggregation(data: pd.DataFrame,
-                      method: Union[AggregationMethod, Set[AggregationMethod]] = AggregationMethod.RECENT
+                      method: Union[AggregationMethod, Set[AggregationMethod]] = AggregationMethod.RECENT,
+                      **options
                       ) -> AggregationOut:
     '''Perform aggregation using given method on the "value" column'''
     async with Client() as client:
@@ -23,7 +24,8 @@ async def aggregation(data: pd.DataFrame,
 
             # AggregationIn
             "method": method,
-            "aggregation_column": "value"
+            "aggregation_column": "value",
+            "aggregation_options": options
         })
         response.raise_for_status()
         return response.json()

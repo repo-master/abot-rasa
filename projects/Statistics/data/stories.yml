@@ -11,32 +11,31 @@ stories:
   - intent: intent_perform_aggregation_quantile
   - action: action_aggregation
 
-- story: Special case quantile not set
-  steps:
-  - intent: intent_perform_aggregation_quantile
-  - slot_was_set:
-    - quantile: null
-  - action: form_aggregation_percentile
-  - active_loop: form_aggregation_percentile
-  - action: action_aggregation
-
+# - story: Special case quantile not set
+#   steps:
+#   - intent: intent_perform_aggregation_quantile
+#   - slot_was_set:
+#     - quantile: null
+#   - action: form_aggregation_percentile
+#   - active_loop: form_aggregation_percentile
+#   - action: action_aggregation
 
 - story: Special case compliance
   steps:
   - intent: intent_perform_aggregation_compliance
   - action: action_aggregation
 
-- story: Special case compliance not set
-  steps:
-  - intent: intent_perform_aggregation_compliance
-  - or:
-    - slot_was_set:
-      - compliance_bound_lower: null
-    - slot_was_set:
-      - compliance_bound_upper: null
-  - action: form_aggregation_compliance
-  - active_loop: form_aggregation_compliance
-  - action: action_aggregation
+# - story: Special case compliance not set
+#   steps:
+#   - intent: intent_perform_aggregation_compliance
+#   - or:
+#     - slot_was_set:
+#       - compliance_bound_lower: null
+#     - slot_was_set:
+#       - compliance_bound_upper: null
+#   - action: form_aggregation_compliance
+#   - active_loop: form_aggregation_compliance
+#   - action: action_aggregation
 
 
 # - story: quantile case

@@ -58,6 +58,14 @@ def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs)
                 agg_method=am.value.title(),
                 value=value*100
             )
+        if am == AggregationMethod.QUANTILE:
+            # Quantile shown with the requested value
+            return '{percentile}{agg_method}: {value:.2f}{unit_symbol}'.format(
+                percentile=kwargs.get('quantile_size', ''),
+                agg_method=am.value.title(),
+                value=value,
+                unit_symbol=unit_symbol
+            )
         if am == AggregationMethod.COUNT:
             return '{agg_method}: {value}'.format(
                 agg_method=am.value.title(),

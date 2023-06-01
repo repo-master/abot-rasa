@@ -22,6 +22,11 @@ from .schemas import StatementContext
 from .language_helper import summary_AggregationOut
 
 
+def cast_float(o, default = None) -> Optional[float]:
+    try:
+        return float(o)
+    except (TypeError, ValueError):
+        return default
 
 
 def update_statement_context(tracker: Tracker, events: list, data: StatementContext):
@@ -83,7 +88,7 @@ class ActionAggregation(Action):
                     dispatcher.utter_message("What value of percentile?")
                     return events
                 # Percentile (between 0.0 and 1.0)
-                agg_opts.update({"quantile_size": float(tracker.get_slot("quantile")) / 100.0})
+                agg_opts.update({"quantile_size": cast_float(tracker.get_slot("quantile"), 50) / 100.0})
 
             # Special cases
             if aggregation == AggregationMethod.COMPLIANCE:
@@ -92,11 +97,11 @@ class ActionAggregation(Action):
                     return events
 
                 agg_opts.update({
-                    "lower_target": float(tracker.get_slot("compliance_bound_lower")),
-                    "upper_target": float(tracker.get_slot("compliance_bound_upper"))
+                    "lower_target": cast_float(tracker.get_slot("compliance_bound_lower")),
+                    "upper_target": cast_float(tracker.get_slot("compliance_bound_upper"))
                 })
 
-            aggregated_result = await statapi.aggregation(data_df, aggregation)
+            aggregated_result = await statapi.aggregation(data_df, aggregation, **agg_opts)
             agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=data_meta.get("display_unit", ''))
             dispatcher.utter_message(agg_response_text)
 

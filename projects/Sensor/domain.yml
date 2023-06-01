@@ -7,6 +7,7 @@ intents:
 #     use_entities:
 #     - metric_type
 - sensor_generate_report
+- sensor_report_download
 - sensor_status
 - query_sensor_list
 - query_location_list
@@ -18,6 +19,7 @@ entities:
 - metric_type
 - location
 - sensor_name_input
+- download_format
 
 
 slots:
@@ -47,6 +49,13 @@ slots:
     - type: from_entity
       entity: sensor_name_input
       intent: activate_sensor_name_form
+  report_download_format:
+    type: text
+    initial_value: pdf
+    mappings:
+    - type: from_entity
+      entity: download_format
+      intent: sensor_report_download
   slot_json:
     type: any
     mappings:
@@ -85,6 +94,7 @@ actions:
 - action_reset_slot
 - action_reset_sensor_name
 - action_query_sensor_status
+- action_download_report
 
 responses:
   utter_ask_data_time_range:

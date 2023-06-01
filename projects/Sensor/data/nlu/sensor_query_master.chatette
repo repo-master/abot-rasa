@@ -1,5 +1,4 @@
 %[&query_metric_aggregate](600)
-    @[metric_type][\??]
     [~[i need?]|what [is|about]?] [the?] @[metric_type] [[at|in] [location?] @[location]?][\??]
     [~[i need?]|what [is|about]?] [the?] @[location?] @[metric_type][\??]
     [~[i need?]|what [is|about]?] [the?] @[metric_type] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|at?] ~[pre_time?] ~[time?] [[at|in] [location?] @[location]?][\??] 
@@ -7,10 +6,17 @@
     [~[i need?]|what [is|about|are]?] [~[time]['s?]?] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|of?] @[metric_type] [[at|in] [location?] @[location]?][\??]
 
 %[&change_source](600)
+    @[metric_type] ~[sensor?][\??]
     [[~[i need]|for]|what [is|about]?] [the?] @[metric_type][\??]
     [~[i need]|for] ~[time][\??]
     [what [is|about]] [for?] ~[time][\??]
     ~[time]
+    @[metric_type] ~[sensor?] ~[time][\??]
+    @[metric_type] ~[sensor?] @[location] ~[time][\??]
+    @[metric_type] ~[sensor?] ~[time] @[location][\??]
+    @[location] @[metric_type] ~[sensor?] ~[time][\??]
+    ~[time] @[location] @[metric_type] ~[sensor?][\??]
+    ~[time] @[metric_type] @[location] ~[sensor?][\??]
 
 %[&sensor_status](600)
     [what|which|current] ~[sensor] [status?]?
@@ -33,7 +39,11 @@
     [report|chart|plot] [on|for] [this|that][\??]
     [report|chart|plot|graph]
 
+%[sensor_report_download](700)
+    [Download|give?] @[download_format] [report|chart|plot?] [file?]
+
 |sensor_type_slots.chatette
+|report_slots.chatette
 |../../../Common/general.chatette
 |../../../Common/time_aliases.chatette
 |../../../Statistics/data/nlu/aggregation_slots.chatette

@@ -47,6 +47,11 @@ rules:
   - intent : sensor_generate_report
   - action : action_fetch_report
 
+- rule: report downloading
+  steps:
+  - intent: sensor_report_download
+  - action: action_download_report
+
 - rule: Sensor status enquiry
   steps:
   - intent: sensor_status

@@ -204,19 +204,33 @@ class ActionFetchReport(Action):
             message = dict()
             message['text'] = "Okay, here is the report plot."
             message['custom'] = {}
+            message['buttons'] = []
             if preview_image_url:
                 message['image'] = preview_image_url
             if interactive_plot:
                 message['custom']['chart'] = interactive_plot
+                message['buttons'].append({
+                    'title': "Download PDF",
+                    'payload': '/sensor_report_download{"download_format": "pdf"}'
+                })
 
             dispatcher.utter_message(**message)
-            dispatcher.utter_message(response="utter_did_that_help")
         except HTTPStatusError as exc:
             if exc.response.is_client_error:
                 raise ClientException(
                     "Sorry, No data found for sensor at the given time range.")
 
         return events
+
+
+class ActionDownloadReport(Action):
+    def name(self):
+        return "action_download_report"
+
+    @action_exception_handle_graceful
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+        dispatcher.utter_message(attachment="https://github.com/repo-master/abot-rasa/releases/download/v2023.06.01r3/dev-model.tar.gz")
+        return []
 
 
 class ActionShowSensorList(Action):
