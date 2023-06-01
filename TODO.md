@@ -1,5 +1,8 @@
 # Tasks pending
 
+- Fix telegram kick
+- Button gets hidden after second message
+
 ## Scrum 2
 
 - [ ] Location given (or none)

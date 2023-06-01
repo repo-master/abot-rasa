@@ -2,8 +2,16 @@
 %[&intent_perform_aggregation](600)
     [and?] @[aggregation]?
     [[~[i need]|for]|what [is|about]?] [the?] @[aggregation][[, @[aggregation]?] and @[aggregation]?][\??]
-    @[aggregation] [with?] [lower ~[limit?] @[number]("role": "lower")?] [and?] [upper ~[limit?] @[number]("role": "upper")?]
-    @[aggregation] [with?] @[number]
+
+%[&intent_perform_aggregation_quantile](100)
+    [and?] @[aggregation_quantile][\??]
+    @[aggregation_quantile] [with?] @[number]
+
+
+%[&intent_perform_aggregation_compliance](100)
+    @[aggregation_compliance][\??]
+    @[aggregation_compliance] [with?] [lower ~[limit?] @[number]("role": "lower")?] [and?] [upper ~[limit?] @[number]("role": "upper")?][\??]
+
 
 %[&change_aggregation_param](300)
     @[number]

@@ -9,7 +9,7 @@ import logging
 from typing import Any, Dict, List, Optional, Text, Tuple, Union
 
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet
+from rasa_sdk.events import SlotSet, ActiveLoop
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.interfaces import Tracker
 from rasa_sdk.types import DomainDict
@@ -147,6 +147,7 @@ class ActionSensorDataLoad(Action):
                 }
                 for sensor_obj in requested_sensors
             ])
+            events.append(ActiveLoop("form_sensor_name"))
             return events
 
         dispatcher.utter_message(text="Loading sensor %s at time range %s to %s..." % (

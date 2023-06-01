@@ -8,9 +8,13 @@
     ~[maximum] = maximum
     ~[stddev] = stddev
     ~[count] = count
-    ~[compliance] = compliance
-    ~[quantile] = quantile
     ~[summary] = summary
+
+@[aggregation_quantile]
+    ~[quantile] = quantile
+
+@[aggregation_compliance]
+    ~[compliance] = compliance
 
 @[number]
     25

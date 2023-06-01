@@ -2,6 +2,8 @@ version: '3.1'
 
 intents:
 - intent_perform_aggregation
+- intent_perform_aggregation_quantile
+- intent_perform_aggregation_compliance
 - change_aggregation_param
 - ask_followup_summary_details
 - ask_for_max_outlier
@@ -12,6 +14,8 @@ intents:
 
 entities:
 - aggregation
+- aggregation_quantile
+- aggregation_compliance
 
 slots:
   aggregation:
@@ -19,6 +23,12 @@ slots:
     mappings:
     - type: from_entity
       entity: aggregation
+    - type: from_entity
+      entity: aggregation_quantile
+      intent: intent_perform_aggregation_quantile
+    - type: from_entity
+      entity: aggregation_compliance
+      intent: intent_perform_aggregation_compliance
   
   statement_context:
     type: any

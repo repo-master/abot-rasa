@@ -12,6 +12,8 @@ from rasa_sdk.types import DomainDict
 from .api import statapi
 from .api.dataapi import get_loaded_data
 from .api.cache import PandasDataCache
+from .api.statapi.schemas import AggregationMethod
+
 from .common import (ACTION_STATEMENT_CONTEXT_SLOT, ClientException, JSONCustomEncoder,
                      action_exception_handle_graceful, find_event_first)
 from .insights import describe_all_data_insights
@@ -71,6 +73,28 @@ class ActionAggregation(Action):
                         "- %d %s(s)" % (v, k) for k, v in insight_type_counts.items()
                     ])
                     dispatcher.utter_message(text="In the selected data, I've found:\n%s" % counts)
+
+            agg_opts = {}
+
+            # Special cases
+            if aggregation == AggregationMethod.QUANTILE:
+                if not tracker.get_slot("quantile"):
+                    # If percentile slot is not filled, ask the user for the value
+                    dispatcher.utter_message("What value of percentile?")
+                    return events
+                # Percentile (between 0.0 and 1.0)
+                agg_opts.update({"quantile_size": float(tracker.get_slot("quantile")) / 100.0})
+
+            # Special cases
+            if aggregation == AggregationMethod.COMPLIANCE:
+                if not (tracker.get_slot("compliance_bound_lower") or tracker.get_slot("compliance_bound_upper")):
+                    dispatcher.utter_message("What lower and/or upper target?")
+                    return events
+
+                agg_opts.update({
+                    "lower_target": float(tracker.get_slot("compliance_bound_lower")),
+                    "upper_target": float(tracker.get_slot("compliance_bound_upper"))
+                })
 
             aggregated_result = await statapi.aggregation(data_df, aggregation)
             agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=data_meta.get("display_unit", ''))
