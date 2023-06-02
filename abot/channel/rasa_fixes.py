@@ -2,6 +2,7 @@
 import logging
 from typing import Any, Dict
 
+import os
 import rasa
 import rasa.utils.endpoints
 from rasa.core.channels.channel import UserMessage, OutputChannel
@@ -41,6 +42,7 @@ def monkey_patch():
 
 if not hasattr(rasa, "_is_fixed_abot"):
     monkey_patch()
+    print("PGSQL SCHEMA SET ==", os.environ.get('POSTGRESQL_SCHEMA'), flush=True)
     setattr(rasa, '_is_fixed_abot', True)
 
 __all__ = [
