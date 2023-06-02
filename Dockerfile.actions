@@ -1,8 +1,6 @@
 # Run the Abot Rasa Actions server
 FROM rasa/rasa-sdk:3.4.1
 
-ENV BACKEND_ENDPOINT_BASE=$BACKEND_ENDPOINT_BASE
-
 USER root
 
 WORKDIR /app
