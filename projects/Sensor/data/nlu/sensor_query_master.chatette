@@ -4,6 +4,7 @@
     [~[i need?]|what [is|about]?] [the?] @[metric_type] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|at?] ~[pre_time?] ~[time?] [[at|in] [location?] @[location]?][\??] 
     [~[i need?]|what [is|about|are]?] [the?] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|of?] @[metric_type] [[at|in] [location?] @[location]?] [for|at?] ~[pre_time?] ~[time?][\??]
     [~[i need?]|what [is|about|are]?] [~[time]['s?]?] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|of?] @[metric_type] [[at|in] [location?] @[location]?][\??]
+    [~[i need?]|what [is|about|are]?] [the?] @[aggregation][, @[aggregation?] and @[aggregation]?] [for|of?] @[metric_type] [[at|in] [location?] @[location]?] [for|at?] ~[pre_time?] ~[time?] [with|having?] @[load_aggregation_interval] ~[pre_time][\??]
 
 %[&change_source](600)
     @[metric_type] ~[sensor?][\??]
@@ -11,9 +12,13 @@
     [~[i need]|for] ~[time][\??]
     [what [is|about]] [for?] ~[time][\??]
     ~[time]
+    @[load_aggregation_interval] ~[pre_time]
+    ~[pre_time] @[load_aggregation_interval]
     @[metric_type] ~[sensor?] ~[time][\??]
+    @[metric_type] ~[sensor?] ~[time] @[load_aggregation_interval] ~[pre_time][\??]
     @[metric_type] ~[sensor?] @[location] ~[time][\??]
     @[metric_type] ~[sensor?] ~[time] @[location][\??]
+    @[metric_type] ~[sensor?] ~[time] @[location] @[load_aggregation_interval] ~[pre_time][\??]
     @[location] @[metric_type] ~[sensor?] ~[time][\??]
     ~[time] @[location] @[metric_type] ~[sensor?][\??]
     ~[time] @[metric_type] @[location] ~[sensor?][\??]

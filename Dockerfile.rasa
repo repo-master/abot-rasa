@@ -15,6 +15,3 @@ COPY . /app
 USER root
 RUN pip install -q -r requirements.rasa.txt
 USER 1001
-
-# TODO: Fix the args issue
-CMD ["run", "--endpoints", "endpoints.test.yml", "--credentials", "credentials.test.yml"]

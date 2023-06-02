@@ -49,6 +49,14 @@ slots:
     - type: from_entity
       entity: sensor_name_input
       intent: activate_sensor_name_form
+  load_aggregation_interval:
+    type: any
+    mappings:
+    - type: from_entity
+      entity: duration
+      intent:
+      - query_metric_aggregate
+      - change_source
   report_download_format:
     type: text
     initial_value: pdf

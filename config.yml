@@ -46,7 +46,7 @@ pipeline:
   - name: abot.extractor.duckling.DucklingEntityExtractor
     # dimensions to extract
     # comment for all dimensions - ["time", "number", "amount-of-money", "distance"]
-    dimensions: ["time"]
+    dimensions: ["time", "duration"]
     # allows you to configure the locale, by default the language is
     # used
     locale: "en_IN"
@@ -79,7 +79,7 @@ policies:
 - name: MemoizationPolicy
 
 - name: RulePolicy
-  core_fallback_threshold: 0.6
+  core_fallback_threshold: 0.4
   core_fallback_action_name: action_default_fallback
   enable_fallback_prediction: true
 

@@ -67,7 +67,9 @@
     Dec[ember?]
 
 ~[pre_time]
+    range
     time[ range?]
     date
     duration
     period
+    interval
