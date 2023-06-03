@@ -31,11 +31,9 @@ responses:
       I am Abot, a chat bot designed for solving statistical or data-related problems.
       I can perform data analysis, perform aggregation on data, and even generate report charts.
     buttons:
-    - title: List of sensors
-      payload: /query_sensor_list
-    - title: Search by sensor name
+    - title: Sensor details
       payload: /activate_sensor_name_form
-    - title: Data aggregation
-      payload: /query_metric_aggregate
+    - title: Sensor report
+      payload: /sensor_generate_report
   utter_youre_welcome:
   - text: You're welcome!

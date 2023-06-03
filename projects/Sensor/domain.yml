@@ -125,6 +125,8 @@ responses:
   utter_ask_query:
   - text: What would you like to know about the sensor?
     buttons:
+    - title: Status
+      payload: /sensor_status
     - title: Average
       payload: average
     - title: Median
