@@ -57,6 +57,11 @@ slots:
       intent:
       - query_metric_aggregate
       - change_source
+  need_select_sensor:
+    type: bool
+    initial_value: false
+    mappings:
+    - type: custom
   report_download_format:
     type: text
     initial_value: pdf

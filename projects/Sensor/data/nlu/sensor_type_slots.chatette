@@ -7,7 +7,7 @@
     [[A|B|C][1|2|3|4]]_[GF|FF|SF]_[A|B|C]
     Block [A|B|C] [Ground|First|Second] Floor
 
-@[load_aggregation_interval]
+~[time_agg_interval]
     ~[num] ~[time_period]
 
 |sensor_type_aliases.chatette

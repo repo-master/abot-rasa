@@ -1,15 +1,15 @@
 version: "3.1"
 
-stories:
-- story: User wants to perform aggregation on loaded data or change aggregation method
-  steps:
-  - intent: intent_perform_aggregation
-  - action: action_aggregation
+stories: []
+# - story: User wants to perform aggregation on loaded data or change aggregation method
+#   steps:
+#   - intent: intent_perform_aggregation
+#   - action: action_aggregation
 
-- story: Special case quantile
-  steps:
-  - intent: intent_perform_aggregation_quantile
-  - action: action_aggregation
+# - story: Special case quantile
+#   steps:
+#   - intent: intent_perform_aggregation_quantile
+#   - action: action_aggregation
 
 # - story: Special case quantile not set
 #   steps:
@@ -20,10 +20,10 @@ stories:
 #   - active_loop: form_aggregation_percentile
 #   - action: action_aggregation
 
-- story: Special case compliance
-  steps:
-  - intent: intent_perform_aggregation_compliance
-  - action: action_aggregation
+# - story: Special case compliance
+#   steps:
+#   - intent: intent_perform_aggregation_compliance
+#   - action: action_aggregation
 
 # - story: Special case compliance not set
 #   steps:
