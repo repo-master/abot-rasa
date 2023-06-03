@@ -49,14 +49,14 @@ rules:
   - active_loop: null
   - action: action_sensor_data_load
 
-- story: User asks to load sensor data and to perform aggregation on it
+- rule: User asks to load sensor data and to perform aggregation on it
   steps:
   - intent: query_metric_aggregate
   - action: action_reset_sensor_name
   - action: action_sensor_data_load
   - action: action_aggregation
 
-- story: User wants to change a parameter, reload data and perform aggregation again
+- rule: User wants to change a parameter, reload data and perform aggregation again
   steps:
   - intent: change_source
   - action: action_reset_sensor_name
