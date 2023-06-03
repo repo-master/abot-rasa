@@ -5,7 +5,8 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet
+from rasa_sdk.forms import FormValidationAction
+from rasa_sdk.events import EventType, SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
 
@@ -24,6 +25,8 @@ from .language_helper import summary_AggregationOut
 
 def cast_float(o, default = None) -> Optional[float]:
     try:
+        if o == float('inf') or o == float('-inf'):
+            return default
         return float(o)
     except (TypeError, ValueError):
         return default
@@ -102,7 +105,7 @@ class ActionAggregation(Action):
                 })
 
             aggregated_result = await statapi.aggregation(data_df, aggregation, **agg_opts)
-            agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=data_meta.get("display_unit", ''))
+            agg_response_text = summary_AggregationOut(aggregated_result, unit_symbol=data_meta.get("display_unit", ''), **agg_opts)
             dispatcher.utter_message(agg_response_text)
 
         return events
@@ -167,3 +170,56 @@ class ActionDescribeCountEventDetails(Action):
                 dispatcher.utter_message(text=f"No Outlier found")
 
         return events
+
+
+class ActionAskForSensorNameSlot(Action):
+    def name(self) -> str:
+        return "action_ask_quantile"
+
+    def run(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> List[EventType]:
+        dispatcher.utter_message(text="Enter the percentile (eg. 99):")
+        return []
+
+class ValidateAggregationComplianceForm(FormValidationAction):
+    def name(self) -> str:
+        return "validate_form_aggregation_compliance"
+
+    # Slot validation
+    # - compliance_bound_lower
+    # - compliance_bound_upper
+
+    def validate_compliance_bound_lower(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> EventType:
+        if not tracker.active_loop.get('name'):
+            return {}
+        if str(slot_value).lower() == 'none':
+            return {"compliance_bound_lower": float('-inf')}
+        try:
+            return {"compliance_bound_lower": float(slot_value)}
+        except (TypeError, ValueError):
+            dispatcher.utter_message(text="Invalid value. Enter a number or 'none'.")
+            return {"compliance_bound_lower": None}
+
+    def validate_compliance_bound_upper(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> EventType:
+        if not tracker.active_loop.get('name'):
+            return {}
+        if str(slot_value).lower() == 'none':
+            return {"compliance_bound_upper": float('inf')}
+        try:
+            return {"compliance_bound_upper": float(slot_value)}
+        except (TypeError, ValueError):
+            dispatcher.utter_message(text="Invalid value. Enter a number or 'none'.")
+            return {"compliance_bound_upper": None}

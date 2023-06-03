@@ -1,5 +1,6 @@
 
 import json
+import urllib.parse
 from typing import List, Optional
 
 from ..client import Client
@@ -77,6 +78,14 @@ async def get_report_generate_preview(metadata: SensorMetadata, fetch_range: Tim
 
         return response.json()
 
+def get_report_download_url(metadata: SensorMetadata, fetch_range: TimeRange, format: str = 'pdf') -> str:
+    # Temporary
+    query_params = urllib.parse.urlencode({
+        'sensor_id': metadata['sensor_id'],
+        'timestamp_from': fetch_range["from"],
+        'timestamp_to': fetch_range["to"]
+    })
+    return f"/genesis/data/report/download/{format}?{query_params}"
 
 def user_to_sensor_type(name: Optional[str]) -> Optional[str]:
     name = name.lower() if name is not None else ''
@@ -108,6 +117,7 @@ __all__ = [
     'determine_user_request_sensor',
     'sensor_query_metadata',
     'get_report_generate_preview',
+    'get_report_download_url',
     'user_to_sensor_type',
     'sensor_name_coalesce',
     'location_name_coalesce'

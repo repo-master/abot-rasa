@@ -12,32 +12,37 @@ rules:
   - action: form_aggregation_percentile
   - active_loop: form_aggregation_percentile
   - slot_was_set:
-    - requested_slot: quantile
-  - slot_was_set:
-    - quantile
-  - slot_was_set:
     - requested_slot: null
   - active_loop: null
   - action: action_aggregation
+
+# - rule: Special case quantile was set via entity
+#   steps:
+#   - intent: intent_perform_aggregation_quantile
+#   - condition:
+#     - slot_was_set:
+#       - quantile
+#   - action: action_aggregation
 
 - rule: Special case compliance
   steps:
   - intent: intent_perform_aggregation_compliance
   - action: form_aggregation_compliance
   - active_loop: form_aggregation_compliance
-  - or:
-    - slot_was_set:
-      - requested_slot: compliance_bound_lower
-    - slot_was_set:
-      - requested_slot: compliance_bound_upper
-  - slot_was_set:
-    - compliance_bound_lower
-  - slot_was_set:
-    - compliance_bound_upper
   - slot_was_set:
     - requested_slot: null
   - active_loop: null
   - action: action_aggregation
+
+# - rule: Special case compliance was set via entity
+#   steps:
+#   - intent: intent_perform_aggregation_compliance
+#   - condition:
+#     - slot_was_set:
+#       - compliance_bound_lower
+#     - slot_was_set:
+#       - compliance_bound_upper
+#   - action: action_aggregation
 
 - rule: Some value that the user needs more details of.
   steps:

@@ -17,7 +17,10 @@ def user_to_aggregation_type(name: Optional[Union[str, List[str]]]) -> Union[Agg
         if isinstance(name, list) and len(name) == 1:
             name = name[0]
         if isinstance(name, str):
-            aggregation = AggregationMethod(name.lower())
+            try:
+                aggregation = AggregationMethod(name.lower())
+            except ValueError:
+                pass
         elif isinstance(name, list):
             aggregation = set(map(lambda n: AggregationMethod(n.lower()), name))
 
@@ -59,10 +62,19 @@ def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs)
                 value=value*100
             )
         if am == AggregationMethod.QUANTILE:
+            def _quantile_to_percent():
+                q_size = kwargs.get('quantile_size')
+                if q_size is not None:
+                    try:
+                        return "{} ".format(round(float(q_size) * 100, 2))
+                    except (ValueError, TypeError):
+                        pass
+                return ''
+
             # Quantile shown with the requested value
             return '{percentile}{agg_method}: {value:.2f}{unit_symbol}'.format(
-                percentile=kwargs.get('quantile_size', ''),
-                agg_method=am.value.title(),
+                percentile=_quantile_to_percent(),
+                agg_method='Percentile',
                 value=value,
                 unit_symbol=unit_symbol
             )

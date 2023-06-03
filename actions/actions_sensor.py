@@ -9,7 +9,9 @@ import logging
 from typing import Any, Dict, List, Optional, Text, Tuple, Union
 
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet, ActiveLoop
+from rasa_sdk.events import EventType
+from rasa_sdk.forms import FormValidationAction
+from rasa_sdk.events import SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.interfaces import Tracker
 from rasa_sdk.types import DomainDict
@@ -25,7 +27,7 @@ from .language_helper import user_to_timeperiod, string_timestamp_to_human
 LOGGER = logging.getLogger(__name__)
 
 
-async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text, Any]]) -> Tuple[Dict, Dict]:
+async def parse_input_sensor_operation(tracker: Tracker, events: List[EventType]) -> Tuple[Dict, Dict]:
     user_input = {}
     parsed_input = {}
 
@@ -33,11 +35,13 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[Dict[Text,
     user_req_metric: Optional[str] = tracker.get_slot("metric")
     user_req_location: Optional[str] = tracker.get_slot("location")
     user_req_sensor_name: Optional[str] = tracker.get_slot("sensor_name")
+    user_req_agg_interval: Optional[str] = tracker.get_slot("load_aggregation_interval")
 
     user_input.update({
         'user_req_metric': user_req_metric,
         'user_req_location': user_req_location,
-        'user_req_sensor_name': user_req_sensor_name
+        'user_req_sensor_name': user_req_sensor_name,
+        'user_req_agg_interval': user_req_agg_interval
     })
 
     # Debug output
@@ -120,8 +124,8 @@ class ActionSensorDataLoad(Action):
         return "action_sensor_data_load"
 
     @action_exception_handle_graceful
-    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
-        events: List[Dict[str, Any]] = []
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[EventType]:
+        events: List[EventType] = []
         parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
 
         requested_sensors = await search_best_matching_sensors(parsed_input)
@@ -147,7 +151,7 @@ class ActionSensorDataLoad(Action):
                 }
                 for sensor_obj in requested_sensors
             ])
-            events.append(ActiveLoop("form_sensor_name"))
+            events.append(SlotSet("need_select_sensor", True))
             return events
 
         dispatcher.utter_message(text="Loading sensor %s at time range %s to %s..." % (
@@ -156,6 +160,7 @@ class ActionSensorDataLoad(Action):
             parsed_input['timeperiod']['to'].strftime('%c')
         ))
 
+        events.append(SlotSet("need_select_sensor", False))
         reset_slot(slot_name="metric", value=requested_sensor["sensor_type"], events=events)
         reset_slot(slot_name="location", value=requested_sensor["sensor_location"]['unit_alias'], events=events)
         reset_slot(slot_name="sensor_name", value=requested_sensor['sensor_name'], events=events)
@@ -184,8 +189,8 @@ class ActionFetchReport(Action):
         return "action_fetch_report"
 
     @action_exception_handle_graceful
-    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-        events: List[Dict[str, Any]] = []
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[EventType]:
+        events: List[EventType] = []
 
         try:
             sensor_selected = dataapi.get_cache("sensor")
@@ -228,8 +233,20 @@ class ActionDownloadReport(Action):
         return "action_download_report"
 
     @action_exception_handle_graceful
-    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-        dispatcher.utter_message(attachment="https://github.com/repo-master/abot-rasa/releases/download/v2023.06.01r3/dev-model.tar.gz")
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[EventType]:
+        sensor_selected = dataapi.get_cache("sensor")
+        if sensor_selected is None:
+            raise ClientException(
+                "Sorry, sensor data not selected. Try specifying sensor and time range.",
+                print_traceback=False)
+
+        sensor_metadata: SensorMetadata = sensor_selected._loader_params['metadata']
+        sensor_data_select_range: TimeRange = sensor_selected._loader_params['fetch_range']
+        report_endpoint = integration_genesis.get_report_download_url(sensor_metadata,sensor_data_select_range)
+        dispatcher.utter_message(
+            text="[Click here](http://uat.phaidelta.com:8091%s) to download the report." % report_endpoint,
+            attachment=report_endpoint
+        )
         return []
 
 
@@ -238,7 +255,7 @@ class ActionShowSensorList(Action):
         return "action_show_sensor_list"
 
     @action_exception_handle_graceful
-    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[EventType]:
         try:
             sensors = await integration_genesis.query_sensor_list()
         except ConnectError as e:
@@ -265,8 +282,8 @@ class ActionResetSlot(Action):
         return "action_reset_slot"
 
     @action_exception_handle_graceful
-    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
-        events: List[Dict[str, Any]] = []
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[EventType]:
+        events: List[EventType] = []
         reset_slot(slot_name="sensor_name", value=None, events=events)
         reset_slot(slot_name="metric", value=None, events=events)
         reset_slot(slot_name="location", value=None, events=events)
@@ -278,7 +295,7 @@ class ActionResetSensorNameSlot(Action):
         return "action_reset_sensor_name"
 
     @action_exception_handle_graceful
-    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[Dict[Text, Any]]:
+    async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[EventType]:
         return [SlotSet("sensor_name", None)]
 
 
@@ -286,7 +303,7 @@ class ActionShowLocationList(Action):
     def name(self) -> Text:
         return "action_show_location_list"
 
-    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[EventType]:
         try:
             locations = await integration_genesis.query_location_list()
         except ConnectError as e:
@@ -310,7 +327,7 @@ class ActionQuerySensorStatus(Action):
         return "action_query_sensor_status"
 
     @action_exception_handle_graceful
-    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[EventType]:
         try:
             sensor_selected = dataapi.get_cache("sensor")
             if sensor_selected is None:
@@ -360,7 +377,7 @@ class ActionShowTimerangeValue(Action):
     def name(self) -> Text:
         return "action_ask_data_value_timerange"
 
-    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[EventType]:
         HUMAN_TIME_FORMAT = "%c"
         time_range = await user_to_timeperiod(tracker, autoset_default=None)
         if time_range:
@@ -377,10 +394,86 @@ class ActionShowLocationValue(Action):
     def name(self) -> Text:
         return "action_ask_data_value_location"
 
-    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[EventType]:
         user_req_location: Optional[str] = tracker.get_slot("location")
         if user_req_location:
             dispatcher.utter_message(text="Location: %s" % user_req_location)
         else:
             dispatcher.utter_message(text="Location is not provided for data.")
         return []
+
+
+# Sensor name
+
+class ActionAskForSensorNameSlot(Action):
+    def name(self) -> Text:
+        return "action_ask_sensor_name"
+
+    def run(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> List[EventType]:
+        if tracker.get_slot('flag_should_ask_sensor_name'):
+            dispatcher.utter_message(text="Enter the sensor name:")
+        return []
+
+class ValidateSensorForm(FormValidationAction):
+    def name(self) -> Text:
+        return "validate_form_sensor_name"
+
+    # Slot validation
+    async def validate_sensor_name(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> EventType:
+        if not tracker.active_loop.get('name'):
+            return {"flag_should_ask_sensor_name": True}
+
+        def loc_at_str(s):
+            if s:
+                return ' at ' + s
+            return ''
+
+        search_sensors = await search_best_matching_sensors({
+            'sensor_name': slot_value
+        })
+
+        if len(search_sensors) == 0:
+            # No matches
+            dispatcher.utter_message(text="Sensor named '%s' not found." % slot_value)
+            return {"sensor_name": None, "flag_should_ask_sensor_name": True}
+        elif len(search_sensors) == 1:
+            # Match found
+            return {
+                "sensor_name": slot_value,
+                "location": None,
+                "metric": None,
+                "flag_should_ask_sensor_name": True
+            }
+        else:
+            # More than 1
+            dispatcher.utter_message(text="Select a sensor from matches:", buttons=[
+                {
+                    "title": "%s%s" % (
+                        integration_genesis.sensor_name_coalesce(sensor_obj),
+                        loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
+                    ),
+                    "payload": sensor_obj["sensor_name"]
+                }
+                for sensor_obj in search_sensors
+            ])
+
+            return {"sensor_name": None, "flag_should_ask_sensor_name": False}
+
+    async def required_slots(
+        self,
+        domain_slots: List[Text],
+        dispatcher: "CollectingDispatcher",
+        tracker: "Tracker",
+        domain: "DomainDict",
+    ) -> List[Text]:
+        text_of_last_user_message = tracker.latest_message.get("text")
+        updated_slots = domain_slots.copy()
+        return updated_slots
