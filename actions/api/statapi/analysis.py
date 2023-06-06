@@ -1,13 +1,13 @@
 '''APIs for data analysis'''
 
-from ..client import Client
+from ..client import StatAPIClient
 
 import pandas as pd
 
 
 async def outliers(data: pd.DataFrame) -> pd.DataFrame:
     '''Detect outliers in the "value" column'''
-    async with Client() as client:
+    async with StatAPIClient() as client:
         # Send DataFrame and parameters
         response = await client.post("/statistics/outliers", json={
             # DataIn

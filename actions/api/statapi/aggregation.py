@@ -1,6 +1,6 @@
 '''APIs for data aggregation'''
 
-from ..client import Client
+from ..client import StatAPIClient
 
 from .schemas import AggregationMethod, AggregationOut
 
@@ -14,7 +14,7 @@ async def aggregation(data: pd.DataFrame,
                       **options
                       ) -> AggregationOut:
     '''Perform aggregation using given method on the "value" column'''
-    async with Client() as client:
+    async with StatAPIClient() as client:
         # Send DataFrame and parameters
         response = await client.post("/statistics/aggregation", json={
             # DataIn

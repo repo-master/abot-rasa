@@ -8,7 +8,11 @@ from .config import BACKEND_ENDPOINT_BASE, DUCKLING_HTTP_URL
 monkeypatch_httpx()
 
 
-def Client(**kwargs) -> AsyncClient:
+def StatAPIClient(**kwargs) -> AsyncClient:
+    return AsyncClient(base_url=BACKEND_ENDPOINT_BASE, timeout=60.0, **kwargs)
+
+
+def FulfillmentClient(**kwargs) -> AsyncClient:
     return AsyncClient(base_url=BACKEND_ENDPOINT_BASE, timeout=60.0, **kwargs)
 
 

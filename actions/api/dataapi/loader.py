@@ -2,7 +2,7 @@
 
 from rasa_sdk import Tracker
 
-from .. import Client
+from .. import FulfillmentClient
 from ..cache.cache import Cache, PandasDataCache, CacheHolder
 from .schemas import DataLoaderRequest
 
@@ -13,7 +13,7 @@ DatasetCache = CacheHolder()
 
 
 async def request_json(req: DataLoaderRequest):
-    async with Client() as client:
+    async with FulfillmentClient() as client:
         response = await client.request(**req)
         response.raise_for_status()
         return response.json()

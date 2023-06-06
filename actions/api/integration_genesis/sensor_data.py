@@ -3,7 +3,7 @@ import json
 import urllib.parse
 from typing import List, Optional
 
-from ..client import Client
+from ..client import FulfillmentClient
 from ..dataapi.schemas import DataLoaderRequest
 from ..duckling import TimeRange
 from .schemas import LocationMetadata, SensorMetadata
@@ -21,19 +21,19 @@ def location_name_coalesce(meta: LocationMetadata) -> str:
 
 
 async def query_sensor_list() -> List[SensorMetadata]:
-    async with Client() as client:
+    async with FulfillmentClient() as client:
         response = await client.get("/genesis/query/sensor/list")
         response.raise_for_status()
         return response.json()
 
 async def query_location_list() -> List[LocationMetadata]:
-    async with Client() as client:
+    async with FulfillmentClient() as client:
         response = await client.get("/genesis/query/unit/list")
         response.raise_for_status()
         return response.json()
 
 async def determine_user_request_sensor(sensor_type=None, sensor_name=None, location=None) -> Optional[List[SensorMetadata]]:
-    async with Client() as client:
+    async with FulfillmentClient() as client:
         params = {
             'sensor_type': sensor_type,
             'location': location,
@@ -50,7 +50,7 @@ async def determine_user_request_sensor(sensor_type=None, sensor_name=None, loca
 
 
 async def sensor_query_metadata(sensor_id: int) -> Optional[SensorMetadata]:
-    async with Client() as client:
+    async with FulfillmentClient() as client:
         response = await client.get("/genesis/query/sensor", params={
             'sensor_id': sensor_id
         })
@@ -62,7 +62,7 @@ async def sensor_query_metadata(sensor_id: int) -> Optional[SensorMetadata]:
 
 
 async def get_report_generate_preview(metadata: SensorMetadata, fetch_range: TimeRange):
-    async with Client() as client:
+    async with FulfillmentClient() as client:
         params = {}
 
         params.update({
