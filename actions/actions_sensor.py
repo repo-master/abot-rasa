@@ -16,7 +16,7 @@ from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.interfaces import Tracker
 from rasa_sdk.types import DomainDict
 
-from .api import (ConnectError, HTTPStatusError, dataapi, integration_genesis,
+from .api import (ConnectError, HTTPStatusError, FulfillmentContext, dataapi, integration_genesis,
                   statapi)
 from .api.duckling import TimeRange
 from .api.integration_genesis.schemas import SensorMetadata
@@ -92,6 +92,8 @@ async def search_best_matching_sensors(parsed_input: dict) -> List[SensorMetadat
                 raise ClientException(resp['detail'], print_traceback=False)
     except ConnectError as e:
         raise ServerException("Couldn't connect to Abot backend.", e)
+    except ClientException as e:
+        raise e
     except Exception as e:  # TODO: Capture specific exceptions
         raise ServerException("Something went wrong while looking up sensor data.", e)
 
@@ -128,7 +130,8 @@ class ActionSensorDataLoad(Action):
         events: List[EventType] = []
         parsed_input, user_input = await parse_input_sensor_operation(tracker, events)
 
-        requested_sensors = await search_best_matching_sensors(parsed_input)
+        with FulfillmentContext(tracker):
+            requested_sensors = await search_best_matching_sensors(parsed_input)
 
         requested_sensor: SensorMetadata = None
 
@@ -198,9 +201,11 @@ class ActionFetchReport(Action):
                 raise ClientException(
                     "Sorry, sensor data not selected. Try specifying sensor and time range.",
                     print_traceback=False)
+            
             sensor_metadata: SensorMetadata = sensor_selected._loader_params['metadata']
             sensor_data_select_range: TimeRange = sensor_selected._loader_params['fetch_range']
-            report_data: dict = await integration_genesis.get_report_generate_preview(sensor_metadata, sensor_data_select_range)
+            with FulfillmentContext(tracker):
+                report_data: dict = await integration_genesis.get_report_generate_preview(sensor_metadata, sensor_data_select_range)
 
             preview_image_url: Optional[str] = report_data.get('preview_image')
             interactive_plot: Optional[dict] = report_data.get('plot_interactive')
@@ -242,7 +247,8 @@ class ActionDownloadReport(Action):
 
         sensor_metadata: SensorMetadata = sensor_selected._loader_params['metadata']
         sensor_data_select_range: TimeRange = sensor_selected._loader_params['fetch_range']
-        report_endpoint = integration_genesis.get_report_download_url(sensor_metadata,sensor_data_select_range)
+        with FulfillmentContext(tracker):
+            report_endpoint = integration_genesis.get_report_download_url(sensor_metadata,sensor_data_select_range)
         dispatcher.utter_message(
             text="[Click here](http://uat.phaidelta.com:8091%s) to download the report." % report_endpoint,
             attachment=report_endpoint
@@ -257,7 +263,8 @@ class ActionShowSensorList(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: "CollectingDispatcher", tracker: Tracker, domain: "DomainDict") -> List[EventType]:
         try:
-            sensors = await integration_genesis.query_sensor_list()
+            with FulfillmentContext(tracker):
+                sensors = await integration_genesis.query_sensor_list()
         except ConnectError as e:
             raise ServerException("Couldn't connect to Abot backend.", e)
 
@@ -305,7 +312,8 @@ class ActionShowLocationList(Action):
 
     async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[EventType]:
         try:
-            locations = await integration_genesis.query_location_list()
+            with FulfillmentContext(tracker):
+                locations = await integration_genesis.query_location_list()
         except ConnectError as e:
             raise ServerException("Couldn't connect to Abot backend.", e)
 
@@ -329,44 +337,45 @@ class ActionQuerySensorStatus(Action):
     @action_exception_handle_graceful
     async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[EventType]:
         try:
-            sensor_selected = dataapi.get_cache("sensor")
-            if sensor_selected is None:
-                raise ClientException(
-                    "Sorry, sensor data not selected. Try specifying a sensor.",
-                    print_traceback=False)
-            sensor_metadata_old: SensorMetadata = sensor_selected._loader_params['metadata']
-            sensor_metadata_updated = await integration_genesis.sensor_query_metadata(sensor_metadata_old["sensor_id"])
-            if not sensor_metadata_updated:
-                raise ClientException("Couldn't get information on sensor %s." %
-                                      integration_genesis.sensor_name_coalesce(sensor_metadata_old))
+            with FulfillmentContext(tracker):
+                sensor_selected = dataapi.get_cache("sensor")
+                if sensor_selected is None:
+                    raise ClientException(
+                        "Sorry, sensor data not selected. Try specifying a sensor.",
+                        print_traceback=False)
+                sensor_metadata_old: SensorMetadata = sensor_selected._loader_params['metadata']
+                sensor_metadata_updated = await integration_genesis.sensor_query_metadata(sensor_metadata_old["sensor_id"])
+                if not sensor_metadata_updated:
+                    raise ClientException("Couldn't get information on sensor %s." %
+                                        integration_genesis.sensor_name_coalesce(sensor_metadata_old))
 
-            status_msg = "Information for {sensor_name}:"
-            status_msg += "\n- Sensor type: {sensor_type}"
-            status_msg += "\n- Health: {sensor_health}"
-            status_msg += "\n- Last reading: {sensor_reading}"
+                status_msg = "Information for {sensor_name}:"
+                status_msg += "\n- Sensor type: {sensor_type}"
+                status_msg += "\n- Health: {sensor_health}"
+                status_msg += "\n- Last reading: {sensor_reading}"
 
-            sensor_status_health = "UNKNOWN"
-            sensor_last_reading = "UNKNOWN"
-            if sensor_metadata_updated['sensor_status']:
-                if sensor_metadata_updated['sensor_status']['sensor_health'] and sensor_metadata_updated['sensor_status']['sensor_health']['code_name']:
-                    sensor_status_health = sensor_metadata_updated['sensor_status']['sensor_health']['code_name']
+                sensor_status_health = "UNKNOWN"
+                sensor_last_reading = "UNKNOWN"
+                if sensor_metadata_updated['sensor_status']:
+                    if sensor_metadata_updated['sensor_status']['sensor_health'] and sensor_metadata_updated['sensor_status']['sensor_health']['code_name']:
+                        sensor_status_health = sensor_metadata_updated['sensor_status']['sensor_health']['code_name']
 
-                if sensor_metadata_updated['sensor_status']['last_value']:
-                    # TODO: ['value'] part depends on sensor type (it can be 'state')
-                    sensor_last_reading = "%s%s" % (
-                        sensor_metadata_updated['sensor_status']['last_value']['value'],
-                        sensor_metadata_updated['display_unit']
-                    )
-                    if sensor_metadata_updated['sensor_status']['last_timestamp']:
-                        ts_human = string_timestamp_to_human(sensor_metadata_updated['sensor_status']['last_timestamp'])
-                        sensor_last_reading += " (at %s)" % ts_human
+                    if sensor_metadata_updated['sensor_status']['last_value']:
+                        # TODO: ['value'] part depends on sensor type (it can be 'state')
+                        sensor_last_reading = "%s%s" % (
+                            sensor_metadata_updated['sensor_status']['last_value']['value'],
+                            sensor_metadata_updated['display_unit']
+                        )
+                        if sensor_metadata_updated['sensor_status']['last_timestamp']:
+                            ts_human = string_timestamp_to_human(sensor_metadata_updated['sensor_status']['last_timestamp'])
+                            sensor_last_reading += " (at %s)" % ts_human
 
-            dispatcher.utter_message(text=status_msg.format(
-                sensor_name=integration_genesis.sensor_name_coalesce(sensor_metadata_updated),
-                sensor_type=sensor_metadata_updated['sensor_type'],
-                sensor_health=sensor_status_health,
-                sensor_reading=sensor_last_reading
-            ))
+                dispatcher.utter_message(text=status_msg.format(
+                    sensor_name=integration_genesis.sensor_name_coalesce(sensor_metadata_updated),
+                    sensor_type=sensor_metadata_updated['sensor_type'],
+                    sensor_health=sensor_status_health,
+                    sensor_reading=sensor_last_reading
+                ))
         except ConnectError as e:
             raise ServerException("Couldn't connect to Abot backend.", e)
 
@@ -436,9 +445,10 @@ class ValidateSensorForm(FormValidationAction):
                 return ' at ' + s
             return ''
 
-        search_sensors = await search_best_matching_sensors({
-            'sensor_name': slot_value
-        })
+        with FulfillmentContext(tracker):
+            search_sensors = await search_best_matching_sensors({
+                'sensor_name': slot_value
+            })
 
         if len(search_sensors) == 0:
             # No matches

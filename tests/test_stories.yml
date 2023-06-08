@@ -16,3 +16,17 @@ stories:
   - user: |
       what about may 28, 8 pm to 10 pm
     intent: change_source
+
+- story: Sensor search
+  steps:
+  - user: |
+      search by sensor name
+    intent: activate_sensor_name_form
+  - action: action_reset_slot
+  - action: form_sensor_name
+  - user: |
+      VER
+  - action: form_sensor_name
+  - user: |
+      Block A Ground Floor Humidity
+  - action: action_sensor_data_load

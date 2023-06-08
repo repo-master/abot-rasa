@@ -2,7 +2,7 @@
 
 from rasa_sdk import Tracker
 
-from .. import FulfillmentClient
+from .. import FulfillmentClient, FulfillmentContext
 from ..cache.cache import Cache, PandasDataCache, CacheHolder
 from .schemas import DataLoaderRequest
 
@@ -35,4 +35,5 @@ async def get_loaded_data(tracker: Tracker, events: list, cache: CacheHolder = D
     data_source: str = tracker.get_slot("data_source")
     c = cache.get(data_source)
     if isinstance(c, Cache):
-        return await c.invalidate(events)
+        with FulfillmentContext(tracker):
+            return await c.invalidate(events)

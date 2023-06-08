@@ -42,6 +42,7 @@ slots:
     mappings:
     - type: from_entity
       entity: number
+      # TODO: Add role (and in NLU)
     - type: from_text
       conditions:
       - active_loop: form_aggregation_percentile

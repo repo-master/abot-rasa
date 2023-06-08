@@ -4,6 +4,7 @@ from rasa_sdk.events import SlotSet
 
 from .schemas import DataLoaderRequest
 from .loader import request_json
+from ..client import FulfillmentContext
 
 from typing import List, Dict, Any, Optional
 
@@ -21,4 +22,5 @@ async def request_data(tracker: Optional[Tracker] = None, options: Optional[Data
     if options is None:
         raise ValueError("Don't know how to load the data")
 
-    return await request_json(options)
+    with FulfillmentContext(tracker):
+        return await request_json(options)

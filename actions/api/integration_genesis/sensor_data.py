@@ -16,7 +16,7 @@ def sensor_name_coalesce(meta: SensorMetadata) -> str:
 
 
 def location_name_coalesce(meta: LocationMetadata) -> str:
-    return meta.get('unit_alias').split(',')[0] or \
+    return meta.get('unit_alias') or \
         meta.get('unit_urn')
 
 

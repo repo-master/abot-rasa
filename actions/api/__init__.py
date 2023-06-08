@@ -1,2 +1,2 @@
 
-from .client import StatAPIClient, FulfillmentClient, HTTPStatusError, ConnectError
+from .client import StatAPIClient, FulfillmentContext, FulfillmentClient, HTTPStatusError, ConnectError

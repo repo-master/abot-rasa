@@ -8,6 +8,13 @@ entities:
 actions:
 - action_human_handoff
 
+slots:
+  fulfillment_id:
+    type: float
+    initial_value: 1
+    mappings:
+    - type: custom
+
 responses:
   utter_did_that_help:
   - text: Did that help you?
