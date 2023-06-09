@@ -9,9 +9,11 @@ import logging
 from typing import Any, Dict, List, Optional, Text, Tuple, Union
 
 from rasa_sdk import Action, Tracker
+from rasa_sdk import events as ra_ev
 from rasa_sdk.events import EventType
+from rasa_sdk import utils as ra_utils
 from rasa_sdk.forms import FormValidationAction
-from rasa_sdk.events import SlotSet
+from rasa_sdk.events import ActionReverted, ActiveLoop, ActionExecutionRejected, SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.interfaces import Tracker
 from rasa_sdk.types import DomainDict
@@ -63,7 +65,7 @@ def reset_slot(slot_name, value, events: list):
     events.append(SlotSet(slot_name, value))
 
 
-async def search_best_matching_sensors(parsed_input: dict) -> List[SensorMetadata]:
+async def search_best_matching_sensors(parsed_input: dict) -> Optional[List[SensorMetadata]]:
     try:
         # TODO: If sensor id is given, fetch metadata of it directly
         # Either one can be set
@@ -79,13 +81,13 @@ async def search_best_matching_sensors(parsed_input: dict) -> List[SensorMetadat
     except HTTPStatusError as exc:
         if exc.response.is_client_error:
             resp = exc.response.json()
-            if parsed_input['sensor_type']:
+            if parsed_input.get('sensor_type'):
                 raise ClientException("No sensors of type {sensor_type} present{loc_opt}.".format(
-                    sensor_type=parsed_input['sensor_type'],
+                    sensor_type=parsed_input.get('sensor_type') or parsed_input.get('sensor_name') or 'unknown',
                     loc_opt='' if parsed_input['sensor_location'] is None else ' at %s' % parsed_input['sensor_location']
                 ), print_traceback=False)
-            elif parsed_input['sensor_name']:
-                raise ClientException("Sensor named {sensor_name} not found.".format(
+            elif parsed_input.get('sensor_name'):
+                raise ClientException("Sensor named '{sensor_name}' not found.".format(
                     sensor_name=parsed_input['sensor_name']
                 ), print_traceback=False)
             elif 'detail' in resp.keys():
@@ -135,26 +137,30 @@ class ActionSensorDataLoad(Action):
 
         requested_sensor: SensorMetadata = None
 
-        if len(requested_sensors) == 1:
+        if requested_sensors is None:
+            dispatcher.utter_message(text="Couldn't search for the given sensor")
+            return events
+        elif len(requested_sensors) == 1:
             requested_sensor = requested_sensors[0]
         elif len(requested_sensors) > 1:
             def loc_at_str(s):
                 if s:
                     return ' at ' + s
                 return ''
-            dispatcher.utter_button_message("Which sensor? Select one:", buttons=[
+            dispatcher.utter_message(text="Which sensor? Select one:", buttons=[
                 {
                     "title": "%s%s" % (
                         integration_genesis.sensor_name_coalesce(sensor_obj),
                         loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
                     ),
                     "payload": "/activate_sensor_name_form%s" % (
-                        json.dumps({"sensor_name_input": sensor_obj["sensor_name"]})
+                        json.dumps({"sensor_name_input": sensor_obj["sensor_urn"]})
                     )
                 }
                 for sensor_obj in requested_sensors
             ])
             events.append(SlotSet("need_select_sensor", True))
+            events.append(ra_ev.UserUtteranceReverted())
             return events
 
         dispatcher.utter_message(text="Loading sensor %s at time range %s to %s..." % (
@@ -429,6 +435,68 @@ class ValidateSensorForm(FormValidationAction):
     def name(self) -> Text:
         return "validate_form_sensor_name"
 
+    # Override
+    async def get_validation_events(
+        self,
+        dispatcher: "CollectingDispatcher",
+        tracker: "Tracker",
+        domain: "DomainDict",
+    ) -> List[EventType]:
+        """Validate slots by calling a validation function for each slot.
+
+        Args:
+            dispatcher: the dispatcher which is used to
+                send messages back to the user.
+            tracker: the conversation tracker for the current user.
+            domain: the bot's domain.
+
+        Returns:
+            `SlotSet` events for every validated slot.
+        """
+        slots_to_validate = await self.required_slots(
+            self.domain_slots(domain), dispatcher, tracker, domain
+        )
+        slots: Dict[Text, Any] = tracker.slots_to_validate()
+
+        for slot_name, slot_value in list(slots.items()):
+            if slot_name not in slots_to_validate:
+                slots.pop(slot_name)
+                continue
+
+            method_name = f"validate_{slot_name.replace('-','_')}"
+            validate_method = getattr(self, method_name, None)
+
+            if not validate_method:
+                LOGGER.warning(
+                    f"Skipping validation for `{slot_name}`: there is no validation "
+                    f"method specified."
+                )
+                continue
+
+            validation_output = await ra_utils.call_potential_coroutine(
+                validate_method(slot_value, dispatcher, tracker, domain)
+            )
+
+            events = []
+
+            if isinstance(validation_output, dict):
+                if validation_output.get('event'):
+                    events.append(validation_output)
+                    tracker.events.append(validation_output)
+                else:
+                    slots.update(validation_output)
+                    # for sequential consistency, also update tracker
+                    # to make changes visible to subsequent validate_{slot_name}
+                    tracker.slots.update(validation_output)
+            elif isinstance(validation_output, list):
+                events.extend(validation_output)
+                tracker.events.extend(validation_output)
+
+        events.extend([SlotSet(*s) for s in slots.items()])
+
+        return events
+
+
     # Slot validation
     async def validate_sensor_name(
         self,
@@ -440,15 +508,23 @@ class ValidateSensorForm(FormValidationAction):
         if not tracker.active_loop.get('name'):
             return {"flag_should_ask_sensor_name": True}
 
+        if slot_value == 'exit':
+            return [ActiveLoop(None), ra_ev.UserUtteranceReverted()]
+
         def loc_at_str(s):
             if s:
                 return ' at ' + s
             return ''
 
         with FulfillmentContext(tracker):
-            search_sensors = await search_best_matching_sensors({
-                'sensor_name': slot_value
-            })
+            try:
+                search_sensors = await search_best_matching_sensors({
+                    'sensor_name': slot_value
+                })
+                if search_sensors is None:
+                    search_sensors = []
+            except (HTTPStatusError, ClientException):
+                search_sensors = []
 
         if len(search_sensors) == 0:
             # No matches
