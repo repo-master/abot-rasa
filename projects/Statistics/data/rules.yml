@@ -9,6 +9,7 @@ rules:
 - rule: Special case quantile
   steps:
   - intent: intent_perform_aggregation_quantile
+  - action: action_reset_quantile_slot_set_agg_type
   - action: form_aggregation_percentile
   - active_loop: form_aggregation_percentile
   - slot_was_set:
@@ -27,6 +28,7 @@ rules:
 - rule: Special case compliance
   steps:
   - intent: intent_perform_aggregation_compliance
+  - action: action_reset_compliance_slot_set_agg_type
   - action: form_aggregation_compliance
   - active_loop: form_aggregation_compliance
   - slot_was_set:

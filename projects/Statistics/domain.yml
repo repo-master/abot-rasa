@@ -29,7 +29,12 @@ slots:
     - type: from_entity
       entity: aggregation_compliance
       intent: intent_perform_aggregation_compliance
-  
+
+  last_used_slot:
+    type: text
+    mappings:
+    - type: custom
+
   statement_context:
     type: any
     mappings:
@@ -86,6 +91,8 @@ actions:
 - action_describe_outlier_count
 - action_ask_quantile
 - validate_form_aggregation_compliance
+- action_reset_quantile_slot_set_agg_type
+- action_reset_compliance_slot_set_agg_type
 
 forms:
   form_aggregation_percentile:
