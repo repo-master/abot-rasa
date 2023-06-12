@@ -143,25 +143,27 @@ class ActionSensorDataLoad(Action):
         elif len(requested_sensors) == 1:
             requested_sensor = requested_sensors[0]
         elif len(requested_sensors) > 1:
-            def loc_at_str(s):
-                if s:
-                    return ' at ' + s
-                return ''
-            dispatcher.utter_message(text="Which sensor? Select one:", buttons=[
-                {
-                    "title": "%s%s" % (
-                        integration_genesis.sensor_name_coalesce(sensor_obj),
-                        loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
-                    ),
-                    "payload": "/activate_sensor_name_form%s" % (
-                        json.dumps({"sensor_name_input": sensor_obj["sensor_urn"]})
-                    )
-                }
-                for sensor_obj in requested_sensors
-            ])
-            events.append(SlotSet("need_select_sensor", True))
-            events.append(ra_ev.UserUtteranceReverted())
-            return events
+            dispatcher.utter_message(text="Too many sensors. Unable to handle this situation.")
+            return []
+            # def loc_at_str(s):
+            #     if s:
+            #         return ' at ' + s
+            #     return ''
+            # dispatcher.utter_message(text="Which sensor? Select one:", buttons=[
+            #     {
+            #         "title": "%s%s" % (
+            #             integration_genesis.sensor_name_coalesce(sensor_obj),
+            #             loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
+            #         ),
+            #         "payload": "/activate_sensor_name_form%s" % (
+            #             json.dumps({"sensor_name_input": sensor_obj["sensor_urn"]})
+            #         )
+            #     }
+            #     for sensor_obj in requested_sensors
+            # ])
+            # events.append(SlotSet("need_select_sensor", True))
+            # events.append(ra_ev.UserUtteranceReverted())
+            # return events
 
         dispatcher.utter_message(text="Loading sensor %s at time range %s to %s..." % (
             integration_genesis.sensor_name_coalesce(requested_sensor),
@@ -418,6 +420,148 @@ class ActionShowLocationValue(Action):
         return []
 
 
+class ActionAskTimeRange(Action):
+    def name(self) -> Text:
+        return "action_ask_data_time_range"
+
+    async def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[EventType]:
+        dispatcher.utter_message(text="Time range:")
+        return []
+
+class ValidateSensorTypeForm(FormValidationAction):
+    def name(self) -> Text:
+        return "form_sensor_type_location"
+
+    # Override
+    async def get_validation_events(
+        self,
+        dispatcher: "CollectingDispatcher",
+        tracker: "Tracker",
+        domain: "DomainDict",
+    ) -> List[EventType]:
+        """Validate slots by calling a validation function for each slot.
+
+        Args:
+            dispatcher: the dispatcher which is used to
+                send messages back to the user.
+            tracker: the conversation tracker for the current user.
+            domain: the bot's domain.
+
+        Returns:
+            `SlotSet` events for every validated slot.
+        """
+        slots_to_validate = await self.required_slots(
+            self.domain_slots(domain), dispatcher, tracker, domain
+        )
+        slots: Dict[Text, Any] = tracker.slots_to_validate()
+
+        for slot_name, slot_value in list(slots.items()):
+            if slot_name not in slots_to_validate:
+                slots.pop(slot_name)
+                continue
+
+            method_name = f"validate_{slot_name.replace('-','_')}"
+            validate_method = getattr(self, method_name, None)
+
+            if not validate_method:
+                LOGGER.warning(
+                    f"Skipping validation for `{slot_name}`: there is no validation "
+                    f"method specified."
+                )
+                continue
+
+            validation_output = await ra_utils.call_potential_coroutine(
+                validate_method(slot_value, dispatcher, tracker, domain)
+            )
+
+            events = []
+
+            if isinstance(validation_output, dict):
+                if validation_output.get('event'):
+                    events.append(validation_output)
+                    tracker.events.append(validation_output)
+                else:
+                    slots.update(validation_output)
+                    # for sequential consistency, also update tracker
+                    # to make changes visible to subsequent validate_{slot_name}
+                    tracker.slots.update(validation_output)
+            elif isinstance(validation_output, list):
+                events.extend(validation_output)
+                tracker.events.extend(validation_output)
+
+        events.extend([SlotSet(*s) for s in slots.items()])
+
+        return events
+
+
+    # Slot validation
+    async def validate_sensor_name(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> EventType:
+        if not tracker.active_loop.get('name'):
+            return []
+
+        if slot_value == 'exit':
+            return [ActiveLoop(None), ra_ev.UserUtteranceReverted()]
+
+        def loc_at_str(s):
+            if s:
+                return ' at ' + s
+            return ''
+
+        with FulfillmentContext(tracker):
+            try:
+                search_sensors = await search_best_matching_sensors({
+                    'sensor_name': slot_value
+                })
+                if search_sensors is None:
+                    search_sensors = []
+            except (HTTPStatusError, ClientException):
+                search_sensors = []
+
+        if len(search_sensors) == 0:
+            # No matches
+            dispatcher.utter_message(text="Sensor named '%s' not found." % slot_value)
+            return {"sensor_name": None, "flag_should_ask_sensor_name": True}
+        elif len(search_sensors) == 1:
+            # Match found
+            return {
+                "sensor_name": slot_value,
+                "location": None,
+                "metric": None,
+                "flag_should_ask_sensor_name": True
+            }
+        else:
+            # More than 1
+            dispatcher.utter_message(text="Select a sensor from matches:", buttons=[
+                {
+                    "title": "%s%s" % (
+                        integration_genesis.sensor_name_coalesce(sensor_obj),
+                        loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
+                    ),
+                    "payload": sensor_obj["sensor_name"]
+                }
+                for sensor_obj in search_sensors
+            ])
+
+            return {"sensor_name": None, "flag_should_ask_sensor_name": False}
+
+    async def required_slots(
+        self,
+        domain_slots: List[Text],
+        dispatcher: "CollectingDispatcher",
+        tracker: "Tracker",
+        domain: "DomainDict",
+    ) -> List[Text]:
+        text_of_last_user_message = tracker.latest_message.get("text")
+        updated_slots = domain_slots.copy()
+        return updated_slots
+
+
 # Sensor name
 
 class ActionAskForSensorNameSlot(Action):
@@ -563,3 +707,24 @@ class ValidateSensorForm(FormValidationAction):
         text_of_last_user_message = tracker.latest_message.get("text")
         updated_slots = domain_slots.copy()
         return updated_slots
+
+class ActionAskForSensorTypeSlot(Action):
+    def name(self) -> str:
+        return "action_ask_metric"
+
+    def run(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> List[EventType]:
+        dispatcher.utter_message(text="Enter the sensor type:")
+        return []
+
+class ActionAskForSensorLocationSlot(Action):
+    def name(self) -> str:
+        return "action_ask_location"
+
+    def run(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> List[EventType]:
+        dispatcher.utter_message(text="Enter the sensor's location':")
+        return []
+

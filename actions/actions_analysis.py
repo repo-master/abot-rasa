@@ -54,6 +54,8 @@ class ActionAggregation(Action):
         # Check aggregation method provided by the user
         aggregation = user_to_aggregation_type(user_req_agg_method)
 
+        print("Events", tracker.events)
+
         # TODO: Needs overhaul, this was done in a rush
         data_raw: PandasDataCache = await get_loaded_data(tracker, analysis_events)
         if data_raw is None:
@@ -223,3 +225,19 @@ class ValidateAggregationComplianceForm(FormValidationAction):
         except (TypeError, ValueError):
             dispatcher.utter_message(text="Invalid value. Enter a number or 'none'.")
             return {"compliance_bound_upper": None}
+
+
+class ActionResetQuantileSlot(Action):
+    def name(self) -> str:
+        return "action_reset_quantile_slot_set_agg_type"
+
+    def run(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> List[EventType]:
+        print("Quantile:", tracker.get_slot('quantile'))
+        print("Entity set:", tracker.latest_message)
+
+        return [
+            SlotSet("aggregation", [AggregationMethod.QUANTILE])
+        ]
+

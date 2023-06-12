@@ -66,7 +66,7 @@ def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs)
                 q_size = kwargs.get('quantile_size')
                 if q_size is not None:
                     try:
-                        return "{} ".format(round(float(q_size) * 100, 2))
+                        return make_ordinal(round(float(q_size) * 100, 2))
                     except (ValueError, TypeError):
                         pass
                 return ''
@@ -96,3 +96,19 @@ def summary_AggregationOut(agg: AggregationOut, unit_symbol: str = '', **kwargs)
     elif len(agg.keys()) > 1:
         # Prepare a markdown list-style output
         return '\n'.join(["- " + _agg_str(AggregationMethod(am), val) for am, val in agg.items()])
+
+def make_ordinal(n):
+    '''
+    Convert an integer into its ordinal representation::
+
+        make_ordinal(0)   => '0th'
+        make_ordinal(3)   => '3rd'
+        make_ordinal(122) => '122nd'
+        make_ordinal(213) => '213th'
+    '''
+    n = int(n)
+    if 11 <= (n % 100) <= 13:
+        suffix = 'th'
+    else:
+        suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
+    return str(n) + suffix
