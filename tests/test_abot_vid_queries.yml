@@ -1,0 +1,72 @@
+
+version: '3.1'
+
+stories:
+- story: All things in video https://www.youtube.com/watch?v=XOOAwbQ85lY
+  steps:
+  - user: |
+      statistics for temp in june
+    intent: query_metric_aggregate
+  - slot_was_set:
+    - metric: temperature
+    - aggregation: ["summary"]
+  - action: action_reset_sensor_name
+  - action: form_sensor_type_location
+  - action: action_ask_location
+  - user: |
+      w1 b2 ff a
+  - action: action_sensor_data_load
+  - action: action_aggregation
+  - user: |
+      rh?
+    intent: change_source
+  - slot_was_set:
+    - metric: humidity
+  - action: action_reset_sensor_name
+  - action: action_sensor_data_load
+  - action: action_aggregation
+  - user: |
+      outliers?
+    intent: ask_followup_summary_details
+  - action: action_describe_event_details
+  - user: |
+      how about the stability?
+  - user: |
+      trending?
+  - user: |
+      what is the compliance of temp to an upper target of 24
+    intent: intent_perform_aggregation_compliance
+  - slot_was_set:
+    - metric: temperature
+    - compliance_bound_upper: 24
+  - action: form_sensor_type_location
+  - action: action_ask_location
+  - user: |
+      w1 b2 ff a
+  - action: action_aggregation
+  - user: |
+      june
+    intent: change_source
+  - action: action_aggregation
+  - user: |
+      vs 30
+    intent: intent_perform_aggregation_compliance
+  - slot_was_set:
+    - compliance_bound_upper: 30
+  - action: action_aggregation
+  - user: |
+      is the temp on 6 june 2020 10 am to 7 tune 2020 10 am the same as 7 june 2020 11 am to 10pm?
+  - user: |
+      is there a relation between temp and rh in june?
+  - user: |
+      whats the 75th percentile fr temp in the last month
+    intent: intent_perform_aggregation_quantile
+  - slot_was_set:
+    - quantile: 75
+  - action: action_aggregation
+  - user: |
+      what about 90th
+    intent: intent_perform_aggregation_quantile
+  - slot_was_set:
+    - quantile: 90
+  - action: action_aggregation
