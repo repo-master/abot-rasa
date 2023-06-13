@@ -557,28 +557,14 @@ class ValidateSensorTypeForm(FormValidationAction):
 
         if len(search_sensors) == 0:
             # No matches
-            dispatcher.utter_message(text="Sensor named '%s' not found." % slot_value)
+            dispatcher.utter_message(text="Sensor of '%s' not found." % slot_value)
             return {"metric": None, "flag_should_ask_sensor_name": True}
-        elif len(search_sensors) == 1:
+        elif len(search_sensors) >= 1:
             # Match found
             return {
                 "metric": slot_value,
                 "flag_should_ask_sensor_name": True
             }
-        else:
-            # More than 1
-            dispatcher.utter_message(text="Select a sensor from matches:", buttons=[
-                {
-                    "title": "%s%s" % (
-                        integration_genesis.sensor_name_coalesce(sensor_obj),
-                        loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
-                    ),
-                    "payload": "$%d" % sensor_obj['sensor_id']
-                }
-                for sensor_obj in search_sensors
-            ])
-
-            return {"metric": None, "flag_should_ask_sensor_name": False}
 
 
 class ActionSensorLoadSlotSetup(Action):
