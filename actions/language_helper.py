@@ -10,6 +10,8 @@ from .api.statapi.schemas import AggregationMethod, AggregationOut
 from actions.common import ActionFailedException
 
 
+to_datetime = pd.to_datetime
+
 def user_to_aggregation_type(name: Optional[Union[str, List[str]]]) -> Union[AggregationMethod, Set[AggregationMethod]]:
     aggregation = AggregationMethod.RECENT
 

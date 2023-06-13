@@ -105,6 +105,11 @@ slots:
     initial_value: true
     mappings:
     - type: custom
+  flag_should_ask_sensor_location:
+    type: bool
+    initial_value: true
+    mappings:
+    - type: custom
 
 forms:
   form_sensor_name:
@@ -127,10 +132,12 @@ actions:
 - action_query_sensor_status
 - action_download_report
 - validate_form_sensor_name
+- validate_form_sensor_type_location
 - action_ask_sensor_name
 - action_ask_metric
 - action_ask_location
 - action_ask_data_time_range
+- action_setup_load_slots
 
 responses:
   utter_ask_data_time_range:

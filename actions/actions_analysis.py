@@ -54,7 +54,7 @@ class ActionAggregation(Action):
         # Check aggregation method provided by the user
         aggregation = user_to_aggregation_type(user_req_agg_method)
 
-        print("Events", tracker.events)
+        # print("Events", tracker.events)
 
         # TODO: Needs overhaul, this was done in a rush
         data_raw: PandasDataCache = await get_loaded_data(tracker, analysis_events)

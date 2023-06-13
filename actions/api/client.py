@@ -21,7 +21,7 @@ def FulfillmentContext(tracker: Tracker):
     global fulfillment_context_id
     old_fulfillment_context_id = fulfillment_context_id
     fulfillment_context_id = tracker.slots.get('fulfillment_id')
-    yield
+    yield fulfillment_context_id
     fulfillment_context_id = old_fulfillment_context_id
 
 
@@ -30,16 +30,16 @@ def StatAPIClient(**kwargs) -> AsyncClient:
 
 
 def FulfillmentClient(**kwargs) -> AsyncClient:
-    # global fulfillment_context_id
-    # if fulfillment_context_id is None:
-    #     raise ClientException("No service selected for performing this action.", print_traceback=False)
-    # try:
-    #     fulfillment_id: int = int(fulfillment_context_id)
-    # except:
-    #     # TODO: Failsafe
-    #     fulfillment_id = 1
-    # fulfillment_url_base = urllib.parse.urljoin(BACKEND_ENDPOINT_BASE, "/fulfillment/%d" % fulfillment_id)
-    return AsyncClient(base_url=BACKEND_ENDPOINT_BASE, timeout=60.0, **kwargs)
+    global fulfillment_context_id
+    if fulfillment_context_id is None:
+        raise ClientException("No service selected for performing this action.", print_traceback=False)
+    try:
+        fulfillment_id: int = int(fulfillment_context_id)
+    except:
+        # TODO: Failsafe
+        fulfillment_id = 1
+    fulfillment_url_base = urllib.parse.urljoin(BACKEND_ENDPOINT_BASE, "/fulfillment/%d" % fulfillment_id)
+    return AsyncClient(base_url=fulfillment_url_base, timeout=60.0, **kwargs)
 
 
 def DucklingClient(**kwargs) -> AsyncClient:
