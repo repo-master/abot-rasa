@@ -681,6 +681,9 @@ class ActionAskForSensorLocationSlot(Action):
         if tracker.get_slot('flag_should_ask_sensor_location'):
             locs = await get_loc_list(tracker)
             dispatcher.utter_message(text="Enter the sensor's location:", buttons=[
-                {integration_genesis.location_name_coalesce(k):k["unit_urn"]}
+                {
+                    "title": integration_genesis.location_name_coalesce(k),
+                    "payload": k["unit_urn"]
+                }
                 for k in locs])
         return []
