@@ -241,3 +241,18 @@ class ActionResetQuantileSlot(Action):
             SlotSet("aggregation", [AggregationMethod.QUANTILE])
         ]
 
+
+class ActionResetComplianceSlot(Action):
+    def name(self) -> str:
+        return "action_reset_compliance_slot_set_agg_type"
+
+    def run(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> List[EventType]:
+        print("Compliance: Lower:", tracker.get_slot('compliance_bound_lower'), "Upper:", tracker.get_slot('compliance_bound_upper'))
+        print("Entity set:", tracker.latest_message)
+
+        return [
+            SlotSet("aggregation", [AggregationMethod.COMPLIANCE])
+        ]
+
