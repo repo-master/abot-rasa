@@ -559,10 +559,17 @@ class ValidateSensorTypeForm(FormValidationAction):
             # No matches
             dispatcher.utter_message(text="Sensor of '%s' not found." % slot_value)
             return {"metric": None, "flag_should_ask_sensor_name": True}
-        elif len(search_sensors) >= 1:
+        elif len(search_sensors) == 1:
             # Match found
             return {
                 "metric": slot_value,
+                "flag_should_ask_sensor_name": True
+            }
+        else:
+            # Multiple matches
+            return {
+                "metric": slot_value,
+                "location": None,
                 "flag_should_ask_sensor_name": True
             }
 
@@ -584,6 +591,7 @@ class ActionSensorLoadSlotSetup(Action):
             }
         })
         events.append(SlotSet("sensor_load_params", params))
+        events.append(SlotSet("metric", None))
         return events
 
 # Sensor name
