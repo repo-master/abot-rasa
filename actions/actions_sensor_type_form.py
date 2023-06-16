@@ -10,7 +10,7 @@ from rasa_sdk.types import DomainDict
 from rasa_sdk import events as ra_ev
 from rasa_sdk.events import EventType
 
-from .actions_sensor import search_best_matching_sensors
+from .actions_sensor import search_best_matching_sensors, locations_containing_sensor_type
 
 from .common import ClientException
 from .api.integration_genesis.schemas import SensorMetadata, LocationMetadata
@@ -219,9 +219,12 @@ class ActionAskForSensorTypeSlot(Action):
             dispatcher.utter_message(text="Enter the sensor type:")
         return []
 
-async def get_loc_list(tracker: Tracker) -> List[LocationMetadata]:
+async def get_loc_list(tracker: Tracker, metric_type: str = None) -> List[LocationMetadata]:
     with FulfillmentContext(tracker):
-        return await integration_genesis.query_location_list()
+        locs = await integration_genesis.query_location_list()
+        if metric_type:
+            return locations_containing_sensor_type(tracker, locs, metric_type)
+        return locs
 
 class ActionAskForSensorLocationSlot(Action):
     def name(self) -> str:
@@ -230,8 +233,9 @@ class ActionAskForSensorLocationSlot(Action):
     async def run(
         self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
     ) -> List[EventType]:
+        metric_type = tracker.get_slot('metric')
         if tracker.get_slot('flag_should_ask_sensor_location'):
-            locs = await get_loc_list(tracker)
+            locs = await get_loc_list(tracker, metric_type)
             dispatcher.utter_message(text="Enter the sensor's location:", buttons=[
                 {
                     "title": integration_genesis.location_name_coalesce(k),

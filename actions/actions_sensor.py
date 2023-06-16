@@ -61,13 +61,13 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[EventType]
 
     return parsed_input, user_input
 
-from fuzzywuzzy import process
+from fuzzywuzzy import process, fuzz
 
 def sensor_data_condenser(data: Union[str, SensorMetadata], force_ascii: bool = False) -> str:
     if isinstance(data, str):
         return data
     elif isinstance(data, dict):
-        return integration_genesis.sensor_name_coalesce(data) + '_' + data["sensor_type"]
+        return data["sensor_type"] + '\n' + integration_genesis.sensor_name_coalesce(data)
     return ''
 
 def merge_sensor_match_results(*results: List[Tuple[SensorMetadata, int]]) -> List[SensorMetadata]:
@@ -80,6 +80,18 @@ def merge_sensor_match_results(*results: List[Tuple[SensorMetadata, int]]) -> Li
             else:
                 all_results.append(sensor)
     return all_results
+
+def fuzzy_compare(s1: str, s2: str) -> bool:
+    return fuzz.partial_ratio(s1, s2) > 75
+
+def locations_containing_sensor_type(tracker: Tracker, locs: List[LocationMetadata], s_type: str) -> List[LocationMetadata]:
+    def _filter_loc(loc: LocationMetadata) -> bool:
+        with FulfillmentContext(tracker) as f_id:
+            for s in all_sensor_list[f_id]:
+                if fuzzy_compare(s['sensor_type'], s_type):
+                    if s['sensor_location']['id'] == loc['unit_id']:
+                        return True
+    return list(filter(_filter_loc, locs))
 
 async def search_best_matching_sensors(tracker: Tracker, parsed_input: dict) -> Optional[List[SensorMetadata]]:
     try:
@@ -96,7 +108,8 @@ async def search_best_matching_sensors(tracker: Tracker, parsed_input: dict) -> 
                     processor=sensor_data_condenser,
                     score_cutoff=score_cutoff),
                 process.extractBests(
-                    ' '.join([parsed_input.get('sensor_type', ''), parsed_input.get('sensor_location', '')]),
+                    '\n'.join([parsed_input.get('sensor_type', ''),
+                              parsed_input.get('sensor_location', '')]),
                     all_sensor_list[f_id],
                     processor=sensor_data_condenser,
                     score_cutoff=score_cutoff)
@@ -404,5 +417,22 @@ class ActionSensorLoadSlotSetup(Action):
             }
         })
         events.append(SlotSet("sensor_load_params", params))
-        events.append(SlotSet("metric", None))
+
+        has_metric_type = None
+        has_location = None
+        has_sensor_name = None
+
+        for entity in tracker.latest_message['entities']:
+            if entity['entity'] == 'metric_type': has_metric_type = entity['value']
+            if entity['entity'] == 'location': has_location = entity['value']
+            if entity['entity'] == 'sensor_name_input': has_sensor_name = entity['value']
+
+        if has_metric_type:
+            events.append(SlotSet("metric", has_metric_type))
+            events.append(SlotSet("location", None))
+        if has_location:
+            events.append(SlotSet("location", has_location))
+        if has_sensor_name:
+            events.append(SlotSet("sensor_name", has_sensor_name))
+            events.append(SlotSet("location", None))
         return events
