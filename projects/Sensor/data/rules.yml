@@ -37,6 +37,7 @@ rules:
 - rule: Sensor name based fetching
   steps:
   - intent: activate_sensor_name_form
+  - action: action_setup_load_slots
   - action: form_sensor_name
   - active_loop: form_sensor_name
   - slot_was_set:
@@ -52,6 +53,7 @@ rules:
 - rule: User asks to load sensor data and to perform aggregation on it
   steps:
   - intent: query_metric_aggregate
+  - action: action_setup_load_slots
   - action: form_sensor_type_location
   - active_loop: form_sensor_type_location
   - active_loop: null
@@ -61,6 +63,7 @@ rules:
 - rule: User wants to change a parameter, reload data and perform aggregation again
   steps:
   - intent: change_source
+  - action: action_setup_load_slots
   - action: form_sensor_type_location
   - active_loop: form_sensor_type_location
   - active_loop: null
