@@ -60,12 +60,11 @@ rules:
   - action: action_sensor_data_load
   - action: action_aggregation
 
-- rule: User wants to change a parameter, reload data and perform aggregation again
-  steps:
-  - intent: change_source
-  - action: action_setup_load_slots
-  - action: form_sensor_type_location
-  - active_loop: form_sensor_type_location
-  - active_loop: null
-  - action: action_sensor_data_load
-  - action: action_aggregation
+# - rule: User wants to change a parameter, reload data and perform aggregation again
+#   steps:
+#   - intent: change_source
+#   - action: form_sensor_type_location
+#   - active_loop: form_sensor_type_location
+#   - active_loop: null
+  # - action: action_sensor_data_load
+  # - action: action_aggregation
