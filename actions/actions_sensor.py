@@ -11,8 +11,6 @@ from typing import Any, Dict, List, Optional, Set, Text, Tuple, Union
 from rasa_sdk import Action, Tracker
 from rasa_sdk import events as ra_ev
 from rasa_sdk.events import EventType
-from rasa_sdk import utils as ra_utils
-from rasa_sdk.forms import FormValidationAction
 from rasa_sdk.events import ActiveLoop, SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.interfaces import Tracker
@@ -63,13 +61,13 @@ async def parse_input_sensor_operation(tracker: Tracker, events: List[EventType]
 
     return parsed_input, user_input
 
-from fuzzywuzzy import process
+from fuzzywuzzy import process, fuzz
 
 def sensor_data_condenser(data: Union[str, SensorMetadata], force_ascii: bool = False) -> str:
     if isinstance(data, str):
         return data
     elif isinstance(data, dict):
-        return integration_genesis.sensor_name_coalesce(data) + '_' + data["sensor_type"]
+        return data["sensor_type"] + '\n' + integration_genesis.sensor_name_coalesce(data)
     return ''
 
 def merge_sensor_match_results(*results: List[Tuple[SensorMetadata, int]]) -> List[SensorMetadata]:
@@ -82,6 +80,18 @@ def merge_sensor_match_results(*results: List[Tuple[SensorMetadata, int]]) -> Li
             else:
                 all_results.append(sensor)
     return all_results
+
+def fuzzy_compare(s1: str, s2: str) -> bool:
+    return fuzz.partial_ratio(s1, s2) > 75
+
+def locations_containing_sensor_type(tracker: Tracker, locs: List[LocationMetadata], s_type: str) -> List[LocationMetadata]:
+    def _filter_loc(loc: LocationMetadata) -> bool:
+        with FulfillmentContext(tracker) as f_id:
+            for s in all_sensor_list[f_id]:
+                if fuzzy_compare(s['sensor_type'], s_type):
+                    if s['sensor_location']['id'] == loc['unit_id']:
+                        return True
+    return list(filter(_filter_loc, locs))
 
 async def search_best_matching_sensors(tracker: Tracker, parsed_input: dict) -> Optional[List[SensorMetadata]]:
     try:
@@ -98,7 +108,8 @@ async def search_best_matching_sensors(tracker: Tracker, parsed_input: dict) -> 
                     processor=sensor_data_condenser,
                     score_cutoff=score_cutoff),
                 process.extractBests(
-                    ' '.join([parsed_input.get('sensor_type', ''), parsed_input.get('sensor_location', '')]),
+                    '\n'.join([parsed_input.get('sensor_type', ''),
+                              parsed_input.get('sensor_location', '')]),
                     all_sensor_list[f_id],
                     processor=sensor_data_condenser,
                     score_cutoff=score_cutoff)
@@ -393,191 +404,6 @@ class ActionAskTimeRange(Action):
         dispatcher.utter_message(text="Time range:")
         return []
 
-class ValidateSensorTypeForm(FormValidationAction):
-    def name(self) -> Text:
-        return "validate_form_sensor_type_location"
-
-    # Override
-    async def get_validation_events(
-        self,
-        dispatcher: "CollectingDispatcher",
-        tracker: "Tracker",
-        domain: "DomainDict",
-    ) -> List[EventType]:
-        slots_to_validate = await self.required_slots(
-            self.domain_slots(domain), dispatcher, tracker, domain
-        )
-        slots: Dict[Text, Any] = tracker.slots_to_validate()
-        events = []
-
-        for slot_name, slot_value in list(slots.items()):
-            if slot_name not in slots_to_validate:
-                slots.pop(slot_name)
-                continue
-
-            method_name = f"validate_{slot_name.replace('-','_')}"
-            validate_method = getattr(self, method_name, None)
-
-            if not validate_method:
-                LOGGER.warning(
-                    f"Skipping validation for `{slot_name}`: there is no validation "
-                    f"method specified."
-                )
-                continue
-
-            validation_output = await ra_utils.call_potential_coroutine(
-                validate_method(slot_value, dispatcher, tracker, domain)
-            )
-
-            if isinstance(validation_output, dict):
-                if validation_output.get('event'):
-                    events.append(validation_output)
-                    tracker.events.append(validation_output)
-                else:
-                    slots.update(validation_output)
-                    # for sequential consistency, also update tracker
-                    # to make changes visible to subsequent validate_{slot_name}
-                    tracker.slots.update(validation_output)
-            elif isinstance(validation_output, list):
-                events.extend(validation_output)
-                tracker.events.extend(validation_output)
-
-        events.extend([SlotSet(*s) for s in slots.items()])
-
-        return events
-
-    # Slot validation
-    async def validate_location(
-        self,
-        slot_value: Any,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> EventType:
-        if not tracker.active_loop.get('name'):
-            return [ra_ev.SlotSet("flag_should_ask_sensor_location", True)]
-
-        if slot_value == 'exit':
-            return [ActiveLoop(None), ra_ev.UserUtteranceReverted(), ra_ev.SlotSet("flag_should_ask_sensor_location", True)]
-
-        if slot_value[:1] == '$':
-            sensor_id: int = int(slot_value.split('$',1)[-1])
-
-            params: Dict = tracker.slots.get('sensor_load_params') or {}
-
-            with FulfillmentContext(tracker):
-                sensor: SensorMetadata = await integration_genesis.sensor_query_metadata(sensor_id)
-                params.update({
-                    "sensor_id": sensor['sensor_id']
-                })
-                return [
-                    ra_ev.SlotSet("location", sensor['sensor_location']["unit_urn"]),
-                    ra_ev.SlotSet("flag_should_ask_sensor_location", True),
-                    ra_ev.SlotSet("sensor_load_params", params)
-                ]
-
-        def loc_at_str(s):
-            if s:
-                return ' at ' + s
-            return ''
-
-        try:
-            search_sensors = await search_best_matching_sensors(tracker, {
-                'sensor_type': tracker.slots.get('metric'),
-                'sensor_location': slot_value
-            })
-            if search_sensors is None:
-                search_sensors = []
-        except (HTTPStatusError, ClientException):
-            search_sensors = []
-
-        if len(search_sensors) == 0:
-            # No matches
-            dispatcher.utter_message(text="Sensor named '%s' not found." % slot_value)
-            return {"location": None, "flag_should_ask_sensor_location": True}
-        elif len(search_sensors) == 1:
-            # Match found
-            return {
-                "location": slot_value,
-                "flag_should_ask_sensor_location": True
-            }
-        else:
-            # More than 1
-            dispatcher.utter_message(text="Select a sensor from matches:", buttons=[
-                {
-                    "title": "%s%s" % (
-                        integration_genesis.sensor_name_coalesce(sensor_obj),
-                        loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
-                    ),
-                    "payload": "$%d" % sensor_obj['sensor_id']
-                }
-                for sensor_obj in search_sensors
-            ])
-
-            return {"location": None, "flag_should_ask_sensor_location": False}
-
-
-    async def validate_metric(
-        self,
-        slot_value: Any,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> EventType:
-        if not tracker.active_loop.get('name'):
-            return [ra_ev.SlotSet("flag_should_ask_sensor_name", True)]
-
-        if slot_value == 'exit':
-            return [ActiveLoop(None), ra_ev.UserUtteranceReverted(), ra_ev.SlotSet("flag_should_ask_sensor_name", True)]
-
-        if slot_value[:1] == '$':
-            sensor_id: int = int(slot_value.split('$',1)[-1])
-
-            params: Dict = tracker.slots.get('sensor_load_params') or {}
-
-            with FulfillmentContext(tracker):
-                sensor: SensorMetadata = await integration_genesis.sensor_query_metadata(sensor_id)
-                params.update({
-                    "sensor_id": sensor['sensor_id']
-                })
-                return [
-                    ra_ev.SlotSet("metric", sensor["sensor_type"]),
-                    ra_ev.SlotSet("flag_should_ask_sensor_name", True),
-                    ra_ev.SlotSet("sensor_load_params", params)
-                ]
-
-        def loc_at_str(s):
-            if s:
-                return ' at ' + s
-            return ''
-
-        try:
-            search_sensors = await search_best_matching_sensors(tracker, {
-                'sensor_type': slot_value
-            })
-            if search_sensors is None:
-                search_sensors = []
-        except (HTTPStatusError, ClientException):
-            search_sensors = []
-
-        if len(search_sensors) == 0:
-            # No matches
-            dispatcher.utter_message(text="Sensor of '%s' not found." % slot_value)
-            return {"metric": None, "flag_should_ask_sensor_name": True}
-        elif len(search_sensors) == 1:
-            # Match found
-            return {
-                "metric": slot_value,
-                "flag_should_ask_sensor_name": True
-            }
-        else:
-            # Multiple matches
-            return {
-                "metric": slot_value,
-                "location": None,
-                "flag_should_ask_sensor_name": True
-            }
-
 
 class ActionSensorLoadSlotSetup(Action):
     def name(self) -> Text:
@@ -596,163 +422,22 @@ class ActionSensorLoadSlotSetup(Action):
             }
         })
         events.append(SlotSet("sensor_load_params", params))
-        events.append(SlotSet("metric", None))
+
+        has_metric_type = None
+        has_location = None
+        has_sensor_name = None
+
+        for entity in tracker.latest_message['entities']:
+            if entity['entity'] == 'metric_type': has_metric_type = entity['value']
+            if entity['entity'] == 'location': has_location = entity['value']
+            if entity['entity'] == 'sensor_name_input': has_sensor_name = entity['value']
+
+        if has_metric_type:
+            events.append(SlotSet("metric", has_metric_type))
+            events.append(SlotSet("location", None))
+        if has_location:
+            events.append(SlotSet("location", has_location))
+        if has_sensor_name:
+            events.append(SlotSet("sensor_name", has_sensor_name))
+            events.append(SlotSet("location", None))
         return events
-
-# Sensor name
-
-class ActionAskForSensorNameSlot(Action):
-    def name(self) -> Text:
-        return "action_ask_sensor_name"
-
-    def run(
-        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
-    ) -> List[EventType]:
-        if tracker.get_slot('flag_should_ask_sensor_name'):
-            dispatcher.utter_message(text="Enter the sensor name:")
-        return []
-
-class ValidateSensorNameForm(FormValidationAction):
-    def name(self) -> Text:
-        return "validate_form_sensor_name"
-
-    # Override
-    async def get_validation_events(
-        self,
-        dispatcher: "CollectingDispatcher",
-        tracker: "Tracker",
-        domain: "DomainDict",
-    ) -> List[EventType]:
-        slots_to_validate = await self.required_slots(
-            self.domain_slots(domain), dispatcher, tracker, domain
-        )
-        slots: Dict[Text, Any] = tracker.slots_to_validate()
-
-        events = []
-
-        for slot_name, slot_value in list(slots.items()):
-            if slot_name not in slots_to_validate:
-                slots.pop(slot_name)
-                continue
-
-            method_name = f"validate_{slot_name.replace('-','_')}"
-            validate_method = getattr(self, method_name, None)
-
-            if not validate_method:
-                LOGGER.warning(
-                    f"Skipping validation for `{slot_name}`: there is no validation "
-                    f"method specified."
-                )
-                continue
-
-            validation_output = await ra_utils.call_potential_coroutine(
-                validate_method(slot_value, dispatcher, tracker, domain)
-            )
-
-            if isinstance(validation_output, dict):
-                if validation_output.get('event'):
-                    events.append(validation_output)
-                    tracker.events.append(validation_output)
-                else:
-                    slots.update(validation_output)
-                    # for sequential consistency, also update tracker
-                    # to make changes visible to subsequent validate_{slot_name}
-                    tracker.slots.update(validation_output)
-            elif isinstance(validation_output, list):
-                events.extend(validation_output)
-                tracker.events.extend(validation_output)
-        events.extend([SlotSet(*s) for s in slots.items()])
-        return events
-
-
-    # Slot validation
-
-    async def validate_sensor_name(
-        self,
-        slot_value: Any,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> EventType:
-        if not tracker.active_loop.get('name'):
-            return {"flag_should_ask_sensor_name": True}
-
-        if slot_value == 'exit':
-            return [ra_ev.ActiveLoop(None), ra_ev.UserUtteranceReverted()]
-
-        def loc_at_str(s):
-            if s:
-                return ' at ' + s
-            return ''
-
-        try:
-            search_sensors = await search_best_matching_sensors(tracker, {
-                'sensor_name': slot_value
-            })
-            if search_sensors is None:
-                search_sensors = []
-        except (HTTPStatusError, ClientException):
-            search_sensors = []
-
-        if len(search_sensors) == 0:
-            # No matches
-            dispatcher.utter_message(text="Sensor named '%s' not found." % slot_value)
-            return {"sensor_name": None, "flag_should_ask_sensor_name": True}
-        elif len(search_sensors) == 1:
-            # Match found
-            loader_params = tracker.slots.get('sensor_load_params') or {}
-            loader_params.update({
-                "sensor_id": search_sensors[0]['sensor_id']
-            })
-            return {
-                "sensor_name": slot_value,
-                "sensor_load_params": loader_params,
-                "flag_should_ask_sensor_name": True
-            }
-        else:
-            # More than 1
-            dispatcher.utter_message(text="Select a sensor from matches:", buttons=[
-                {
-                    "title": "%s%s" % (
-                        integration_genesis.sensor_name_coalesce(sensor_obj),
-                        loc_at_str(integration_genesis.location_name_coalesce(sensor_obj.get('sensor_location')))
-                    ),
-                    "payload": sensor_obj["sensor_urn"]
-                }
-                for sensor_obj in search_sensors[:5]
-            ])
-
-            return {"sensor_name": None, "flag_should_ask_sensor_name": False}
-
-
-class ActionAskForSensorTypeSlot(Action):
-    def name(self) -> str:
-        return "action_ask_metric"
-
-    def run(
-        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
-    ) -> List[EventType]:
-        if tracker.get_slot('flag_should_ask_sensor_name'):
-            dispatcher.utter_message(text="Enter the sensor type:")
-        return []
-
-async def get_loc_list(tracker: Tracker) -> List[LocationMetadata]:
-    with FulfillmentContext(tracker):
-        return await integration_genesis.query_location_list()
-
-class ActionAskForSensorLocationSlot(Action):
-    def name(self) -> str:
-        return "action_ask_location"
-
-    async def run(
-        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
-    ) -> List[EventType]:
-        if tracker.get_slot('flag_should_ask_sensor_location'):
-            locs = await get_loc_list(tracker)
-            dispatcher.utter_message(text="Enter the sensor's location:", buttons=[
-                {
-                    "title": integration_genesis.location_name_coalesce(k),
-                    "payload": k["unit_urn"]
-                }
-                for k in locs])
-        return []

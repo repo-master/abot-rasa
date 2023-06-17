@@ -115,7 +115,6 @@ forms:
     required_slots:
     - metric
     - location
-    - data_time_range
 
 actions:
 - action_sensor_data_load
