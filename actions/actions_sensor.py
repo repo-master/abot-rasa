@@ -89,7 +89,7 @@ def locations_containing_sensor_type(tracker: Tracker, locs: List[LocationMetada
         with FulfillmentContext(tracker) as f_id:
             for s in all_sensor_list[f_id]:
                 if fuzzy_compare(s['sensor_type'], s_type):
-                    if s['sensor_location']['id'] == loc['unit_id']:
+                    if s['sensor_location']['unit_id'] == loc['unit_id']:
                         return True
     return list(filter(_filter_loc, locs))
 
@@ -103,13 +103,13 @@ async def search_best_matching_sensors(tracker: Tracker, parsed_input: dict) -> 
                 all_sensor_list[f_id] = await integration_genesis.query_sensor_list()
             return merge_sensor_match_results(
                 process.extractBests(
-                    parsed_input.get('sensor_name', ''),
+                    parsed_input.get('sensor_name') or '',
                     all_sensor_list[f_id],
                     processor=sensor_data_condenser,
                     score_cutoff=score_cutoff),
                 process.extractBests(
-                    '\n'.join([parsed_input.get('sensor_type', ''),
-                              parsed_input.get('sensor_location', '')]),
+                    '\n'.join([parsed_input.get('sensor_type') or '',
+                              parsed_input.get('sensor_location') or '']),
                     all_sensor_list[f_id],
                     processor=sensor_data_condenser,
                     score_cutoff=score_cutoff)
@@ -168,11 +168,11 @@ class ActionSensorDataLoad(Action):
                 "to": to_datetime(timerange_str['to'])
             }
 
-        # dispatcher.utter_message(text="Loading sensor %s at time range %s to %s..." % (
-        #     integration_genesis.sensor_name_coalesce(requested_sensor),
-        #     parsed_input['timeperiod']['from'].strftime('%c'),
-        #     parsed_input['timeperiod']['to'].strftime('%c')
-        # ))
+        dispatcher.utter_message(text="Loading sensor %s at time range %s to %s..." % (
+            integration_genesis.sensor_name_coalesce(requested_sensor),
+            timeperiod['from'].strftime('%c'),
+            timeperiod['to'].strftime('%c')
+        ))
 
         events.append(SlotSet("need_select_sensor", False))
 
@@ -427,12 +427,15 @@ class ActionSensorLoadSlotSetup(Action):
             if entity['entity'] == 'location': has_location = entity['value']
             if entity['entity'] == 'sensor_name_input': has_sensor_name = entity['value']
 
+        events.append(SlotSet("flag_require_new_sensor_input", True))
+
         if has_metric_type:
             events.append(SlotSet("metric", has_metric_type))
-            events.append(SlotSet("location", None))
+            events.append(SlotSet("location", None)) # Force ask location
         if has_location:
             events.append(SlotSet("location", has_location))
-        if has_sensor_name:
-            events.append(SlotSet("sensor_name", has_sensor_name))
-            events.append(SlotSet("location", None))
+            if has_metric_type:
+                events.append(SlotSet("metric", has_metric_type))
+
+        events.append(SlotSet("sensor_name", has_sensor_name))
         return events

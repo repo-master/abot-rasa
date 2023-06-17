@@ -111,6 +111,12 @@ slots:
     mappings:
     - type: custom
 
+  flag_require_new_sensor_input:
+    type: bool
+    initial_value: false
+    mappings:
+    - type: custom
+
 forms:
   form_sensor_name:
     required_slots:

@@ -133,7 +133,8 @@ class ValidateSensorNameForm(FormValidationAction):
             return {
                 "sensor_name": slot_value,
                 "sensor_load_params": loader_params,
-                "flag_should_ask_sensor_name": True
+                "flag_should_ask_sensor_name": True,
+                "flag_require_new_sensor_input": False
             }
         else:
             # More than 1

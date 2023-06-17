@@ -47,6 +47,9 @@ slots:
     mappings:
     - type: from_entity
       entity: number
+      intent:
+        - intent_perform_aggregation_quantile
+        - change_aggregation_param
       # TODO: Add role (and in NLU)
     - type: from_text
       conditions:
@@ -59,6 +62,9 @@ slots:
     - type: from_entity
       entity: number
       role: lower
+      intent:
+        - intent_perform_aggregation_compliance
+        - change_aggregation_param
     - type: from_text
       conditions:
       - active_loop: form_aggregation_compliance
@@ -69,6 +75,9 @@ slots:
     - type: from_entity
       entity: number
       role: upper
+      intent:
+        - intent_perform_aggregation_compliance
+        - change_aggregation_param
     - type: from_text
       conditions:
       - active_loop: form_aggregation_compliance

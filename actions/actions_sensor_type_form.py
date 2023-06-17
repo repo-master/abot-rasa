@@ -89,6 +89,9 @@ class ValidateSensorTypeForm(FormValidationAction):
         if slot_value == 'exit':
             return [ra_ev.ActiveLoop(None), ra_ev.UserUtteranceReverted(), ra_ev.SlotSet("flag_should_ask_sensor_location", True)]
 
+        if not tracker.slots.get('flag_require_new_sensor_input', False):
+            return []
+
         if slot_value[:1] == '$':
             sensor_id: int = int(slot_value.split('$',1)[-1])
 
@@ -159,6 +162,9 @@ class ValidateSensorTypeForm(FormValidationAction):
         if slot_value == 'exit':
             return [ra_ev.ActiveLoop(None), ra_ev.UserUtteranceReverted(), ra_ev.SlotSet("flag_should_ask_sensor_name", True)]
 
+        if not tracker.slots.get('flag_require_new_sensor_input', False):
+            return []
+
         if slot_value[:1] == '$':
             sensor_id: int = int(slot_value.split('$',1)[-1])
 
@@ -174,11 +180,6 @@ class ValidateSensorTypeForm(FormValidationAction):
                     ra_ev.SlotSet("flag_should_ask_sensor_name", True),
                     ra_ev.SlotSet("sensor_load_params", params)
                 ]
-
-        def loc_at_str(s):
-            if s:
-                return ' at ' + s
-            return ''
 
         try:
             search_sensors = await search_best_matching_sensors(tracker, {
@@ -197,10 +198,11 @@ class ValidateSensorTypeForm(FormValidationAction):
             # Match found
             return {
                 "metric": slot_value,
-                "flag_should_ask_sensor_name": True
+                "flag_should_ask_sensor_name": True,
+                "flag_require_new_sensor_input": False
             }
         else:
-            # Multiple matches
+            # Multiple matches. Force ask location
             return {
                 "metric": slot_value,
                 "location": None,
