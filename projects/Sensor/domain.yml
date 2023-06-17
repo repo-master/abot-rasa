@@ -2,7 +2,6 @@ version: '3.1'
 
 intents:
 - query_metric_aggregate
-- change_source
 # - summarize_sensor_data:
 #     use_entities:
 #     - metric_type
@@ -30,7 +29,6 @@ slots:
       entity: metric_type
       intent:
       - query_metric_aggregate
-      - change_source
     - type: from_text
       conditions:
       - active_loop: form_sensor_type_location
@@ -42,7 +40,6 @@ slots:
       entity: location
       intent:
       - query_metric_aggregate
-      - change_source
     - type: from_text
       conditions:
       - active_loop: form_sensor_type_location
@@ -65,7 +62,6 @@ slots:
       entity: duration
       intent:
       - query_metric_aggregate
-      - change_source
   need_select_sensor:
     type: bool
     initial_value: false
