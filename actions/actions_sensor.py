@@ -157,9 +157,11 @@ class ActionSensorDataLoad(Action):
             requested_sensor_params['sensor_name'] = tracker.slots.get('sensor_name')
             requested_sensor_params['sensor_type'] = tracker.slots.get('metric')
             requested_sensor_params['sensor_location'] = tracker.slots.get('location')
-            requested_sensor_params['sensor_id'] = search_best_matching_sensors(tracker, requested_sensor_params)
-            if requested_sensor_params.get('sensor_id') is None:
+            
+            r = await search_best_matching_sensors(tracker, requested_sensor_params)
+            if len(r) == 0:
                 raise ClientException("No sensor selected.")
+            requested_sensor = r[0]
 
         sid_search: int = int(requested_sensor_params.get('sensor_id'))
 

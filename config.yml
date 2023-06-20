@@ -42,6 +42,8 @@ pipeline:
   - name: DIETClassifier
     epochs: 200
     constrain_similarities: true
+    use_masked_language_model: true
+    transformers_layers: 4
 
   - name: abot.extractor.duckling.DucklingEntityExtractor
     # dimensions to extract
